@@ -6,16 +6,19 @@ import Home from "./Home";
 import axios from 'axios';
 import {Link} from "react-router-dom";
 import Bar from "./Bar";
+import red from "@material-ui/core/colors/red";
 
 class Register extends Component {
+    password = '';
+    passwordRepeat = '';
+    passwordMatch = true;
     constructor(props){
         super(props);
         this.state={
             username:'',
             password:'',
             firstName:'',
-            lastName:'',
-
+            lastName:''
         }
     }
     render() {
@@ -46,9 +49,29 @@ class Register extends Component {
                                    type="password"
                                    hintText="Enter your Password"
                                    floatingLabelText="Password"
-                                   onChange = {(event,newValue) => this.setState({password:newValue})}
+                                   onChange = {(event,newValue) => {
+                                       this.password = newValue;
+                                       this.setState({password:newValue})
+                                       if(this.password===this.passwordRepeat){
+                                           this.passwordMatch = true;
+                                       }else{this.passwordMatch = false;}
+                                   }}
                         />
                         <br/>
+                        <TextField style={style}
+                                   type="password"
+                                   hintText="repeat your Password"
+                                   floatingLabelText="repeat password"
+                                   onChange = {(event,newValue)=>{
+                                       this.passwordRepeat = newValue;
+                                      this.setState({password:newValue});
+                                      if(this.password===this.passwordRepeat){
+                                          this.passwordMatch = true;
+                                      }else{this.passwordMatch = false;}
+                                   }}
+                        />
+                        <br/>
+                        <PasswordMatchNotification isLoggedIn={this.passwordMatch}/>
                         <RaisedButton label="Submit" primary={true} style={style} onClick={(event) => this.handleClick(event)}/>
                         <br/>
                         already registered? login
@@ -60,6 +83,7 @@ class Register extends Component {
             </div>
         );
     }
+
     handleClick(event){
         var apiBaseUrl = "http://localhost:4000/api/";
         var self = this;
@@ -69,31 +93,47 @@ class Register extends Component {
             "firstname":this.state.firstName,
             "lastname":this.state.lastName,
         }
-        axios.post(apiBaseUrl+'login', payload)
-            .then(function (response) {
-                console.log(response);
-                if(response.data.code === 200){
-                    console.log("Register successfull");
-                    var uploadScreen=[];
-                    uploadScreen.push(<Home appContext={self.props.appContext}/>)
-                    self.props.appContext.setState({loginPage:[],uploadScreen:uploadScreen})
-                }
-                else if(response.data.code === 204){
-                    console.log("Username password do not match");
-                    alert("username password do not match")
-                }
-                else{
-                    console.log("Username does not exists");
-                    alert("Username does not exist");
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+        if(this.passwordMatch){
+            axios.post(apiBaseUrl+'login', payload)
+                .then(function (response) {
+                    console.log(response);
+                    if(response.data.code === 200){
+                        console.log("Register successfull");
+                        var uploadScreen=[];
+                        uploadScreen.push(<Home appContext={self.props.appContext}/>)
+                        self.props.appContext.setState({loginPage:[],uploadScreen:uploadScreen})
+                    }
+                    else if(response.data.code === 204){
+                        console.log("Username password do not match");
+                        alert("username password do not match")
+                    }
+                    else{
+                        console.log("Username does not exists");
+                        alert("Username does not exist");
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
     }
 
 }
+
+function PasswordMatchNotification(props) {
+    const isLoggedIn = props.isLoggedIn;
+    if (isLoggedIn) {
+        return (<div> </div>);
+    }
+    return (<div><p style={passwordmatchnotification}>passwords don't match</p></div>
+    );
+}
+
 const style = {
-    margin: 15,
+    margin: 5,
 };
+const passwordmatchnotification = {
+    fontsize:160,
+    color:red
+}
 export default Register;
