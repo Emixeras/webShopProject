@@ -26,7 +26,7 @@ class Register extends Component {
             <div>
                 <MuiThemeProvider>
                     <div>
-                        <Bar title={this.constructor.name}></Bar>
+                        <Bar title={this.constructor.name}/>
                         <TextField style={style}
                                    hintText="First Name"
                                    floatingLabelText="First Name"
@@ -52,9 +52,7 @@ class Register extends Component {
                                    onChange = {(event,newValue) => {
                                        this.password = newValue;
                                        this.setState({password:newValue})
-                                       if(this.password===this.passwordRepeat){
-                                           this.passwordMatch = true;
-                                       }else{this.passwordMatch = false;}
+                                       this.passwordMatch = this.password === this.passwordRepeat;
                                    }}
                         />
                         <br/>
@@ -65,9 +63,7 @@ class Register extends Component {
                                    onChange = {(event,newValue)=>{
                                        this.passwordRepeat = newValue;
                                       this.setState({password:newValue});
-                                      if(this.password===this.passwordRepeat){
-                                          this.passwordMatch = true;
-                                      }else{this.passwordMatch = false;}
+                                      this.passwordMatch = this.password === this.passwordRepeat;
                                    }}
                         />
                         <br/>
