@@ -2,14 +2,15 @@ import React from 'react'
 import {RaisedButton} from "material-ui";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import {Link} from "react-router-dom";
-import Bar from "./Bar";
+import MenuDrawer from "./MenuDrawer";
+
 
 class Home extends React.Component {
     render() {
         return (
             <div>
                 <MuiThemeProvider>
-                    <Bar title={this.constructor.name}></Bar>
+                    <MenuDrawer>title={this.constructor.name}</MenuDrawer>
                     <Link to="/login" >
                         <RaisedButton label="login" primary={true} style={style}/>
                     </Link>
