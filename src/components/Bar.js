@@ -12,8 +12,7 @@ render() {
     return <div>
         <AppBar style={{ background: '#2E3B55' }}
                 title={title}
-                position="static"
-        >
+                position="static">
             <Link to="/">
                 <IconButton style={{margin: 5, color: "white"}} component="span">
                     <HomeIcon />

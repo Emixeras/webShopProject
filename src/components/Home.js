@@ -4,22 +4,31 @@ import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import {Link} from "react-router-dom";
 import Bar from "./Bar";
 
+
 class Home extends React.Component {
     render() {
-        return (
+        if(localStorage.getItem('myUser')!== undefined){
+            console.log('logged in');
+            return (
             <div>
                 <MuiThemeProvider>
-                    <Bar title={this.constructor.name}></Bar>
+                    <Bar title={this.constructor.name}/>
                     <Link to="/login" >
                         <RaisedButton label="login" primary={true} style={style}/>
                     </Link>
                     <Link to="/register">
                         <RaisedButton label="register" primary={true} style={style}/>
                     </Link>
+                    <Link to="/profile" >
+                        <RaisedButton label="profile" primary={true} style={style}/>
+                    </Link>
                 </MuiThemeProvider>
             </div>
 
-        )
+        )}else{
+            return <div>pls log in</div>
+        }
+
     }
 }
 const style = {
