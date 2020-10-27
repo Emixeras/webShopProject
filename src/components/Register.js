@@ -2,11 +2,11 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import React, { Component }  from 'react';
-import Home from "./Home";
 import axios from 'axios';
 import {Link} from "react-router-dom";
 import Bar from "./Bar";
 import red from "@material-ui/core/colors/red";
+import Profile from "./Profile";
 
 class Register extends Component {
     password = '';
@@ -15,6 +15,7 @@ class Register extends Component {
     constructor(props){
         super(props);
         this.state={
+            email:'',
             username:'',
             password:'',
             firstName:'',
@@ -22,7 +23,8 @@ class Register extends Component {
         }
     }
     render() {
-        return (
+        if(localStorage.getItem('isLoggedIn')!=='1'){
+            return (
             <div>
                 <MuiThemeProvider>
                     <div>
@@ -46,6 +48,12 @@ class Register extends Component {
                         />
                         <br/>
                         <TextField style={style}
+                                   hintText="Enter your Email"
+                                   floatingLabelText="Email"
+                                   onChange = {(event,newValue) => this.setState({email:newValue})}
+                        />
+                        <br/>
+                        <TextField style={style}
                                    type="password"
                                    hintText="Enter your Password"
                                    floatingLabelText="Password"
@@ -62,8 +70,8 @@ class Register extends Component {
                                    floatingLabelText="repeat password"
                                    onChange = {(event,newValue)=>{
                                        this.passwordRepeat = newValue;
-                                      this.setState({password:newValue});
-                                      this.passwordMatch = this.password === this.passwordRepeat;
+                                       this.setState({password:newValue});
+                                       this.passwordMatch = this.password === this.passwordRepeat;
                                    }}
                         />
                         <br/>
@@ -78,34 +86,38 @@ class Register extends Component {
                 </MuiThemeProvider>
             </div>
         );
+        }else{
+            return(
+                <Profile/>
+            );
+        }
     }
 
-    handleClick(event){
-        var apiBaseUrl = "http://localhost:4000/api/";
-        var self = this;
+    handleClick(){
+        var apiBaseUrl = "http://localhost:8080/user";
+        const { history } = this.props;
+
         var payload={
-            "email":this.state.username,
+            //"email":this.state.email,
+            "username":this.state.username,
             "password":this.state.password,
             "firstname":this.state.firstName,
             "lastname":this.state.lastName,
         }
+
         if(this.passwordMatch){
-            axios.post(apiBaseUrl+'login', payload)
+            axios.post(apiBaseUrl, payload)
                 .then(function (response) {
                     console.log(response);
-                    if(response.data.code === 200){
+                    if(response.status === 200){
                         console.log("Register successfull");
-                        var uploadScreen=[];
-                        uploadScreen.push(<Home appContext={self.props.appContext}/>)
-                        self.props.appContext.setState({loginPage:[],uploadScreen:uploadScreen})
-                    }
-                    else if(response.data.code === 204){
-                        console.log("Username password do not match");
-                        alert("username password do not match")
+                        console.log(response.data);
+                        localStorage.setItem('User', JSON.stringify(response.data));
+                        localStorage.setItem('isLoggedIn', '1');
+                        history.push("/");
                     }
                     else{
-                        console.log("Username does not exists");
-                        alert("Username does not exist");
+                        console.log("register failed");
                     }
                 })
                 .catch(function (error) {
