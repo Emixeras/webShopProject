@@ -5,14 +5,19 @@ import HomeIcon from '@material-ui/icons/Home';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import {Link} from "react-router-dom";
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import logo from '../assets/text4549.png';
+import index from '../index.css'
 
 class Bar extends React.Component{
 render() {
     const title = this.props.title;
     return <div>
         <AppBar style={{ background: '#2E3B55' }}
-                title={title}
+                //title={title}
                 position="static">
+            <div style={{ alignSelf: 'center', flex: 3}}>
+                <img style={{ alignSelf: 'center' }} height="50" src={logo} alt="fireSpot"/>
+            </div>
             <Link to="/">
                 <IconButton style={{margin: 5, color: "white"}} component="span">
                     <HomeIcon />

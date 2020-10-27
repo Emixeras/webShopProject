@@ -17,7 +17,7 @@ class Login extends Component {
         }
     }
     render() {
-        if(localStorage.getItem('isLoggedIn')!='1'){
+        if(localStorage.getItem('isLoggedIn')!=='1'){
             return (
                 <div>
                     <MuiThemeProvider>
