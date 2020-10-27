@@ -55,7 +55,7 @@ class Login extends Component {
     }
 
     handleClick(){
-        var apiBaseUrl = "http://localhost:8080/api/user/login";
+        var apiBaseUrl = "http://localhost:8080/user";
         const { history } = this.props;
 
         axios.get(apiBaseUrl, {
@@ -70,11 +70,7 @@ class Login extends Component {
                     console.log("Login successfull");
                     console.log(response.data.password);
                     localStorage.setItem('isLoggedIn', '1');
-                    localStorage.setItem('UserPass', response.data.password);
-                    localStorage.setItem('UserName', response.data.username);
-                    localStorage.setItem('UserAdresses', response.data.addresses);
-                    localStorage.setItem('UserRole', response.data.role);
-                    localStorage.setItem('UserId', response.data.id);
+                    localStorage.setItem('User',JSON.stringify(response.data));
                     history.push("/");
                 }
                 else if(response.status === 204){
