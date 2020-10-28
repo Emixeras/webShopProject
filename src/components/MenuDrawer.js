@@ -105,7 +105,7 @@ function ListItemLink(props) {
 }
 
 
-export default function MenuDrawer(title) {
+export default function MenuDrawer() {
     const classes = useStyles();
     const theme = useTheme();
     const [open, setOpen] = React.useState(true);
@@ -120,6 +120,8 @@ export default function MenuDrawer(title) {
 
 
     return (
+
+
         <div>
             <AppBar
                 position="fixed"
