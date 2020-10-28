@@ -2,7 +2,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
 import React, { Component }  from 'react';
 import {Link} from "react-router-dom";
-import Bar from "./Bar";
+import MenuDrawer from "./MenuDrawer";
 import axios from "axios";
 
 
@@ -49,7 +49,7 @@ class Profile extends Component {
                 <div>
                     <MuiThemeProvider>
                         <div>
-                            <Bar title={this.constructor.name}/>
+                            <MenuDrawer/>
                             you're logged in
                             <br/>
                             <br/>
@@ -70,7 +70,7 @@ class Profile extends Component {
                 <div>
                     <MuiThemeProvider>
                         <div>
-                            <Bar title={this.constructor.name}/>
+                            <MenuDrawer/>
                             pls log in
                             <Link to="/login" >
                             <RaisedButton label="here" primary={true} style={style}/>

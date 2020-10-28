@@ -1,13 +1,13 @@
 import React from "react";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
-import Bar from "./Bar";
+import MenuDrawer from "./MenuDrawer";
 
 class ShoppingCart extends React.Component {
     render(){
         return (
             <div>
                 <MuiThemeProvider>
-                    <Bar title={this.constructor.name}></Bar>
+                    <MenuDrawer/>
                     <br/>
                     sign in or register
                 </MuiThemeProvider>

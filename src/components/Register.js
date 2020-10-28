@@ -4,9 +4,9 @@ import TextField from 'material-ui/TextField';
 import React, { Component }  from 'react';
 import axios from 'axios';
 import {Link} from "react-router-dom";
-import Bar from "./Bar";
 import red from "@material-ui/core/colors/red";
 import Profile from "./Profile";
+import MenuDrawer from "./MenuDrawer";
 
 class Register extends Component {
     password = '';
@@ -28,7 +28,7 @@ class Register extends Component {
             <div>
                 <MuiThemeProvider>
                     <div>
-                        <Bar title={this.constructor.name}/>
+                        <MenuDrawer/>
                         <TextField style={style}
                                    hintText="First Name"
                                    floatingLabelText="First Name"

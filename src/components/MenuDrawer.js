@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import {makeStyles, useTheme} from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
@@ -15,15 +15,15 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 import {Link} from "react-router-dom";
 import HomeIcon from "@material-ui/icons/Home";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import {Title} from "@material-ui/icons";
 import DescriptionIcon from '@material-ui/icons/Description';
-
+import logo from "../assets/text4549.png";
+import AlbumIcon from '@material-ui/icons/Album';
+import LibraryMusicIcon from '@material-ui/icons/LibraryMusic';
+import RadioIcon from '@material-ui/icons/Radio';
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -84,7 +84,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function ListItemLink(props) {
-    const { icon, primary, to } = props;
+    const {icon, primary, to} = props;
 
     const renderLink = React.useMemo(
         () =>
@@ -98,7 +98,7 @@ function ListItemLink(props) {
         <li>
             <ListItem button component={renderLink}>
                 {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
-                <ListItemText primary={primary} />
+                <ListItemText primary={primary}/>
             </ListItem>
         </li>
     );
@@ -121,13 +121,15 @@ export default function MenuDrawer(title) {
 
     return (
         <div>
+
             <AppBar
                 position="fixed"
-                style={{ background: '#2E3B55' }}
+                style={{background: '#2E3B55'}}
                 className={clsx(classes.appBar, {
                     [classes.appBarShift]: open,
                 })}
             >
+
                 <Toolbar
                 >
                     <IconButton
@@ -135,25 +137,26 @@ export default function MenuDrawer(title) {
                         aria-label="open drawer"
                         onClick={handleDrawerOpen}
                         edge="start"
+                        style={{alignSelf: 'center'}}
                         className={clsx(classes.menuButton, open && classes.hide)}
                     >
-                        <MenuIcon />
+                        <MenuIcon/>
                     </IconButton>
-                    <Typography variant="h6" >
-                        Studiotranics
-                    </Typography>
+                    <div style={{alignSelf: 'center', flex: 3}}>
+                        <img style={{alignSelf: 'center'}} height="50" src={logo} alt="fireSpot"/>
+                    </div>
                     <Link to="/">
-                        <IconButton style={{margin: 5, color: "white"}} component="span">
-                            <HomeIcon />
+                        <IconButton style={{margin: 5, color: "white"}} component="span" edge ="start">
+                            <HomeIcon/>
                         </IconButton>
                     </Link>
                     <Link to="/shoppingcart">
                         <IconButton style={{margin: 5, color: "white"}} component="span">
-                            <ShoppingCartIcon />
+                            <ShoppingCartIcon/>
                         </IconButton>
                     </Link><Link to="/login">
                     <IconButton style={{margin: 5, color: "white"}} component="span">
-                        <AccountCircleIcon />
+                        <AccountCircleIcon/>
                     </IconButton>
                 </Link>
                 </Toolbar>
@@ -169,28 +172,44 @@ export default function MenuDrawer(title) {
             >
                 <div className={classes.drawerHeader}>
                     <IconButton onClick={handleDrawerClose}>
-                        {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+                        {theme.direction === 'ltr' ? <ChevronLeftIcon/> : <ChevronRightIcon/>}
                     </IconButton>
                 </div>
-                <Divider />
-
+                <Divider/>
                 <List>
                     <ListItemLink
-                        to="/User"
-                        primary="Benutzer"
-                        icon={<AccountCircleIcon />}
+                        to="/artists"
+                        primary="Künstler"
+                        icon={<LibraryMusicIcon/>}
                     />
-
+                    <ListItemLink
+                        to="/albums"
+                        primary="Alben"
+                        icon={<AlbumIcon/>}
+                    />
+                    <ListItemLink
+                        to="/genres"
+                        primary="Genre"
+                        icon={<RadioIcon/>}
+                    />
                 </List>
-
-                <Divider />
+                <Divider/>
                 <List>
+                    <ListItemLink
+                        to="/shoppingcart"
+                        primary="Warenkorb"
+                        icon={<ShoppingCartIcon/>}
+                    />
+                    <ListItemLink
+                        to="/profile"
+                        primary="Benutzer"
+                        icon={<AccountCircleIcon/>}
+                    />
                     <ListItemLink
                         to="/Impressum"
                         primary="Impressum"
-                        icon={<DescriptionIcon />}
+                        icon={<DescriptionIcon/>}
                     />
-
                 </List>
             </Drawer>
             <main
@@ -198,7 +217,7 @@ export default function MenuDrawer(title) {
                     [classes.contentShift]: open,
                 })}
             >
-                <div className={classes.drawerHeader} />
+                <div className={classes.drawerHeader}/>
                 <Typography paragraph>
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
                     ut labore et dolore magna aliqua. Rhoncus dolor purus non enim praesent elementum
