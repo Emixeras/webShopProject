@@ -72,14 +72,14 @@ const useStyles = makeStyles((theme) => ({
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
-        marginLeft: -drawerWidth,
+        marginLeft: 0,
     },
     contentShift: {
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.easeOut,
             duration: theme.transitions.duration.enteringScreen,
         }),
-        marginLeft: 0,
+        marginLeft: drawerWidth,
     },
 }));
 
@@ -216,8 +216,7 @@ export default function MenuDrawer(title) {
                 })}
             >
                 <div className={classes.drawerHeader}/>
-                <Typography paragraph>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                <Typography paragraph>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
                     ut labore et dolore magna aliqua. Rhoncus dolor purus non enim praesent elementum
                     facilisis leo vel. Risus at ultrices mi tempus imperdiet. Semper risus in hendrerit
                     gravida rutrum quisque non tellus. Convallis convallis tellus id interdum velit laoreet id
