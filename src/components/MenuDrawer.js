@@ -140,7 +140,7 @@ export default function MenuDrawer(title) {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" >
-                        Titel
+                        Studiotranics
                     </Typography>
                     <Link to="/">
                         <IconButton style={{margin: 5, color: "white"}} component="span">
