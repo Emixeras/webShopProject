@@ -121,7 +121,6 @@ export default function MenuDrawer(title) {
 
     return (
         <div>
-
             <AppBar
                 position="fixed"
                 style={{background: '#2E3B55'}}
@@ -129,7 +128,6 @@ export default function MenuDrawer(title) {
                     [classes.appBarShift]: open,
                 })}
             >
-
                 <Toolbar
                 >
                     <IconButton
@@ -146,7 +144,7 @@ export default function MenuDrawer(title) {
                         <img style={{alignSelf: 'center'}} height="50" src={logo} alt="fireSpot"/>
                     </div>
                     <Link to="/">
-                        <IconButton style={{margin: 5, color: "white"}} component="span" edge ="start">
+                        <IconButton style={{margin: 5, color: "white"}} component="span" edge="start">
                             <HomeIcon/>
                         </IconButton>
                     </Link>
