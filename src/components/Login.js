@@ -37,7 +37,7 @@ class Login extends Component {
                                        onChange = {(event,newValue) => this.setState({password:newValue})}
                             />
                             <br/>
-                            <RaisedButton label="Submit" primary={true} style={style} onClick={(event) => this.handleClick(event)}/>
+                            <RaisedButton label="Submit" primary={true} style={style} onClick={() => this.handleClick()}/>
                             <br/>
                             or register
                             <Link to="/register" >
@@ -69,7 +69,6 @@ class Login extends Component {
                 console.log(response);
                 if(response.status === 200){
                     console.log("Login successfull");
-                    console.log(response.data.password);
                     localStorage.setItem('isLoggedIn', '1');
                     localStorage.setItem('User',JSON.stringify(response.data));
                     history.push("/");

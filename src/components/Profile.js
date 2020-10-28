@@ -25,7 +25,7 @@ class Profile extends Component {
         const { history } = this.props;
         var apiBaseUrl = "http://localhost:8080/user/";
 
-        axios.delete(apiBaseUrl+this.user.username, {
+        axios.delete(apiBaseUrl + this.user.username, {
             auth: {
                 username: this.user.username,
                 password: this.user.password
@@ -43,7 +43,7 @@ class Profile extends Component {
 
     }
     render() {
-        if (localStorage.getItem('isLoggedIn') == '1') {
+        if (localStorage.getItem('isLoggedIn') === '1') {
             var user = JSON.parse(localStorage.getItem('User'));
             return (
                 <div>
