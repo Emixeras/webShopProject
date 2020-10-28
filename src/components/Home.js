@@ -3,6 +3,7 @@ import {RaisedButton} from "material-ui";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
+import {Typography} from "@material-ui/core";
 
 
 class Home extends React.Component {
@@ -13,6 +14,7 @@ class Home extends React.Component {
             <div>
                 <MuiThemeProvider>
                     <MenuDrawer/>
+                    <Typography variant = "h3" align="center">Herzlich Willkommen im Studiotranics Shop :-)</Typography>
                     <Link to="/login" >
                         <RaisedButton label="login" primary={true} style={style}/>
                     </Link>
