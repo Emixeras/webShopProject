@@ -3,48 +3,34 @@ import RaisedButton from 'material-ui/RaisedButton';
 import React, { Component }  from 'react';
 import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
-import axios from "axios";
+import {getSessionUser} from "../services/StorageUtil";
+import {deleteUser, logoutUser} from "../services/ApiUtil";
 
 
 
 class Profile extends Component {
     constructor(props){
         super(props);
-        this.user = JSON.parse(localStorage.getItem('User'))
+        this.user = getSessionUser();
         this.state={
         }
     }
     onSignOutClick(){
         const { history } = this.props;
         console.log('you have been logged out');
-        localStorage.clear();
+        logoutUser();
         history.push("/login");
     }
 
     onDeleteUserClick(){
         const { history } = this.props;
-        var apiBaseUrl = "http://localhost:8080/user/";
-
-        axios.delete(apiBaseUrl + this.user.username, {
-            auth: {
-                username: this.user.username,
-                password: this.user.password
-            }
-        })
-            .then(function (response) {
-                if(response.status === 200){
-                    console.log("user delete successful");
-                    localStorage.clear();
-                    history.push("/");
-                }else(
-                    alert('delete failed')
-                )
-    })
-
+        deleteUser();
+        history.push("/");
     }
+
     render() {
         if (localStorage.getItem('isLoggedIn') === '1') {
-            var user = JSON.parse(localStorage.getItem('User'));
+            var user = getSessionUser();
             return (
                 <div>
                     <MuiThemeProvider>
@@ -58,7 +44,7 @@ class Profile extends Component {
                             pass: {user.password}<br/>
                             address: {user.addresses}<br/>
                             id: {user.id}<br/>
-                            user_json: {localStorage.getItem('User')}<br/>
+                            user_json: {JSON.stringify(user)}<br/>
                             <RaisedButton onClick={() => this.onSignOutClick()} label="log out" primary={true} style={style}/>
                             <RaisedButton onClick={() => this.onDeleteUserClick()} label="delete user" primary={true} style={style}/>
                         </div>

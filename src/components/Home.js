@@ -4,12 +4,12 @@ import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
 import {Typography} from "@material-ui/core";
+import {isUserLoggedIn} from "../services/StorageUtil";
 
 
 class Home extends React.Component {
     render() {
-        if(localStorage.getItem('myUser')!== undefined){
-            console.log('logged in');
+        if(isUserLoggedIn() !== undefined){
             return (
             <div>
                 <MuiThemeProvider>
