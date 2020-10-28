@@ -22,6 +22,8 @@ import HomeIcon from "@material-ui/icons/Home";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import {Title} from "@material-ui/icons";
+import DescriptionIcon from '@material-ui/icons/Description';
+
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -81,10 +83,32 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+function ListItemLink(props) {
+    const { icon, primary, to } = props;
+
+    const renderLink = React.useMemo(
+        () =>
+            React.forwardRef((itemProps, ref) => (
+                <Link to={to} ref={ref} {...itemProps} />
+            )),
+        [to]
+    );
+
+    return (
+        <li>
+            <ListItem button component={renderLink}>
+                {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
+                <ListItemText primary={primary} />
+            </ListItem>
+        </li>
+    );
+}
+
+
 export default function MenuDrawer(title) {
     const classes = useStyles();
     const theme = useTheme();
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = React.useState(true);
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -97,7 +121,6 @@ export default function MenuDrawer(title) {
 
     return (
         <div>
-
             <AppBar
                 position="fixed"
                 style={{ background: '#2E3B55' }}
@@ -106,7 +129,6 @@ export default function MenuDrawer(title) {
                 })}
             >
                 <Toolbar
-
                 >
                     <IconButton
                         color="inherit"
@@ -118,7 +140,7 @@ export default function MenuDrawer(title) {
                         <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" >
-
+                        Titel
                     </Typography>
                     <Link to="/">
                         <IconButton style={{margin: 5, color: "white"}} component="span">
@@ -135,9 +157,6 @@ export default function MenuDrawer(title) {
                     </IconButton>
                 </Link>
                 </Toolbar>
-
-
-
             </AppBar>
             <Drawer
                 className={classes.drawer}
@@ -154,23 +173,23 @@ export default function MenuDrawer(title) {
                     </IconButton>
                 </div>
                 <Divider />
+
                 <List>
-                    {['Alben', 'Künstler', 'Genre', ].map((text, index) => (
-                        <ListItem button key={text}>
-                            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                            <ListItemText primary={text} />
-                        </ListItem>
-                    ))}
+                    <ListItemLink
+                        to="/User"
+                        primary="Benutzer"
+                        icon={<AccountCircleIcon />}
+                    />
 
                 </List>
+
                 <Divider />
                 <List>
-                    {['Konto', 'Impressum', 'Logout', ].map((text, index) => (
-                        <ListItem button key={text}>
-                            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                            <ListItemText primary={text} />
-                        </ListItem>
-                    ))}
+                    <ListItemLink
+                        to="/Impressum"
+                        primary="Impressum"
+                        icon={<DescriptionIcon />}
+                    />
 
                 </List>
             </Drawer>
