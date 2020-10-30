@@ -120,11 +120,11 @@ class Register extends Component {
         const {history} = this.props;
 
         var payload = {
-            "birthdayDate": this.state.birthdayDate,
+            "birth": this.state.birthdayDate,
             "username": this.state.username,
             "password": this.state.password,
-            "firstname": this.state.firstName,
-            "lastname": this.state.lastName,
+            "firstName": this.state.firstName,
+            "lastName": this.state.lastName,
         }
 
         if (this.passwordMatch) {
