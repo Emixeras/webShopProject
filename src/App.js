@@ -9,16 +9,15 @@ import Profile from "./components/Profile";
 
 function App() {
   return (
-    <div className="App">
-      <Switch>
-        <Route path="/" component={Home} exact />
-        <Route path="/login" component={Login} exact />
-        <Route path="/register" component={Register} exact />
-        <Route path="/shoppingcart" component={ShoppingCart} exact />
-        <Route path="/profile" component={Profile} exact />
-      </Switch>
-    </div>
-
+          <div className="App">
+              <Switch>
+                  <Route path="/" component={Home} exact />
+                  <Route path="/login" component={Login} exact />
+                  <Route path="/register" component={Register} exact />
+                  <Route path="/shoppingcart" component={ShoppingCart} exact />
+                  <Route path="/profile" component={Profile} exact />
+              </Switch>
+          </div>
   );
 }
 

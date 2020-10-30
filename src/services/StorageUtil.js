@@ -1,5 +1,4 @@
 
-//returns user object
 export const getSessionUser = () => {
     return JSON.parse(localStorage.getItem('myUser'));
 };
@@ -7,6 +6,7 @@ export const getSessionUser = () => {
 export const setSessionUser = (user) => {
     localStorage.setItem('myUser', JSON.stringify(user));
 }
+
 export const setUserLoggedIn = (bool) => {
     if(bool === true){
         localStorage.setItem('isLoggedIn', '1');

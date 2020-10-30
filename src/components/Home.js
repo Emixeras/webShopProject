@@ -9,30 +9,48 @@ import {isUserLoggedIn} from "../services/StorageUtil";
 
 class Home extends React.Component {
     render() {
-        if(isUserLoggedIn() !== undefined){
+        if (isUserLoggedIn()) {
             return (
-            <div>
+                <div>
+                    <MuiThemeProvider>
+                        <MenuDrawer props={this.props}/>
+                        <Typography variant="h3" align="center">Herzlich Willkommen im Studiotranics Shop
+                            :-)</Typography>
+                        <Link to="/login">
+                            <RaisedButton label="login" primary={true} style={style}/>
+                        </Link>
+                        <Link to="/register">
+                            <RaisedButton label="register" primary={true} style={style}/>
+                        </Link>
+                        <Link to="/profile">
+                            <RaisedButton label="profile" primary={true} style={style}/>
+                        </Link>
+                    </MuiThemeProvider>
+                </div>
+
+            )
+        } else {
+            return <div>
                 <MuiThemeProvider>
                     <MenuDrawer/>
-                    <Typography variant = "h3" align="center">Herzlich Willkommen im Studiotranics Shop :-)</Typography>
-                    <Link to="/login" >
+                    pls log in
+                    <br/>
+                    <Link to="/login">
                         <RaisedButton label="login" primary={true} style={style}/>
                     </Link>
                     <Link to="/register">
                         <RaisedButton label="register" primary={true} style={style}/>
                     </Link>
-                    <Link to="/profile" >
+                    <Link to="/profile">
                         <RaisedButton label="profile" primary={true} style={style}/>
                     </Link>
                 </MuiThemeProvider>
             </div>
-
-        )}else{
-            return <div>pls log in</div>
         }
 
     }
 }
+
 const style = {
     margin: 15,
 };

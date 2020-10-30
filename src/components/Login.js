@@ -5,7 +5,7 @@ import React, { Component }  from 'react';
 import {Link} from "react-router-dom";
 import Profile from "./Profile";
 import MenuDrawer from "./MenuDrawer";
-import {loginUser} from "../services/ApiUtil";
+import {loginUser} from "../services/UserApiUtil";
 
 
 class Login extends Component {
@@ -56,7 +56,7 @@ class Login extends Component {
     }
 
     handleClick(){
-        loginUser(this.state.username, this.state.password, this.props)
+        loginUser(this.state.username, this.state.password, this.props);
     }
 
 }

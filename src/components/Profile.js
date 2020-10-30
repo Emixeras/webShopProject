@@ -4,7 +4,7 @@ import React, { Component }  from 'react';
 import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
 import {getSessionUser} from "../services/StorageUtil";
-import {deleteUser, logoutUser} from "../services/ApiUtil";
+import {deleteUser, logoutUser} from "../services/UserApiUtil";
 
 
 
@@ -16,16 +16,12 @@ class Profile extends Component {
         }
     }
     onSignOutClick(){
-        const { history } = this.props;
         console.log('you have been logged out');
-        logoutUser();
-        history.push("/login");
+        logoutUser(this.props);
     }
 
     onDeleteUserClick(){
-        const { history } = this.props;
-        deleteUser();
-        history.push("/");
+        deleteUser(this.props);
     }
 
     render() {
