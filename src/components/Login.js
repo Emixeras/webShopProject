@@ -13,7 +13,7 @@ class Login extends Component {
     constructor(props){
         super(props);
         this.state={
-            username:'',
+            email:'',
             password:'',
         }
     }
@@ -25,9 +25,9 @@ class Login extends Component {
                         <div>
                             <MenuDrawer/>
                             <TextField style={style}
-                                       hintText="Enter your Username"
-                                       floatingLabelText="Username"
-                                       onChange = {(event,newValue) => this.setState({username:newValue})}
+                                       hintText="Enter your Email"
+                                       floatingLabelText="Email"
+                                       onChange = {(event,newValue) => this.setState({email:newValue})}
                             />
                             <br/>
                             <TextField style={style}
@@ -61,7 +61,7 @@ class Login extends Component {
 
         axios.get(apiBaseUrl, {
             auth: {
-                username: this.state.username,
+                username: this.state.email,
                 password: this.state.password
             }
         })

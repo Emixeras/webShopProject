@@ -18,7 +18,6 @@ class Register extends Component {
         super(props);
         this.state = {
             email: '',
-            username: '',
             password: '',
             firstName: '',
             lastName: '',
@@ -44,13 +43,6 @@ class Register extends Component {
                                        hintText="Last Name"
                                        floatingLabelText="Last Name"
                                        onChange={(event, newValue) => this.setState({lastName: newValue})}
-                            />
-                            <br/>
-                            <TextField
-                                style={style}
-                                hintText="Enter your Username"
-                                floatingLabelText="Username"
-                                onChange={(event, newValue) => this.setState({username: newValue})}
                             />
                             <br/>
                             <TextField
@@ -121,7 +113,7 @@ class Register extends Component {
 
         var payload = {
             "birth": this.state.birthdayDate,
-            "username": this.state.username,
+            "email": this.state.email,
             "password": this.state.password,
             "firstName": this.state.firstName,
             "lastName": this.state.lastName,
