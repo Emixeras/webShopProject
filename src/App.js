@@ -6,6 +6,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import ShoppingCart from "./components/ShoppingCart";
 import Profile from "./components/Profile";
+import EditUser from "./components/EditUser";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/register" component={Register} exact />
         <Route path="/shoppingcart" component={ShoppingCart} exact />
         <Route path="/profile" component={Profile} exact />
+        <Route path="/editUser" component={EditUser} exact />
       </Switch>
     </div>
 
