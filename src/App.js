@@ -7,7 +7,9 @@ import Register from "./components/Register";
 import ShoppingCart from "./components/ShoppingCart";
 import Profile from "./components/Profile";
 import EditUser from "./components/EditUser";
+import { toast } from 'react-toastify';
 
+toast.configure()
 function App() {
   return (
     <div className="App">

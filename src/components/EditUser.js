@@ -13,17 +13,19 @@ import {
     OutlinedInput,
     InputAdornment,
     IconButton,
-    FormHelperText
+    FormHelperText,
+    Icon, fade
 } from '@material-ui/core';
 import MenuDrawer from "./MenuDrawer";
-import {Visibility, VisibilityOff} from "@material-ui/icons";
+import {Visibility, VisibilityOff, Edit, Save} from "@material-ui/icons";
+import {ToastContainer, toast, Flip} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const propState = {
     title: '',
     firstName: '',
     lastName: '',
-    birthday: '',
-    username: '',
+    birth: '',
     email: '',
     password: '',
     addresses: []
@@ -37,25 +39,44 @@ class Register extends Component {
     passwordState = {password: "", passwordRepeat: ""};
     emailError = false;
     emailRegEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
+    user = {};
+    unchangedState;
+    editMode = false;
+    currentEdiModeToastId = 0;
+    mobileView = window.innerWidth < 950;
 
     constructor(props, context) {
         super(props, context);
         this.state = {
+            id: -1,
             title: 'none',
             firstName: '',
             lastName: '',
-            birthday: require('dateformat')(new Date(), "yyyy-mm-dd"),
-            username: '',
+            birth: require('dateformat')(new Date(), "yyyy-mm-dd"),
             email: '',
             password: '',
-            addresses: []
+            street: '',
+            streetNumber: '',
+            postalCode: '',
+            town: ''
         };
         this.user = JSON.parse(localStorage.getItem('User'));
+        this.user.birth = this.user.birth.split("T")[0];
+        this.state = this.unchangedState = {...this.state, ...this.user};
+        this.passwordState = {password: this.user.password, passwordRepeat: this.user.password}
+
+        window.addEventListener('resize', ev => {
+            let newState = window.innerWidth < 950;
+            if (this.mobileView !== newState) {
+                this.mobileView = newState;
+                console.log(this.mobileView + " " + window.innerWidth);
+                this.forceUpdate();
+            }
+        })
     }
 
-
     render() {
+        // this.showToast("render")
         if (localStorage.getItem('isLoggedIn')) {
             return <div>
                 {/*<MuiThemeProvider>*/}
@@ -96,6 +117,7 @@ class Register extends Component {
                                             value={this.state.title}
                                             helperText="Eine gewünschte Anrede auswählen"
                                             variant="outlined"
+                                            disabled={!this.editMode}
                                             onChange={this.handleChange}
                                         >
                                             {titles.map((option) => (
@@ -109,33 +131,44 @@ class Register extends Component {
                                     <Grid item style={{width: '100%'}}>
                                         <Grid
                                             container
-                                            direction={"row"}
+                                            direction={this.mobileView ? "column" : "row"}
                                             justify="space-between"
+                                            wrap={'wrap'}
                                             spacing={2}>
-                                            <Grid item style={{width: '50%'}}>
-                                                <TextField style={{width: '100%'}}
+                                            <Grid item
+                                                  style={{width: this.mobileView ? "100%" : '50%'}}>
+                                                <TextField required
+                                                           style={{width: '100%'}}
                                                            label="Vorname" variant="outlined"
-                                                           onChange={event => this.setState({firstName: event.target.value.trim()})}
+                                                           onChange={event => this.changeStateItem("firstName", event)}
+                                                           value={this.state.firstName}
+                                                           disabled={!this.editMode}
                                                            margin={"normal"}/>
                                             </Grid>
-                                            <Grid item style={{width: '50%'}}>
-                                                <TextField style={{width: '100%'}}
+                                            <Grid item
+                                                  style={{width: this.mobileView ? "100%" : '50%'}}>
+                                                <TextField required
+                                                           style={{width: '100%'}}
                                                            label="Nachname" variant="outlined"
-                                                           onChange={event => this.setState({lastName: event.target.value.trim()})}
+                                                           onChange={event => this.changeStateItem("lastName", event)}
+                                                           value={this.state.lastName}
+                                                           disabled={!this.editMode}
                                                            margin={"normal"}/>
                                             </Grid>
                                         </Grid>
                                     </Grid>
                                     <Grid item
                                           style={{width: '100%'}}>
-                                        <TextField
-                                            label="Geburtsdatum"
-                                            type="date"
-                                            variant="outlined"
-                                            margin={"normal"}
-                                            style={{width: '100%'}}
-                                            onChange={event => this.setState({birthday: event.target.value.trim()})}
-                                            defaultValue={this.state.birthday}
+                                        <TextField required
+                                                   label="Geburtsdatum"
+                                                   type="date"
+                                                   variant="outlined"
+                                                   margin={"normal"}
+                                                   style={{width: '100%'}}
+                                                   value={this.state.birth}
+                                            // defaultValue={this.state.birth}
+                                                   disabled={!this.editMode}
+                                                   onChange={event => this.changeStateItem("birth", event)}
                                         />
                                     </Grid>
                                 </Grid>
@@ -156,25 +189,24 @@ class Register extends Component {
                                         </div>
                                     </Grid>
                                     <Grid item>
-                                        <TextField label="Benutzername" variant="outlined"
-                                                   onChange={event => this.setState({userName: event.target.value.trim()})}
-                                                   margin={"normal"} style={{width: '100%'}}/>
-                                    </Grid>
-                                    <Grid item>
-                                        <TextField type="email" label="E-MailAdresse"
+                                        <TextField required
+                                                   type="email" label="E-MailAdresse"
                                                    variant="outlined" margin={"normal"}
                                                    onChange={event => this.setState({email: event.target.value.trim()})}
                                                    error={this.checkEmail()}
+                                                   value={this.state.email}
+                                                   disabled={!this.editMode}
                                                    helperText={this.emailError ? "Bitte eine Korrekte E-MailAdresse eingeben" : ""}
                                                    style={{width: '100%'}}/>
                                     </Grid>
                                     < Grid item>
                                         <FormControl margin={"normal"} style={{width: '100%'}}
                                                      variant="outlined">
-                                            <InputLabel>Passwort</InputLabel>
+                                            <InputLabel required>Passwort</InputLabel>
                                             <OutlinedInput
                                                 type={this.showPassword ? 'text' : 'password'}
                                                 value={this.passwordState.password}
+                                                disabled={!this.editMode}
                                                 onChange={this.handlePasswordChange("password")}
                                                 endAdornment={
                                                     <InputAdornment position="end">
@@ -192,17 +224,20 @@ class Register extends Component {
                                                         </IconButton>
                                                     </InputAdornment>
                                                 }
-                                                labelWidth={68}
+                                                labelWidth={78}
                                             />
                                         </FormControl>
                                     </Grid>
                                     < Grid item>
-                                        <FormControl margin={"normal"} style={{width: '100%'}} variant="outlined">
-                                            <InputLabel error={this.passwordError}>Passwort Wiederholen</InputLabel>
+                                        <FormControl margin={"normal"} style={{width: '100%'}}
+                                                     variant="outlined">
+                                            <InputLabel required error={this.passwordError}>Passwort
+                                                Wiederholen</InputLabel>
                                             <OutlinedInput
                                                 type={this.showPassword ? 'text' : 'password'}
                                                 value={this.passwordState.passwordRepeat}
                                                 error={this.passwordError}
+                                                disabled={!this.editMode}
                                                 onChange={this.handlePasswordChange("passwordRepeat")}
                                                 endAdornment={
                                                     <InputAdornment position="end">
@@ -215,13 +250,15 @@ class Register extends Component {
                                                                 event.preventDefault();
                                                             }}
                                                             edge="end">
-                                                            {this.showPassword ? <Visibility/> : <VisibilityOff/>}
+                                                            {this.showPassword ? <Visibility/> :
+                                                                <VisibilityOff/>}
                                                         </IconButton>
                                                     </InputAdornment>
                                                 }
-                                                labelWidth={165}
+                                                labelWidth={175}
                                             />
-                                            <FormHelperText error={this.passwordError}> {this.passwordError ? "Die Passwörter müssen übereinstimmen" : ""}</FormHelperText>
+                                            <FormHelperText
+                                                error={this.passwordError}> {this.passwordError ? "Die Passwörter müssen übereinstimmen" : ""}</FormHelperText>
                                         </FormControl>
                                     </Grid>
 
@@ -245,17 +282,27 @@ class Register extends Component {
                                     <Grid item style={{width: '100%'}}>
                                         <Grid
                                             container
-                                            direction={"row"}
+                                            direction={this.mobileView ? "column" : "row"}
                                             spacing={2}
                                             justify="space-between">
-                                            <Grid item style={{width: '80%'}}>
+                                            <Grid item
+                                                  style={{width: this.mobileView ? "100%" : '80%'}}>
                                                 <TextField style={{width: '100%'}}
-                                                           label="Straße" variant="outlined"
+                                                           label="Straße"
+                                                           variant="outlined"
+                                                           value={this.state.street}
+                                                           disabled={!this.editMode}
+                                                           onChange={event => this.setState({street: event.target.value.trim()})}
                                                            margin={"normal"}/>
                                             </Grid>
-                                            <Grid item style={{width: '20%'}}>
-                                                <TextField style={{width: '100%'}} label="Nr."
+                                            <Grid item
+                                                  style={{width: this.mobileView ? "100%" : '20%'}}>
+                                                <TextField style={{width: '100%'}}
+                                                           label="Nr."
                                                            variant="outlined"
+                                                           value={this.state.streetNumber}
+                                                           disabled={!this.editMode}
+                                                           onChange={event => this.setState({streetNumber: event.target.value.trim()})}
                                                            margin={"normal"}/>
                                             </Grid>
                                         </Grid>
@@ -263,17 +310,27 @@ class Register extends Component {
                                     <Grid item style={{width: '100%'}}>
                                         <Grid
                                             container
-                                            direction={"row"}
+                                            direction={this.mobileView ? "column" : "row"}
                                             spacing={2}
                                             justify="space-between">
-                                            <Grid item style={{width: '20%'}}>
-                                                <TextField style={{width: '100%'}} label="PLZ"
+                                            <Grid item
+                                                  style={{width: this.mobileView ? "100%" : '20%'}}>
+                                                <TextField style={{width: '100%'}}
+                                                           label="PLZ"
                                                            variant="outlined"
+                                                           value={this.state.postalCode}
+                                                           disabled={!this.editMode}
+                                                           onChange={event => this.setState({postalCode: event.target.value.trim()})}
                                                            margin={"normal"}/>
                                             </Grid>
-                                            <Grid item style={{width: '80%'}}>
-                                                <TextField style={{width: '100%'}} label="Ort"
+                                            <Grid item
+                                                  style={{width: this.mobileView ? "100%" : '80%'}}>
+                                                <TextField style={{width: '100%'}}
+                                                           label="Ort"
                                                            variant="outlined"
+                                                           value={this.state.town}
+                                                           disabled={!this.editMode}
+                                                           onChange={event => this.setState({town: event.target.value.trim()})}
                                                            margin={"normal"}/>
                                             </Grid>
                                         </Grid>
@@ -282,25 +339,7 @@ class Register extends Component {
                             </Card>
                         </Grid>
                         <Grid item style={{width: '100%'}}>
-                            <Grid
-                                container
-                                justify="flex-end"
-                                spacing={1}
-                                direction="row">
-                                <Grid item>
-                                    <Button>Abbrechen</Button>
-                                </Grid>
-                                <Grid item>
-                                    <Button variant="contained"
-                                            ref={ref => saveButton = ref}
-                                            disabled={this.getButtonState()}
-                                            onClick={event => {
-                                                debugger
-                                                console.log(propState)
-                                            }}
-                                            color="primary">Speichern</Button>
-                                </Grid>
-                            </Grid>
+                            <ModeButtons context={this}/>
                         </Grid>
                     </Grid>
                 </Container>
@@ -312,6 +351,43 @@ class Register extends Component {
                 <div>Nicht Angemeldet</div>
             );
         }
+    }
+
+    TestBlock() {
+        return <div>Test</div>
+    }
+
+    changeStateItem(key, eventOrText) {
+        if (this.editMode)
+            this.setState({[key]: (eventOrText instanceof String ? eventOrText : eventOrText.target.value.trim())});
+        else {
+            if (!toast.isActive(this.currentEdiModeToastId))
+                this.currentEdiModeToastId = this.showToast('Zum Editieren in den BearbeitenModus wechseln', "warn", {toastId: ++this.currentEdiModeToastId});
+            else
+                toast.update(this.currentEdiModeToastId, {autoClose: 2500});
+        }
+        // ToDo: Eventuell durch klick auf Toast edit aktivieren
+    }
+
+    /**
+     * @param {string} text Den anzuzeigenen Text
+     * @param {(''|'info'|'success'|'warn'|'error'|'dark')} [type] Leer für 'Default', der eines der folgenden typen: 'info', 'success', 'warn', 'error', 'dark'
+     * @param {object} [customOptions] Ein Objekt mit überschriebenen Optionen
+     * @param func
+     * @returns {number} Gibt die Toast-ID zurück
+     */
+    showToast(text, type, customOptions, func) {
+        let options = {
+            position: "bottom-right",
+            autoClose: 2500,
+            hideProgressBar: true,
+            transition: Flip,
+            ...customOptions
+        };
+        if (type)
+            return toast[type](text, options);
+        else
+            return toast(text, options);
     }
 
     handleClick() {
@@ -360,8 +436,7 @@ class Register extends Component {
             this.state.title &&
             this.state.firstName &&
             this.state.lastName &&
-            this.state.birthday &&
-            this.state.userName &&
+            this.state.birth &&
             this.state.email &&
             !this.emailError &&
             this.state.password &&
@@ -372,47 +447,131 @@ class Register extends Component {
     checkEmail() {
         return this.emailError = !(this.state.email.length === 0 || this.emailRegEx.test(this.state.email));
     }
+
+    toggleEditMode(notForce) {
+        this.editMode = !this.editMode;
+        if (!notForce)
+            this.forceUpdate()
+    }
 }
 
-function ValidatedPasswordPair() {
-    const [values, setValues] = useState({password: "", passwordRepeat: ""});
-    const [error, setError] = useState(false);
-    const [helper, setHelper] = useState("");
-
-    const handleChange = name => event => {
-        let tempValues = {...values, [name]: propState.password = event.target.value};
-        setValues(tempValues);
-        let tempError = tempValues.password !== tempValues.passwordRepeat;
-        setError(tempError);
-        setHelper(tempError ? "Die Passwörter müssen übereinstimmen" : "");
-    };
-
-    return (
-        <div>
-            <Grid item>
-                <TextField type="password"
-                           label="Passwort"
-                           variant="outlined"
-                           margin={"normal"}
-                           onChange={handleChange("password")}
-                           style={{width: '100%'}}/>
+function ModeButtons(props) {
+    let that = props.context;
+    if (that.editMode) {
+        return (
+            <Grid
+                container
+                justify="flex-end"
+                spacing={1}
+                direction="row">
+                <Grid item>
+                    <Button onClick={event => {
+                        if (!shallowEqual(that.state, that.unchangedState)) {
+                            if (window.confirm('Alle ungespeicherten Änderungen werden verworfen')) {
+                                that.setState(that.unchangedState);
+                                that.toggleEditMode(true);
+                            }
+                        } else
+                            that.toggleEditMode();
+                    }}>Abbrechen</Button>
+                </Grid>
+                <Grid item>
+                    <Button variant="contained"
+                            ref={ref => saveButton = ref}
+                            disabled={that.getButtonState()}
+                            onClick={event => {
+                                console.log(that.state);
+                                if (shallowEqual(that.unchangedState, that.state)) {
+                                    toast.info('Es wurden keine Änderungen vorgenommen', {
+                                        position: "bottom-right",
+                                        autoClose: 2500,
+                                        hideProgressBar: true,
+                                        transition: Flip
+                                    });
+                                } else {
+                                    that.unchangedState = that.state;
+                                    toast.success('Die Daten wurden gespeichert', {
+                                        position: "bottom-right",
+                                        autoClose: 2500,
+                                        hideProgressBar: true,
+                                        transition: Flip
+                                    });
+                                }
+                                that.toggleEditMode();
+                                // toast(<TestButton/>, {
+                                //     position: "top-right",
+                                //     autoClose: false,
+                                //     hideProgressBar: true,
+                                //     closeOnClick: false,
+                                //     pauseOnHover: true,
+                                //     draggable: false,
+                                //     progress: undefined,
+                                // })
+                                //TODO: confirmation mit https://github.com/fkhadra/react-toastify
+                                // ToDo: test
+                            }}
+                            endIcon={<Save/>}
+                            color="primary">Speichern</Button>
+                </Grid>
             </Grid>
-            < Grid
-                item>
-                < TextField type="password"
-                            label="Passwort Wiederholen"
-                            variant="outlined"
-                            margin={"normal"}
-                            helperText={helper}
-                            error={error}
-                            onChange={handleChange("passwordRepeat")}
-                            style={{width: '100%'}}
-                />
+        )
+    } else {
+        return (
+            <Grid
+                container
+                justify="flex-end"
+                spacing={1}
+                direction="row">
+                <Grid item/>
+                <Grid item>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={event => that.toggleEditMode()}
+                        endIcon={<Edit/>}>
+                        Bearbeiten
+                    </Button>
+                </Grid>
             </Grid>
-        </div>
-    )
+
+        )
+    }
 }
 
+function TestButton() {
+    return <button>Nur ein Test</button>
+}
+
+
+const titles = [
+    {
+        value: 'none',
+        label: 'Nicht Ausgewählt',
+    },
+    {
+        value: 'Hr',
+        label: 'Herr',
+    },
+    {
+        value: 'Fr',
+        label: 'Frau',
+    },
+    {
+        value: 'Prof',
+        label: 'Professor',
+    },
+    {
+        value: 'Dr',
+        label: 'Doktor',
+    },
+    {
+        value: 'Div',
+        label: 'Divers',
+    },
+];
+
+
+//  ------------------------- Utilities ------------------------->
 function padding_extend(obj, a, b, c, d) {
     debugger
     return {
@@ -433,59 +592,53 @@ function padding(a, b, c, d) {
     }
 }
 
-function TitleSelection() {
-    const [title, setTitle] = useState('none');
-    const handleChange = event => {
-        setTitle(propState.title = event.target.value.trim());
-        debugger
-        applyButtonState(this);
-    };
+// ---------------
 
-    return (
-        <TextField
-            style={{width: '100%'}}
-            id="test2"
-            margin={"normal"}
-            select
-            label="Anrede"
-            value={title}
-            helperText="Eine gewünschte Anrede auswählen"
-            variant="outlined"
-            onChange={handleChange.bind(this)}
-        >
-            {titles.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                </MenuItem>
-            ))}
-        </TextField>
-    )
-}
+function shallowEqual(object1, object2) {
+    const keys1 = Object.keys(object1);
+    const keys2 = Object.keys(object2);
 
-const titles = [
-    {
-        value: 'none',
-        label: 'Nicht Ausgewählt',
-    },
-    {
-        value: 'Herr',
-        label: 'Herr',
-    },
-    {
-        value: 'Frau',
-        label: 'Frau',
+    if (keys1.length !== keys2.length) {
+        return false;
     }
-];
 
+    for (let key of keys1) {
+        if (object1[key] !== object2[key]) {
+            return false;
+        }
+    }
 
-function applyButtonState(context) {
-    buttonEnabled = propState.firstName && propState.lastName && propState.title;
-    debugger
-    console.log(this.name);
-    if (saveButton)
-        console.log(saveButton.forceUpdate);
-    // if (context)
-    //     context.setState({})
+    return true;
 }
+
+function deepEqual(object1, object2) {
+    const keys1 = Object.keys(object1);
+    const keys2 = Object.keys(object2);
+
+    if (keys1.length !== keys2.length) {
+        return false;
+    }
+
+    for (const key of keys1) {
+        const val1 = object1[key];
+        const val2 = object2[key];
+        const areObjects = isObject(val1) && isObject(val2);
+        if (
+            areObjects && !deepEqual(val1, val2) ||
+            !areObjects && val1 !== val2
+        ) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function isObject(object) {
+    return object != null && typeof object === 'object';
+}
+
+//  <------------------------- Utilities -------------------------
+
 
 export default Register;
