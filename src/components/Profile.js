@@ -3,7 +3,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import React, { Component }  from 'react';
 import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
-import {getSessionUser} from "../services/StorageUtil";
+import {getSessionUser, isUserLoggedIn} from "../services/StorageUtil";
 import {deleteUser, logoutUser} from "../services/UserApiUtil";
 
 
@@ -16,16 +16,26 @@ class Profile extends Component {
         }
     }
     onSignOutClick(){
-        console.log('you have been logged out');
-        logoutUser(this.props);
+        const {history} = this.props;
+        logoutUser(()=>{
+            history.push("/")
+        },()=>{
+            alert('log out failed')
+        });
     }
 
     onDeleteUserClick(){
-        deleteUser(this.props);
+        const {history} = this.props;
+        deleteUser(()=>{
+            history.push("/")
+        },()=>{
+            alert('delete failed')
+        });
     }
 
     render() {
-        if (localStorage.getItem('isLoggedIn') === '1') {
+        console.log('isuser logged in ' + isUserLoggedIn())
+        if (isUserLoggedIn()) {
             var user = getSessionUser();
             return (
                 <div>
@@ -35,7 +45,7 @@ class Profile extends Component {
                             you're logged in
                             <br/>
                             <br/>
-                            username: {user.username}<br/>
+                            email: {user.email}<br/>
                             role: {user.role}<br/>
                             pass: {user.password}<br/>
                             address: {user.addresses}<br/>

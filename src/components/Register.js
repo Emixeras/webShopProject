@@ -7,6 +7,7 @@ import red from "@material-ui/core/colors/red";
 import Profile from "./Profile";
 import MenuDrawer from "./MenuDrawer";
 import {registerUser} from "../services/UserApiUtil";
+import {isUserLoggedIn} from "../services/StorageUtil";
 
 class Register extends Component {
 
@@ -26,8 +27,7 @@ class Register extends Component {
     }
 
     render() {
-
-        if (localStorage.getItem('isLoggedIn') !== '1') {
+        if (!isUserLoggedIn) {
             return (
                 <div>
                     <MuiThemeProvider>

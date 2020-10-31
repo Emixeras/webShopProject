@@ -14,71 +14,89 @@ export const registerUser = (payload, onSuccess, onFail) => {
     axios.post(apiBaseUrlUserRegister, payload)
         .then(function (response) {
             console.log(response);
-            if(response.status === 200){
+            if (response.status === 200) {
                 console.log("register successfull");
                 console.log(response.data);
                 setSessionUser(response.data);
                 setUserLoggedIn(true);
                 onSuccess(response)
-            }
-            else{
+            } else {
                 console.log("register failed");
-                onFail(response)
+                if (onFail)
+                    onFail(response)
             }
         })
         .catch(function (error) {
             alert('register failed');
             console.log(error);
-            onFail(error)
+            if (onFail)
+                onFail(error)
         });
 };
-
-export const loginUser = (username,password,props) => {
+/**
+ * @param {string} email
+ * @param {string} password
+ * @param [onSuccess]
+ * @param [onFail]
+ */
+export const loginUser = (email, password, onSuccess, onFail) => {
     axios.get(apiBaseUrlUserLogin, {
         auth: {
-            username: username,
+            username: email,
             password: password
         }
     })
         .then(function (response) {
             console.log(response);
-            if(response.status === 200){
+            if (response.status === 200) {
                 console.log("Login successfull");
                 setUserLoggedIn(true);
                 setSessionUser(response.data);
-                props.history.push("/")
-            }else{
+                onSuccess(response);
+            } else {
                 alert('authentication failed, please try again');
                 console.log(response);
+                if (onFail)
+                    onFail(response);
             }
         })
         .catch(function (error) {
             alert('login failed');
             console.log(error);
+            if (onFail)
+                onFail(error);
         });
 };
 
-export const deleteUser = (props) => {
+export const deleteUser = (onSuccess, onFail) => {
     var user = getSessionUser();
-    axios.delete(apiBaseUrlUserDelete + user.username, {
+    axios.delete(apiBaseUrlUserDelete + user.email, {
         auth: {
-            username: user.username,
+            username: user.email,
             password: user.password
         }
     })
         .then(function (response) {
-            if(response.status === 200){
+            if (response.status === 200) {
                 console.log("user delete successful");
                 localStorage.clear();
-                props.history.push("/")
-            }else(
-                alert('delete failed')
-            )
+                onSuccess();
+            } else {
+                if(onFail)
+                onFail()
+            }
         })
 }
 
-export const logoutUser = (props) => {
-    console.log('user has been logged out');
-    localStorage.clear();
-    props.history.push("/")
+export const logoutUser = (onSuccess, onFail) => {
+    try {
+        console.log('user has been logged out');
+        localStorage.clear();
+        setUserLoggedIn(false);
+        onSuccess();
+    }catch(e){
+        if(onFail)
+        onFail(e);
+    }
+
 }
