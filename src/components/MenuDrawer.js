@@ -2,11 +2,9 @@ import React from 'react';
 import clsx from 'clsx';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -24,6 +22,7 @@ import logo from "../assets/text4549.png";
 import AlbumIcon from '@material-ui/icons/Album';
 import LibraryMusicIcon from '@material-ui/icons/LibraryMusic';
 import RadioIcon from '@material-ui/icons/Radio';
+import {isDrawerVisible, setDrawerVisible} from "../services/StorageUtil";
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -93,7 +92,6 @@ function ListItemLink(props) {
             )),
         [to]
     );
-
     return (
         <li>
             <ListItem button component={renderLink}>
@@ -106,18 +104,20 @@ function ListItemLink(props) {
 
 
 export default function MenuDrawer() {
+
     const classes = useStyles();
     const theme = useTheme();
-    const [open, setOpen] = React.useState(true);
+    const [open, setOpen] = React.useState(isDrawerVisible);
 
     const handleDrawerOpen = () => {
         setOpen(true);
+        setDrawerVisible(true);
     };
 
     const handleDrawerClose = () => {
         setOpen(false);
+        setDrawerVisible(false);
     };
-
 
     return (
 

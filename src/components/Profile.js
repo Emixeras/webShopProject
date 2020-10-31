@@ -3,48 +3,40 @@ import RaisedButton from 'material-ui/RaisedButton';
 import React, { Component }  from 'react';
 import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
-import axios from "axios";
+import {getSessionUser, isUserLoggedIn} from "../services/StorageUtil";
+import {deleteUser, logoutUser} from "../services/UserApiUtil";
 
 
 
 class Profile extends Component {
     constructor(props){
         super(props);
-        this.user = JSON.parse(localStorage.getItem('User'))
+        this.user = getSessionUser();
         this.state={
         }
     }
     onSignOutClick(){
-        const { history } = this.props;
-        console.log('you have been logged out');
-        localStorage.clear();
-        history.push("/login");
+        const {history} = this.props;
+        logoutUser(()=>{
+            history.push("/")
+        },()=>{
+            alert('log out failed')
+        });
     }
 
     onDeleteUserClick(){
-        const { history } = this.props;
-        var apiBaseUrl = "http://localhost:8080/user/";
-
-        axios.delete(apiBaseUrl + this.user.username, {
-            auth: {
-                username: this.user.username,
-                password: this.user.password
-            }
-        })
-            .then(function (response) {
-                if(response.status === 200){
-                    console.log("user delete successful");
-                    localStorage.clear();
-                    history.push("/");
-                }else(
-                    alert('delete failed')
-                )
-    })
-
+        const {history} = this.props;
+        deleteUser(()=>{
+            history.push("/")
+        },()=>{
+            alert('delete failed')
+        });
     }
+
     render() {
-        if (localStorage.getItem('isLoggedIn') === '1') {
-            var user = JSON.parse(localStorage.getItem('User'));
+        console.log('isuser logged in ' + isUserLoggedIn())
+        if (isUserLoggedIn()) {
+            var user = getSessionUser();
             return (
                 <div>
                     <MuiThemeProvider>
@@ -53,12 +45,12 @@ class Profile extends Component {
                             you're logged in
                             <br/>
                             <br/>
-                            username: {user.username}<br/>
+                            email: {user.email}<br/>
                             role: {user.role}<br/>
                             pass: {user.password}<br/>
                             address: {user.addresses}<br/>
                             id: {user.id}<br/>
-                            user_json: {localStorage.getItem('User')}<br/>
+                            user_json: {JSON.stringify(user)}<br/>
                             <RaisedButton onClick={() => this.onSignOutClick()} label="log out" primary={true} style={style}/>
                             <RaisedButton onClick={() => this.onDeleteUserClick()} label="delete user" primary={true} style={style}/>
                         </div>
