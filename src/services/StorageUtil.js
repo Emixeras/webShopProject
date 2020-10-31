@@ -19,3 +19,14 @@ export const isUserLoggedIn = () => {
     return localStorage.getItem('isLoggedIn') === '1';
 }
 
+export const setDrawerVisible = (bool) =>{
+    if (bool){
+        localStorage.setItem('isDrawerVisible','1')
+    }else{
+        localStorage.setItem('isDrawerVisible',undefined)
+    }
+}
+
+export const isDrawerVisible = () =>{
+    return localStorage.getItem('isDrawerVisible') === '1';
+}

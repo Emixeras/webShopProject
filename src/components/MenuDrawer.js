@@ -22,6 +22,7 @@ import logo from "../assets/text4549.png";
 import AlbumIcon from '@material-ui/icons/Album';
 import LibraryMusicIcon from '@material-ui/icons/LibraryMusic';
 import RadioIcon from '@material-ui/icons/Radio';
+import {isDrawerVisible, setDrawerVisible} from "../services/StorageUtil";
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -106,14 +107,16 @@ export default function MenuDrawer() {
 
     const classes = useStyles();
     const theme = useTheme();
-    const [open, setOpen] = React.useState(true);
+    const [open, setOpen] = React.useState(isDrawerVisible);
 
     const handleDrawerOpen = () => {
         setOpen(true);
+        setDrawerVisible(true);
     };
 
     const handleDrawerClose = () => {
         setOpen(false);
+        setDrawerVisible(false);
     };
 
     return (
