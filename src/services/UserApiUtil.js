@@ -1,12 +1,16 @@
 import axios from "axios";
 import {getSessionUser, setSessionUser, setUserLoggedIn} from "./StorageUtil";
-import { withRouter } from "react-router-dom";
 
 const apiBaseUrlUserRegister = "http://localhost:8080/user";
 const apiBaseUrlUserLogin = "http://localhost:8080/user";
 const apiBaseUrlUserDelete = "http://localhost:8080/user/";
 
-export const registerUser = (payload,props) => {
+/**
+ * @param {object} payload
+ * @param [onSuccess]
+ * @param [onFail]
+ */
+export const registerUser = (payload, onSuccess, onFail) => {
     axios.post(apiBaseUrlUserRegister, payload)
         .then(function (response) {
             console.log(response);
@@ -15,15 +19,17 @@ export const registerUser = (payload,props) => {
                 console.log(response.data);
                 setSessionUser(response.data);
                 setUserLoggedIn(true);
-                props.history.push("/")
+                onSuccess(response)
             }
             else{
                 console.log("register failed");
+                onFail(response)
             }
         })
         .catch(function (error) {
             alert('register failed');
             console.log(error);
+            onFail(error)
         });
 };
 

@@ -2,11 +2,11 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import React, {Component} from 'react';
-import axios from 'axios';
 import {Link} from "react-router-dom";
 import red from "@material-ui/core/colors/red";
 import Profile from "./Profile";
 import MenuDrawer from "./MenuDrawer";
+import {registerUser} from "../services/UserApiUtil";
 
 class Register extends Component {
 
@@ -108,11 +108,9 @@ class Register extends Component {
     }
 
     handleClick() {
-        var apiBaseUrl = "http://localhost:8080/user";
         const {history} = this.props;
-
         var payload = {
-            "birth": this.state.birthdayDate,
+            "birth": this.state.birthdayDate+"T00:00:00Z[UTC]",
             "email": this.state.email,
             "password": this.state.password,
             "firstName": this.state.firstName,
@@ -120,22 +118,12 @@ class Register extends Component {
         }
 
         if (this.passwordMatch) {
-            axios.post(apiBaseUrl, payload)
-                .then(function (response) {
-                    console.log(response);
-                    if (response.status === 200) {
-                        console.log("Register successfull");
-                        console.log(response.data);
-                        localStorage.setItem('User', JSON.stringify(response.data));
-                        localStorage.setItem('isLoggedIn', '1');
-                        history.push("/");
-                    } else {
-                        console.log("register failed");
-                    }
+            registerUser(payload, ()=>{
+                history.push("/");
+            },
+                ()=>{
+
                 })
-                .catch(function (error) {
-                    console.log(error);
-                });
         }
     }
 
