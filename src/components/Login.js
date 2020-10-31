@@ -2,17 +2,18 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import React, { Component }  from 'react';
+import axios from 'axios';
 import {Link} from "react-router-dom";
+
 import Profile from "./Profile";
 import MenuDrawer from "./MenuDrawer";
-import {loginUser} from "../services/UserApiUtil";
 
 
 class Login extends Component {
     constructor(props){
         super(props);
         this.state={
-            username:'',
+            email:'',
             password:'',
         }
     }
@@ -24,9 +25,9 @@ class Login extends Component {
                         <div>
                             <MenuDrawer/>
                             <TextField style={style}
-                                       hintText="Enter your Username"
-                                       floatingLabelText="Username"
-                                       onChange = {(event,newValue) => this.setState({username:newValue})}
+                                       hintText="Enter your Email"
+                                       floatingLabelText="Email"
+                                       onChange = {(event,newValue) => this.setState({email:newValue})}
                             />
                             <br/>
                             <TextField style={style}
@@ -44,7 +45,6 @@ class Login extends Component {
                             </Link>
                         </div>
                     </MuiThemeProvider>
-
                 </div>
             );
         }
@@ -56,7 +56,35 @@ class Login extends Component {
     }
 
     handleClick(){
-        loginUser(this.state.username, this.state.password, this.props);
+        var apiBaseUrl = "http://localhost:8080/user";
+        const { history } = this.props;
+
+        axios.get(apiBaseUrl, {
+            auth: {
+                username: this.state.email,
+                password: this.state.password
+            }
+        })
+            .then(function (response) {
+                console.log(response);
+                if(response.status === 200){
+                    console.log("Login successfull");
+                    localStorage.setItem('isLoggedIn', '1');
+                    localStorage.setItem('User',JSON.stringify(response.data));
+                    history.push("/");
+                }
+                else if(response.status === 204){
+                    console.log("Username password do not match");
+                    alert("username password do not match")
+                }
+                else{
+                    console.log("Username does not exists");
+                    alert("Username does not exists");
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
     }
 
 }
