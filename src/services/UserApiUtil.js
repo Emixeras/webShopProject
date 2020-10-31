@@ -68,6 +68,35 @@ export const loginUser = (email, password, onSuccess, onFail) => {
         });
 };
 
+export const updateUser = (payload, onSuccess, onFail) => {
+    var user = getSessionUser();
+    axios.put(apiBaseUrlUserLogin, payload, {
+        auth: {
+            username: user.email,
+            password: user.password
+        }
+    })
+        .then(function (response) {
+            console.log(response);
+            if (response.status === 200) {
+                console.log("update successfull");
+                setSessionUser(response.data);
+                onSuccess(response);
+            } else {
+                console.log(response);
+                console.log("user update failed")
+                if (onFail)
+                    onFail(response);
+            }
+        })
+        .catch(function (error) {
+            console.log("user update failed")
+            console.log(error);
+            if (onFail)
+                onFail(error);
+        });
+};
+
 export const deleteUser = (onSuccess, onFail) => {
     var user = getSessionUser();
     axios.delete(apiBaseUrlUserDelete + user.email, {
