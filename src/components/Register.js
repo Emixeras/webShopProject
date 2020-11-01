@@ -27,7 +27,7 @@ class Register extends Component {
     }
 
     render() {
-        if (!isUserLoggedIn) {
+        if (!isUserLoggedIn()) {
             return (
                 <div>
                     <MuiThemeProvider>

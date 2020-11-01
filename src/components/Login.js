@@ -20,7 +20,7 @@ class Login extends Component {
     }
 
     render() {
-        if (isUserLoggedIn !== true) {
+        if (isUserLoggedIn() !== true) {
             return (
                 <div>
                     <MuiThemeProvider>
