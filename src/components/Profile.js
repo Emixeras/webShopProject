@@ -21,7 +21,12 @@ import {ToastContainer, toast, Flip} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {deleteUser, logoutUser, updateUser} from "../services/UserApiUtil";
 import {padding, showToast, shallowEqual, isEmail} from "../services/Utilities";
-import {getSessionUser, setSessionUser} from "../services/StorageUtil";
+import {
+    addDrawerCallback,
+    getSessionUser,
+    isDrawerVisible,
+    setSessionUser
+} from "../services/StorageUtil";
 import {useHistory} from "react-router-dom";
 
 class Profile extends Component {
@@ -33,7 +38,7 @@ class Profile extends Component {
     unchangedState;
     editMode = false;
     currentEdiModeToastId = 0;
-    mobileView = window.innerWidth < 950;
+    drawerState = isDrawerVisible();
 
     constructor(props) {
         super(props);
@@ -54,45 +59,30 @@ class Profile extends Component {
         this.user.birth = this.user.birth.split("T")[0];
         this.state = this.unchangedState = {...this.state, ...this.user};
         this.passwordState = {password: this.user.password, passwordRepeat: this.user.password};
-        // ToDo: pstalCode und StreetNumber sollten nicht 0 sein
-        //  & userrolle wird bei createUser nicht gesetzt
-        //  & loginKriterrien sind nicht erfüllt
-        //  & Drawer Content richtig sizen
-        window.addEventListener('resize', ev => {
-            let newState = window.innerWidth < 950;
-            if (this.mobileView !== newState) {
-                this.mobileView = newState;
-                // console.log(this.mobileView + " " + window.innerWidth);
-                this.forceUpdate();
-            }
+        addDrawerCallback(state => {
+            this.drawerState = state;
+            this.forceUpdate()
         })
     }
 
     render() {
-        // this.showToast("render")
+        // showToast("render");
         if (localStorage.getItem('isLoggedIn')) {
             return <div>
-                <MuiThemeProvider>
-                    <div>
+                {/*<MuiThemeProvider>*/}
+                {/*    <div>*/}
                         <MenuDrawer/>
-                        <Container style={{
-                            marginTop: 10,
-                            display: 'flex', justifyContent: 'center'
-                        }}
-                        >
+                        <div style={{marginTop: 8, marginInlineStart: (this.drawerState ? 240 : 0), display: 'flex', justifyContent: 'center'}}>
                             <Grid
-                                style={{width: '58%'}}
+                                style={{width: '75%', maxWidth: "800px"}}
                                 container
-                                direction="column"
-                                justify="center"
-                                alignItems="center"
                                 spacing={3}>
-                                <Grid item style={{width: '100%'}}>
+                                <Grid item xs={12}>
                                     <Card style={padding(18)}>
                                         <Grid
                                             container
                                             direction="column">
-                                            <Grid item style={{width: '100%'}}>
+                                            <Grid item fullWidth>
                                                 <div style={{
                                                     textAlign: "start",
                                                     fontSize: 22,
@@ -101,11 +91,11 @@ class Profile extends Component {
                                                     Personen Daten
                                                 </div>
                                             </Grid>
-                                            <Grid item style={{width: '100%'}}>
+                                            <Grid item >
                                                 <TextField
                                                     select
-                                                    style={{width: '100%'}}
                                                     margin={"normal"}
+                                                    fullWidth
                                                     label="Anrede"
                                                     value={this.state.title}
                                                     helperText="Eine gewünschte Anrede auswählen"
@@ -122,17 +112,13 @@ class Profile extends Component {
                                                 </TextField>
 
                                             </Grid>
-                                            <Grid item style={{width: '100%'}}>
+                                            <Grid item fullWidth>
                                                 <Grid
                                                     container
-                                                    direction={this.mobileView ? "column" : "row"}
-                                                    justify="space-between"
-                                                    wrap={'wrap'}
                                                     spacing={2}>
-                                                    <Grid item
-                                                          style={{width: this.mobileView ? "100%" : '50%'}}>
+                                                    <Grid item md sm={12} xs={12}>
                                                         <TextField required
-                                                                   style={{width: '100%'}}
+                                                                   fullWidth
                                                                    label="Vorname"
                                                                    variant="outlined"
                                                                    onChange={event => this.changeStateItem("firstName", event)}
@@ -140,10 +126,9 @@ class Profile extends Component {
                                                                    disabled={!this.editMode}
                                                                    margin={"normal"}/>
                                                     </Grid>
-                                                    <Grid item
-                                                          style={{width: this.mobileView ? "100%" : '50%'}}>
+                                                    <Grid item md sm={12} xs={12}>
                                                         <TextField required
-                                                                   style={{width: '100%'}}
+                                                                   fullWidth
                                                                    label="Nachname"
                                                                    variant="outlined"
                                                                    onChange={event => this.changeStateItem("lastName", event)}
@@ -154,15 +139,14 @@ class Profile extends Component {
                                                 </Grid>
                                             </Grid>
                                             <Grid item
-                                                  style={{width: '100%'}}>
+                                                  fullWidth>
                                                 <TextField required
                                                            label="Geburtsdatum"
                                                            type="date"
                                                            variant="outlined"
                                                            margin={"normal"}
-                                                           style={{width: '100%'}}
+                                                           fullWidth
                                                            value={this.state.birth}
-                                                    // defaultValue={this.state.birth}
                                                            disabled={!this.editMode}
                                                            onChange={event => this.changeStateItem("birth", event)}
                                                 />
@@ -170,12 +154,12 @@ class Profile extends Component {
                                         </Grid>
                                     </Card>
                                 </Grid>
-                                <Grid item style={{width: '100%'}}>
+                                <Grid item xs={12}>
                                     <Card style={padding(18)}>
                                         <Grid
                                             container
                                             direction="column">
-                                            <Grid item style={{width: '100%'}}>
+                                            <Grid item fullWidth>
                                                 <div style={{
                                                     textAlign: "start",
                                                     fontSize: 22,
@@ -193,11 +177,11 @@ class Profile extends Component {
                                                            value={this.state.email}
                                                            disabled={!this.editMode}
                                                            helperText={this.emailError ? "Bitte eine Korrekte E-MailAdresse eingeben" : ""}
-                                                           style={{width: '100%'}}/>
+                                                           fullWidth/>
                                             </Grid>
                                             < Grid item>
                                                 <FormControl margin={"normal"}
-                                                             style={{width: '100%'}}
+                                                             fullWidth
                                                              variant="outlined">
                                                     <InputLabel required>Passwort</InputLabel>
                                                     <OutlinedInput
@@ -228,7 +212,7 @@ class Profile extends Component {
                                             </Grid>
                                             < Grid item>
                                                 <FormControl margin={"normal"}
-                                                             style={{width: '100%'}}
+                                                             fullWidth
                                                              variant="outlined">
                                                     <InputLabel required error={this.passwordError}>Passwort
                                                         Wiederholen</InputLabel>
@@ -265,12 +249,12 @@ class Profile extends Component {
                                         </Grid>
                                     </Card>
                                 </Grid>
-                                <Grid item style={{width: '100%'}}>
+                                <Grid item xs={12}>
                                     <Card style={padding(18)}>
                                         <Grid
                                             container
                                             direction="column">
-                                            <Grid item style={{width: '100%'}}>
+                                            <Grid item fullWidth>
                                                 <div style={{
                                                     textAlign: "start",
                                                     fontSize: 22,
@@ -279,15 +263,12 @@ class Profile extends Component {
                                                     Adressen
                                                 </div>
                                             </Grid>
-                                            <Grid item style={{width: '100%'}}>
+                                            <Grid item fullWidth>
                                                 <Grid
                                                     container
-                                                    direction={this.mobileView ? "column" : "row"}
-                                                    spacing={2}
-                                                    justify="space-between">
-                                                    <Grid item
-                                                          style={{width: this.mobileView ? "100%" : '80%'}}>
-                                                        <TextField style={{width: '100%'}}
+                                                    spacing={2}>
+                                                    <Grid item md={10} sm={12} xs={12}>
+                                                        <TextField fullWidth
                                                                    label="Straße"
                                                                    variant="outlined"
                                                                    value={this.state.street}
@@ -295,9 +276,8 @@ class Profile extends Component {
                                                                    onChange={event => this.setState({street: event.target.value.trim()})}
                                                                    margin={"normal"}/>
                                                     </Grid>
-                                                    <Grid item
-                                                          style={{width: this.mobileView ? "100%" : '20%'}}>
-                                                        <TextField style={{width: '100%'}}
+                                                    <Grid item md={2} sm={12} xs={12}>
+                                                        <TextField fullWidth
                                                                    label="Nr."
                                                                    variant="outlined"
                                                                    value={this.state.streetNumber}
@@ -307,15 +287,12 @@ class Profile extends Component {
                                                     </Grid>
                                                 </Grid>
                                             </Grid>
-                                            <Grid item style={{width: '100%'}}>
+                                            <Grid item fullWidth>
                                                 <Grid
                                                     container
-                                                    direction={this.mobileView ? "column" : "row"}
-                                                    spacing={2}
-                                                    justify="space-between">
-                                                    <Grid item
-                                                          style={{width: this.mobileView ? "100%" : '20%'}}>
-                                                        <TextField style={{width: '100%'}}
+                                                    spacing={2}>
+                                                    <Grid item md={3} sm={12} xs={12}>
+                                                        <TextField fullWidth
                                                                    label="PLZ"
                                                                    variant="outlined"
                                                                    value={this.state.postalCode}
@@ -323,9 +300,8 @@ class Profile extends Component {
                                                                    onChange={event => this.setState({postalCode: event.target.value.trim()})}
                                                                    margin={"normal"}/>
                                                     </Grid>
-                                                    <Grid item
-                                                          style={{width: this.mobileView ? "100%" : '80%'}}>
-                                                        <TextField style={{width: '100%'}}
+                                                    <Grid item md={9} sm={12} xs={12}>
+                                                        <TextField fullWidth
                                                                    label="Ort"
                                                                    variant="outlined"
                                                                    value={this.state.town}
@@ -338,26 +314,26 @@ class Profile extends Component {
                                         </Grid>
                                     </Card>
                                 </Grid>
-                                <Grid item style={{width: '100%'}}>
+                                <Grid item xs={12}>
                                     <Grid container
+                                          wrap={"wrap-reverse"}
                                           direction="row"
-                                          justify="space-between"
-                                          alignItems="center"
+                                          justify="flex-end"
                                           spacing={3}>
                                         <Grid item >
-                                            <LogoutAccountButton/>
+                                            <DeleteAccountButton/>
                                         </Grid>
-                                        <Grid item >
+                                        <Grid item xs>
                                             <ModeButtons context={this}/>
                                         </Grid>
                                     </Grid>
                                 </Grid>
 
-                                <DeleteAccountButton context={this}/>
+                                <LogoutAccountButton context={this}/>
                             </Grid>
-                        </Container>
-                    </div>
-                </MuiThemeProvider>
+                        </div>
+                {/*    </div>*/}
+                {/*</MuiThemeProvider>*/}
             </div>;
         } else {
             return (
@@ -412,45 +388,45 @@ class Profile extends Component {
     }
 }
 
-function LogoutAccountButton(props) {
-    const history = useHistory();
-
-    return (
-        <Button endIcon={<ExitToApp/>}
-                variant="contained"
-                onClick={event => {
-                    logoutUser(() => {
-                        showToast("Abmeldung Erfolgreich", "success")
-                        history.push("/");
-                    }, () => {
-                        showToast('Abmelden Fehlgeschlagen', "error")
-                    });
-                }}>Abmelden</Button>
-    )
-}
-
 function DeleteAccountButton(props) {
     const history = useHistory();
 
     return (
-        <Grid item style={{width: '100%'}}>
+        <Button variant="contained"
+                onClick={event => {
+                    deleteUser(() => {
+                        showToast("Löschen Erfolgreich", "success")
+                        history.push("/");
+                    }, () => {
+                        showToast('Benutzer Löschen Fehlgeschlagen', "error")
+                    });
+                }}
+                endIcon={<Delete/>}
+                color="secondary">Account Löschen</Button>
+    )
+}
+
+function LogoutAccountButton(props) {
+    const history = useHistory();
+
+    return (
+        <Grid item xs>
             <Grid
                 container
                 justify="flex-end"
                 spacing={1}
                 direction="row">
                 <Grid item>
-                    <Button variant="contained"
+                    <Button endIcon={<ExitToApp/>}
+                            variant="contained"
                             onClick={event => {
-                                deleteUser(() => {
-                                    showToast("Löschen Erfolgreich", "success")
+                                logoutUser(() => {
+                                    showToast("Abmeldung Erfolgreich", "success")
                                     history.push("/");
                                 }, () => {
-                                    showToast('Benutzer Löschen Fehlgeschlagen', "error")
+                                    showToast('Abmelden Fehlgeschlagen', "error")
                                 });
-                            }}
-                            endIcon={<Delete/>}
-                            color="secondary">Account Löschen</Button>
+                            }}>Abmelden</Button>
                 </Grid>
             </Grid>
         </Grid>
@@ -464,6 +440,7 @@ function ModeButtons(props) {
         return (
             <Grid
                 container
+                wrap={"wrap-reverse"}
                 justify="flex-end"
                 spacing={1}
                 direction="row">
@@ -515,7 +492,6 @@ function ModeButtons(props) {
             <Grid
                 container
                 justify="flex-end"
-                spacing={1}
                 direction="row">
                 <Grid item/>
                 <Grid item>
@@ -528,7 +504,6 @@ function ModeButtons(props) {
                     </Button>
                 </Grid>
             </Grid>
-
         )
     }
 }
