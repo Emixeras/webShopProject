@@ -7,6 +7,7 @@ import Register from "./components/Register";
 import ShoppingCart from "./components/ShoppingCart";
 import Profile from "./components/Profile";
 import EditUser from "./components/EditUser";
+import SimpleReactFileUpload from "./components/SimpleReactFileUpload";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/shoppingcart" component={ShoppingCart} exact />
         <Route path="/profile" component={Profile} exact />
         <Route path="/editUser" component={EditUser} exact />
+        <Route path="/upload" component={SimpleReactFileUpload} exact />
       </Switch>
     </div>
 

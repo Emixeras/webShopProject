@@ -120,8 +120,6 @@ export default function MenuDrawer() {
     };
 
     return (
-
-
         <div>
             <AppBar
                 position="fixed"

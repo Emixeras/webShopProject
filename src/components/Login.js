@@ -7,7 +7,8 @@ import {Link} from "react-router-dom";
 import Profile from "./Profile";
 import MenuDrawer from "./MenuDrawer";
 import {loginUser} from "../services/UserApiUtil";
-import {isUserLoggedIn} from "../services/StorageUtil";
+import {isDrawerVisible, isUserLoggedIn} from "../services/StorageUtil";
+import MenuDrawerContent from "./MenuDrawerContent";
 
 
 class Login extends Component {
@@ -26,26 +27,30 @@ class Login extends Component {
                     <MuiThemeProvider>
                         <div>
                             <MenuDrawer/>
-                            <TextField style={style}
-                                       hintText="Enter your Email"
-                                       floatingLabelText="Email"
-                                       onChange={(event, newValue) => this.setState({email: newValue})}
-                            />
-                            <br/>
-                            <TextField style={style}
-                                       type="password"
-                                       hintText="Enter your Password"
-                                       floatingLabelText="Password"
-                                       onChange={(event, newValue) => this.setState({password: newValue})}
-                            />
-                            <br/>
-                            <RaisedButton label="Submit" primary={true} style={style}
-                                          onClick={() => this.handleClick()}/>
-                            <br/>
-                            or register
-                            <Link to="/register">
-                                <RaisedButton label="here" style={style}/>
-                            </Link>
+                            <MenuDrawerContent isVisible={isDrawerVisible()}/>
+                            <div>
+                                <TextField style={style}
+                                           hintText="Enter your Email"
+                                           floatingLabelText="Email"
+                                           onChange={(event, newValue) => this.setState({email: newValue})}
+                                />
+                                <br/>
+                                <TextField style={style}
+                                           type="password"
+                                           hintText="Enter your Password"
+                                           floatingLabelText="Password"
+                                           onChange={(event, newValue) => this.setState({password: newValue})}
+                                />
+                                <br/>
+                                <RaisedButton label="Submit" primary={true} style={style}
+                                              onClick={() => this.handleClick()}/>
+                                <br/>
+                                or register
+                                <Link to="/register">
+                                    <RaisedButton label="here" style={style}/>
+                                </Link>
+                            </div>
+
                         </div>
                     </MuiThemeProvider>
                 </div>
@@ -69,4 +74,5 @@ class Login extends Component {
 const style = {
     margin: 15,
 };
+
 export default Login;
