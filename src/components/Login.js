@@ -190,7 +190,6 @@ function LogInForm(props) {
     )
 }
 
-
 const style = {
     margin: 15,
 };
