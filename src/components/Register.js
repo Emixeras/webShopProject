@@ -1,6 +1,4 @@
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import RaisedButton from 'material-ui/RaisedButton';
-//import {titles} from "../services/Utilities";
+import {titles} from "../services/Utilities";
 import {
     Card,
     Avatar,
@@ -10,21 +8,19 @@ import {
     TextField,
     FormControlLabel,
     Typography,
-    Container, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, MenuItem, FormHelperText,
+    FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton, MenuItem, FormHelperText,
 } from '@material-ui/core';
-import React, {Component, useState} from 'react';
+import React, {Component} from 'react';
 import {Link} from "react-router-dom";
-import red from "@material-ui/core/colors/red";
 import Profile from "./Profile";
 import MenuDrawer from "./MenuDrawer";
-import {loginUser, registerUser} from "../services/UserApiUtil";
+import {registerUser} from "../services/UserApiUtil";
 import {addDrawerCallback, isDrawerVisible, isUserLoggedIn} from "../services/StorageUtil";
 import {isEmail, padding, showToast} from "../services/Utilities";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import {Visibility, VisibilityOff} from "@material-ui/icons";
 import {makeStyles} from "@material-ui/core/styles";
 import {useHistory} from "react-router-dom";
-import {toast} from "react-toastify";
 
 class Register extends Component {
 
@@ -58,7 +54,7 @@ class Register extends Component {
 
     render() {
         if (!isUserLoggedIn()) {
-            return <LogInForm context={this}/>
+            return <RegisterForm context={this}/>
         } else {
             {/*<NavigateToProfile/>*/
             }
@@ -87,6 +83,9 @@ class Register extends Component {
         );
     }
 
+    checkEmail() {
+        return this.emailError = !(this.state.email.length === 0 || isEmail(this.state.email));
+    }
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -108,12 +107,10 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-    function LogInForm(props) {
+    function RegisterForm(props) {
         const that = props.context;
         const classes = useStyles();
         const history = useHistory();
-        const [showPassword, setShowPassword] = useState(false);
-        const validEmail = that.state.email.length === 0 || isEmail(that.state.email);
         return (
     <div>
                 <MenuDrawer/>
@@ -142,7 +139,7 @@ const useStyles = makeStyles((theme) => ({
                                         variant="outlined"
                                         onChange={event => that.setState({title: event.target.value.trim()})}
                                     >
-                                        {titles.map((option) => (
+                                        {titles().map((option) => (
                                             <MenuItem key={option.value}
                                                       value={option.value}>
                                                 {option.label}
@@ -186,9 +183,9 @@ const useStyles = makeStyles((theme) => ({
                                                label="E-Mail Adresse"
                                                variant="outlined"
                                                margin="normal"
-                                               error={!validEmail}
-                                               helperText={validEmail ? "" : "Eine valide E-Mail Adresse eingeben"}
+                                               error={that.checkEmail()}
                                                value={that.state.email}
+                                               helperText={that.emailError ? "Bitte eine Korrekte E-MailAdresse eingeben" : ""}
                                                name="email"
                                                onChange={event => that.setState({email: event.target.value})}/>
                                     <FormControl margin={"normal"}
@@ -202,7 +199,7 @@ const useStyles = makeStyles((theme) => ({
                                             endAdornment={
                                                 <InputAdornment position="end">
                                                     <IconButton
-                                                        onClick={event => {
+                                                        onClick={() => {
                                                             that.state.showPassword = !that.state.showPassword;
                                                             that.forceUpdate()
                                                         }}
@@ -232,7 +229,7 @@ const useStyles = makeStyles((theme) => ({
                                             endAdornment={
                                                 <InputAdornment position="end">
                                                     <IconButton
-                                                        onClick={event => {
+                                                        onClick={() => {
                                                             that.state.showPassword = !that.state.showPassword;
                                                             that.forceUpdate()
                                                         }}
@@ -306,30 +303,4 @@ const useStyles = makeStyles((theme) => ({
             </div>)
     }
 
-const titles = [
-    {
-        value: 'none',
-        label: 'Nicht Ausgewählt',
-    },
-    {
-        value: 'Hr',
-        label: 'Herr',
-    },
-    {
-        value: 'Fr',
-        label: 'Frau',
-    },
-    {
-        value: 'Prof',
-        label: 'Professor',
-    },
-    {
-        value: 'Dr',
-        label: 'Doktor',
-    },
-    {
-        value: 'Div',
-        label: 'Divers',
-    },
-];
 export default Register;

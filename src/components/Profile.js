@@ -1,31 +1,28 @@
 import React, {Component} from 'react';
+import {titles} from "../services/Utilities";
 import Grid from "@material-ui/core/Grid";
 import {
     Card,
-    Container,
     TextField,
     MenuItem,
     Button,
-    MuiThemeProvider,
     FormControl,
     InputLabel,
     OutlinedInput,
     InputAdornment,
     IconButton,
     FormHelperText,
-    Icon, fade
 } from '@material-ui/core';
 import MenuDrawer from "./MenuDrawer";
 import {Visibility, VisibilityOff, Edit, Save, ExitToApp, Delete} from "@material-ui/icons";
-import {ToastContainer, toast, Flip} from 'react-toastify';
+import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {deleteUser, logoutUser, updateUser} from "../services/UserApiUtil";
 import {padding, showToast, shallowEqual, isEmail} from "../services/Utilities";
 import {
     addDrawerCallback,
     getSessionUser,
-    isDrawerVisible,
-    setSessionUser
+    isDrawerVisible
 } from "../services/StorageUtil";
 import {useHistory} from "react-router-dom";
 import Login from "./Login";
@@ -69,7 +66,6 @@ class Profile extends Component {
     }
 
     render() {
-        // showToast("render");
         if (localStorage.getItem('isLoggedIn') === "1") {
             return <div>
                 {/*<MuiThemeProvider>*/}
@@ -110,7 +106,7 @@ class Profile extends Component {
                                             disabled={!this.editMode}
                                             onChange={this.handleChange}
                                         >
-                                            {titles.map((option) => (
+                                            {titles().map((option) => (
                                                 <MenuItem key={option.value}
                                                           value={option.value}>
                                                     {option.label}
@@ -211,7 +207,7 @@ class Profile extends Component {
                                                 endAdornment={
                                                     <InputAdornment position="end">
                                                         <IconButton
-                                                            onClick={event => {
+                                                            onClick={() => {
                                                                 this.showPassword = !this.showPassword;
                                                                 this.forceUpdate()
                                                             }}
@@ -244,7 +240,7 @@ class Profile extends Component {
                                                 endAdornment={
                                                     <InputAdornment position="end">
                                                         <IconButton
-                                                            onClick={event => {
+                                                            onClick={() => {
                                                                 this.showPassword = !this.showPassword;
                                                                 this.forceUpdate()
                                                             }}
@@ -407,12 +403,12 @@ class Profile extends Component {
     }
 }
 
-function DeleteAccountButton(props) {
+function DeleteAccountButton() {
     const history = useHistory();
 
     return (
         <Button variant="contained"
-                onClick={event => {
+                onClick={() => {
                     deleteUser(() => {
                         showToast("Löschen Erfolgreich", "success")
                         history.push("/");
@@ -425,7 +421,7 @@ function DeleteAccountButton(props) {
     )
 }
 
-function LogoutAccountButton(props) {
+function LogoutAccountButton() {
     const history = useHistory();
 
     return (
@@ -438,7 +434,7 @@ function LogoutAccountButton(props) {
                 <Grid item>
                     <Button endIcon={<ExitToApp/>}
                             variant="contained"
-                            onClick={event => {
+                            onClick={() => {
                                 logoutUser(() => {
                                     showToast("Abmeldung Erfolgreich", "success")
                                     history.push("/");
@@ -464,7 +460,7 @@ function ModeButtons(props) {
                 spacing={1}
                 direction="row">
                 <Grid item>
-                    <Button onClick={event => {
+                    <Button onClick={() => {
                         if (!shallowEqual(that.state, that.unchangedState)) {
                             if (window.confirm('Alle ungespeicherten Änderungen werden verworfen')) {
                                 that.setState(that.unchangedState);
@@ -477,7 +473,7 @@ function ModeButtons(props) {
                 <Grid item>
                     <Button variant="contained"
                             disabled={that.getButtonState()}
-                            onClick={event => {
+                            onClick={() => {
                                 console.log(that.state);
                                 if (shallowEqual(that.unchangedState, that.state)) {
                                     showToast('Es wurden keine Änderungen vorgenommen', "info");
@@ -517,7 +513,7 @@ function ModeButtons(props) {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={event => that.toggleEditMode()}
+                        onClick={() => that.toggleEditMode()}
                         endIcon={<Edit/>}>
                         Bearbeiten
                     </Button>
@@ -526,32 +522,5 @@ function ModeButtons(props) {
         )
     }
 }
-
-const titles = [
-    {
-        value: 'none',
-        label: 'Nicht Ausgewählt',
-    },
-    {
-        value: 'Hr',
-        label: 'Herr',
-    },
-    {
-        value: 'Fr',
-        label: 'Frau',
-    },
-    {
-        value: 'Prof',
-        label: 'Professor',
-    },
-    {
-        value: 'Dr',
-        label: 'Doktor',
-    },
-    {
-        value: 'Div',
-        label: 'Divers',
-    },
-];
 
 export default Profile;
