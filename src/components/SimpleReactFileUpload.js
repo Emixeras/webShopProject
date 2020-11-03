@@ -9,8 +9,8 @@ class SimpleReactFileUpload extends React.Component {
         this.state ={
             file:null,
         }
-        this.onClickHandler = this.onClickHandler.bind(this)
-        this.onChangeHandler = this.onChangeHandler.bind(this)
+        this.onFormSubmit = this.onFormSubmit.bind(this)
+        this.onChange = this.onChange.bind(this)
         this.fileUpload = this.fileUpload.bind(this)
     }
 
@@ -19,18 +19,10 @@ class SimpleReactFileUpload extends React.Component {
         this.fileUpload(this.state.file)
     }
 
+    onChange(e) {
+        this.setState({file:e.target.files[0]})
+    }
 
-    onChangeHandler=event=>{
-        this.setState({
-            selectedFile: event.target.files[0],
-            loaded: 0,
-        })
-    }
-    onClickHandler = () => {
-        const data = new FormData()
-        data.append('file', this.state.selectedFile)
-        this.fileUpload(data)
-    }
     fileUpload(file){
         //todo insert data from UI here
         var payload = {
@@ -70,22 +62,12 @@ class SimpleReactFileUpload extends React.Component {
     }
     render() {
         return (
-            <div  className="container">
-                <div className="row">
-                    <div style={{alignSelf: 'center'}}  className="col-md-6">
-                        <form style={{alignSelf: 'center'}}   method="post" action="#" id="#">
-                            <div className="form-group files">
-                                <label>Upload Your File </label>
-                                <input type="file" name="file" onChange={this.onChangeHandler}/>
-                            </div>
-                            <button type="button" className="btn btn-success btn-block"
-                                    onClick={this.onClickHandler}>Upload
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            )
+            <form onSubmit={this.onFormSubmit}>
+                <h1>File Upload</h1>
+                <input type="file" onChange={this.onChange} />
+                <button type="submit">Upload</button>
+            </form>
+        )
     }
 }
 
