@@ -186,6 +186,18 @@ class Profile extends Component {
                                                    helperText={this.emailError ? "Bitte eine Korrekte E-MailAdresse eingeben" : ""}
                                                    fullWidth/>
                                     </Grid>
+                                    <Grid item
+                                          fullWidth>
+                                        <TextField required
+                                                   label="Geburtsdatum"
+                                                   type="date"
+                                                   variant="outlined"
+                                                   margin={"normal"}
+                                                   fullWidth
+                                                   value={this.state.birth}
+                                                   onChange={event => this.changeStateItem("birth", event)}
+                                        />
+                                    </Grid>
                                     < Grid item>
                                         <FormControl margin={"normal"}
                                                      fullWidth
@@ -480,7 +492,7 @@ function ModeButtons(props) {
                                         that.unchangedState = that.state;
                                         debugger
                                         showToast('Die Daten wurden gespeichert', "success");
-                                        setSessionUser(response.data);
+                                        //setSessionUser(response.data);
                                     }, error => {
                                         console.log(error);
                                         showToast("Beim Speichern ist ein Fehler aufgetreten:\n" + error.message, "error");

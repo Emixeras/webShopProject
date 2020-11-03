@@ -1,6 +1,35 @@
 import { toast, Flip} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+export function titles() {
+    return (
+        [
+            {
+                value: 'none',
+                label: 'Nicht Ausgewählt',
+            },
+            {
+                value: 'Hr',
+                label: 'Herr',
+            },
+            {
+                value: 'Fr',
+                label: 'Frau',
+            },
+            {
+                value: 'Prof',
+                label: 'Professor',
+            },
+            {
+                value: 'Dr',
+                label: 'Doktor',
+            },
+            {
+                value: 'Div',
+                label: 'Divers',
+            },
+        ]
+    )
+}
 //  ------------------------- Padding ------------------------->
 export function padding_extend(obj, a, b, c, d) {
     debugger

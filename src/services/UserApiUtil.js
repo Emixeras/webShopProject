@@ -28,7 +28,6 @@ export const registerUser = (payload, onSuccess, onFail) => {
             }
         })
         .catch(function (error) {
-            alert('register failed');
             console.log(error);
             if (onFail)
                 onFail(error)
