@@ -27,11 +27,11 @@ class SimpleReactFileUpload extends React.Component {
         })
     }
     onClickHandler = () => {
-        const data = new FormData()
-        data.append('file', this.state.selectedFile)
-        this.fileUpload(data)
+        const formData = new FormData()
+        formData.append('Picture', this.state.selectedFile)
+        this.fileUpload(formData)
     }
-    fileUpload(file){
+    fileUpload(formData){
         //todo insert data from UI here
         var payload = {
 
@@ -52,9 +52,7 @@ class SimpleReactFileUpload extends React.Component {
             type: 'application/json'
         });
         const url = 'http://localhost:8080/article';
-        const formData = new FormData();
-        formData.append('Picture',file)
-        formData.append('Article',blob)
+        formData.append('Article', blob)
         const config = {
             headers: {
                 'content-type': 'multipart/form-data'
