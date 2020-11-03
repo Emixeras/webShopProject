@@ -53,8 +53,8 @@ class SimpleReactFileUpload extends React.Component {
         });
         const url = 'http://localhost:8080/article';
         const formData = new FormData();
-        formData.append('ArticlePicture',file)
-        formData.append('ArticleMetadata',blob)
+        formData.append('Picture',file)
+        formData.append('Article',blob)
         const config = {
             headers: {
                 'content-type': 'multipart/form-data'
