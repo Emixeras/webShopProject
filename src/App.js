@@ -6,8 +6,8 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import ShoppingCart from "./components/ShoppingCart";
 import Profile from "./components/Profile";
-import EditUser from "./components/EditUser";
 import SimpleReactFileUpload from "./components/SimpleReactFileUpload";
+import {toast} from 'react-toastify'
 
 toast.configure();
 function App() {
@@ -19,7 +19,6 @@ function App() {
         <Route path="/register" component={Register} exact />
         <Route path="/shoppingcart" component={ShoppingCart} exact />
         <Route path="/profile" component={Profile} exact />
-        <Route path="/editUser" component={EditUser} exact />
         <Route path="/upload" component={SimpleReactFileUpload} exact />
       </Switch>
     </div>

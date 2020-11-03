@@ -24,8 +24,7 @@
     "react-router-dom": "^5.2.0",
     "react-router-redux": "^4.0.8",
     "react-scripts": "3.4.3",
-    "write-json-file": "^4.3.0"
-    "react-scripts": "3.4.3",
+    "write-json-file": "^4.3.0",
     "react-toastify": "^6.0.9"
   },
   "scripts": {
