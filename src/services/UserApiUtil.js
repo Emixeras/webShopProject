@@ -1,5 +1,6 @@
 import axios from "axios";
 import {getSessionUser, setSessionUser, setUserLoggedIn} from "./StorageUtil";
+import {showToast} from "./Utilities";
 
 const apiBaseUrlUserRegister = "http://localhost:8080/user";
 const apiBaseUrlUserLogin = "http://localhost:8080/user";
@@ -49,19 +50,21 @@ export const loginUser = (email, password, onSuccess, onFail) => {
         .then(function (response) {
             console.log(response);
             if (response.status === 200) {
+                showToast("Anmeldung Erfolgreich", "success");
                 console.log("Login successfull");
                 setUserLoggedIn(true);
                 setSessionUser(response.data);
-                onSuccess(response);
+                if (onSuccess)
+                    onSuccess(response);
             } else {
-                alert('authentication failed, please try again');
+                showToast("Anmeldung Fehlgeschlagen", "error");
                 console.log(response);
                 if (onFail)
                     onFail(response);
             }
         })
         .catch(function (error) {
-            alert('login failed');
+            showToast("Anmeldung Fehlgeschlagen: " + error.message, "error");
             console.log(error);
             if (onFail)
                 onFail(error);
