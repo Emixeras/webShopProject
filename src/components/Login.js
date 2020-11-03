@@ -7,8 +7,7 @@ import {Link} from "react-router-dom";
 import Profile from "./Profile";
 import MenuDrawer from "./MenuDrawer";
 import {loginUser} from "../services/UserApiUtil";
-import {isDrawerVisible, isUserLoggedIn} from "../services/StorageUtil";
-import MenuDrawerContent from "./MenuDrawerContent";
+import {isUserLoggedIn} from "../services/StorageUtil";
 
 
 class Login extends Component {
@@ -27,7 +26,6 @@ class Login extends Component {
                     <MuiThemeProvider>
                         <div>
                             <MenuDrawer/>
-                            <MenuDrawerContent isVisible={isDrawerVisible()}/>
                             <div>
                                 <TextField style={style}
                                            hintText="Enter your Email"
