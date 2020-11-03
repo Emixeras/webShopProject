@@ -9,6 +9,7 @@ import Profile from "./components/Profile";
 import EditUser from "./components/EditUser";
 import SimpleReactFileUpload from "./components/SimpleReactFileUpload";
 
+toast.configure();
 function App() {
   return (
     <div className="App">

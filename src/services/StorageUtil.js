@@ -25,8 +25,24 @@ export const setDrawerVisible = (bool) =>{
     }else{
         localStorage.setItem('isDrawerVisible',undefined)
     }
+    drawerStateCallbackList.forEach(value => value(bool))
 }
 
 export const isDrawerVisible = () =>{
     return localStorage.getItem('isDrawerVisible') === '1';
 }
+
+//  ------------------------- Drawer-Callbacks ------------------------->
+const drawerStateCallbackList = require("collections/list")();
+
+/**
+ * @param {function} callback Der hinzuzufügende Clallback
+ */
+export function addDrawerCallback(callback) {
+    drawerStateCallbackList.push(callback)
+}
+
+export function removeDrawerCallback(callback) {
+    drawerStateCallbackList.delete(callback)
+}
+//  <------------------------- Drawer-Callbacks -------------------------

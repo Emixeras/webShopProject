@@ -10,6 +10,7 @@
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "axios": "^0.20.0",
+    "collections": "^5.1.12",
     "date-fns": "^2.16.1",
     "dateformat": "^3.0.3",
     "load-json-file": "^6.2.0",
@@ -24,6 +25,8 @@
     "react-router-redux": "^4.0.8",
     "react-scripts": "3.4.3",
     "write-json-file": "^4.3.0"
+    "react-scripts": "3.4.3",
+    "react-toastify": "^6.0.9"
   },
   "scripts": {
     "start": "react-scripts start",
