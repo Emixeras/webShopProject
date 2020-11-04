@@ -22,6 +22,7 @@ import logo from "../assets/text4549.png";
 import AlbumIcon from '@material-ui/icons/Album';
 import LibraryMusicIcon from '@material-ui/icons/LibraryMusic';
 import RadioIcon from '@material-ui/icons/Radio';
+import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
 import {isDrawerVisible, setDrawerVisible} from "../services/StorageUtil";
 
 const drawerWidth = 240;
@@ -144,7 +145,8 @@ export default function MenuDrawer() {
                         <img style={{alignSelf: 'center'}} height="50" src={logo} alt="fireSpot"/>
                     </div>
                     <Link to="/">
-                        <IconButton style={{margin: 5, color: "white"}} component="span" edge="start">
+                        <IconButton style={{margin: 5, color: "white"}} component="span"
+                                    edge="start">
                             <HomeIcon/>
                         </IconButton>
                     </Link>
@@ -156,6 +158,11 @@ export default function MenuDrawer() {
                     <IconButton style={{margin: 5, color: "white"}} component="span">
                         <AccountCircleIcon/>
                     </IconButton>
+                    <Link to="/dev">
+                        <IconButton style={{margin: 5, color: "white"}} component="span">
+                            <DeveloperBoardIcon/>
+                        </IconButton>
+                    </Link>
                 </Link>
                 </Toolbar>
             </AppBar>
