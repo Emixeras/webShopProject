@@ -6,6 +6,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import ShoppingCart from "./components/ShoppingCart";
 import Profile from "./components/Profile";
+import Dev from "./components/Dev";
 import SimpleReactFileUpload from "./components/SimpleReactFileUpload";
 import {toast} from 'react-toastify'
 import EditArticles from "./components/EditArticles";
@@ -22,6 +23,8 @@ function App() {
         <Route path="/profile" component={Profile} exact />
         <Route path="/upload" component={SimpleReactFileUpload} exact />
         <Route path="/editArticles" component={EditArticles} exact />
+        <Route path="/dev" component={Dev} exact />
+        <Route component={Home}/>
       </Switch>
     </div>
 

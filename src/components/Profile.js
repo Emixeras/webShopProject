@@ -22,7 +22,7 @@ import {padding, showToast, shallowEqual, isEmail} from "../services/Utilities";
 import {
     addDrawerCallback,
     getSessionUser,
-    isDrawerVisible
+    isDrawerVisible, removeDrawerCallback
 } from "../services/StorageUtil";
 import {useHistory} from "react-router-dom";
 import Login from "./Login";
@@ -37,6 +37,11 @@ class Profile extends Component {
     editMode = false;
     currentEdiModeToastId = 0;
     drawerState = isDrawerVisible();
+
+    drawerCallback = state => {
+        this.drawerState = state;
+        this.forceUpdate()
+    };
 
     constructor(props) {
         super(props);
@@ -59,10 +64,7 @@ class Profile extends Component {
             this.state = this.unchangedState = {...this.state, ...this.user};
             this.passwordState = {password: this.user.password, passwordRepeat: this.user.password};
         }
-        addDrawerCallback(state => {
-            this.drawerState = state;
-            this.forceUpdate()
-        })
+        addDrawerCallback(this.drawerCallback)
     }
 
     render() {
@@ -356,6 +358,8 @@ class Profile extends Component {
             );
         }
     }
+
+    componentWillUnmount() {removeDrawerCallback(this.drawerCallback)}
 
     // ---------------
 
