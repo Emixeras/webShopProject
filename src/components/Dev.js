@@ -13,6 +13,7 @@ import {
 import MenuDrawer from "./MenuDrawer";
 import Box from "@material-ui/core/Box";
 import {Visibility, VisibilityOff} from "@material-ui/icons";
+import {addDrawerCallback, removeDrawerCallback} from "../services/StorageUtil";
 
 class Dev extends React.Component {
 
@@ -22,6 +23,15 @@ class Dev extends React.Component {
         "POST": "#49cc90",
         "DELETE": "#f93e3e"
     };
+    drawerCallback = state => {
+        this.drawerState = state;
+        this.forceUpdate()
+    };
+
+    constructor(props) {
+        super(props);
+        addDrawerCallback(this.drawerCallback)
+    }
 
     render() {
         return (
@@ -43,7 +53,9 @@ class Dev extends React.Component {
         )
     }
 
-    // <RaisedButton label="Query" primary={true} style={style} onClick={(event) => this.apiRequestUser(event)} />
+    componentWillUnmount() {removeDrawerCallback(this.drawerCallback)}
+
+    // ---------------
 
     generateComponents() {
         return (
