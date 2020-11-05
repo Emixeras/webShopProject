@@ -22,7 +22,7 @@ import {padding, showToast, shallowEqual, isEmail} from "../services/Utilities";
 import {
     addDrawerCallback,
     getSessionUser,
-    isDrawerVisible, removeDrawerCallback
+    isDrawerVisible, isUserLoggedIn, removeDrawerCallback
 } from "../services/StorageUtil";
 import {useHistory} from "react-router-dom";
 import Login from "./Login";
@@ -68,10 +68,8 @@ class Profile extends Component {
     }
 
     render() {
-        if (localStorage.getItem('isLoggedIn') === "1") {
+        if (isUserLoggedIn()) {
             return <div>
-                {/*<MuiThemeProvider>*/}
-                {/*    <div>*/}
                 <MenuDrawer/>
                 <div style={{
                     marginTop: 8,
@@ -183,18 +181,6 @@ class Profile extends Component {
                                                    disabled={!this.editMode}
                                                    helperText={this.emailError ? "Bitte eine Korrekte E-MailAdresse eingeben" : ""}
                                                    fullWidth/>
-                                    </Grid>
-                                    <Grid item
-                                          fullWidth>
-                                        <TextField required
-                                                   label="Geburtsdatum"
-                                                   type="date"
-                                                   variant="outlined"
-                                                   margin={"normal"}
-                                                   fullWidth
-                                                   value={this.state.birth}
-                                                   onChange={event => this.changeStateItem("birth", event)}
-                                        />
                                     </Grid>
                                     < Grid item>
                                         <FormControl margin={"normal"}
@@ -349,8 +335,6 @@ class Profile extends Component {
                         <LogoutAccountButton context={this}/>
                     </Grid>
                 </div>
-                {/*    </div>*/}
-                {/*</MuiThemeProvider>*/}
             </div>;
         } else {
             return (
@@ -359,7 +343,9 @@ class Profile extends Component {
         }
     }
 
-    componentWillUnmount() {removeDrawerCallback(this.drawerCallback)}
+    componentWillUnmount() {
+        removeDrawerCallback(this.drawerCallback)
+    }
 
     // ---------------
 
@@ -481,25 +467,22 @@ function ModeButtons(props) {
                                 console.log(that.state);
                                 if (shallowEqual(that.unchangedState, that.state)) {
                                     showToast('Es wurden keine Änderungen vorgenommen', "info");
+                                    that.toggleEditMode();
                                 } else {
                                     let payload = {
                                         ...that.state,
-                                        birth: (that.unchangedState.birth + "T00:00:00Z[UTC]")
+                                        birth: (that.state.birth + "T00:00:00Z[UTC]")
                                     };
-                                    debugger
                                     updateUser(payload, response => {
                                         console.log(response);
                                         that.unchangedState = that.state;
-                                        debugger
                                         showToast('Die Daten wurden gespeichert', "success");
-                                        //setSessionUser(response.data);
+                                        that.toggleEditMode();
                                     }, error => {
                                         console.log(error);
                                         showToast("Beim Speichern ist ein Fehler aufgetreten:\n" + error.message, "error");
-                                        debugger
                                     })
                                 }
-                                that.toggleEditMode();
                             }}
                             endIcon={<Save/>}
                             color="primary">Speichern</Button>

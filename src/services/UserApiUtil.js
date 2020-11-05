@@ -79,7 +79,6 @@ export const updateUser = (payload, onSuccess, onFail) => {
         }
     })
         .then(function (response) {
-            debugger
             console.log(response);
             if (response.status === 200) {
                 console.log("update successfull");
@@ -94,7 +93,6 @@ export const updateUser = (payload, onSuccess, onFail) => {
             }
         })
         .catch(function (error) {
-            debugger
             console.log("user update failed")
             console.log(error);
             if (onFail)
