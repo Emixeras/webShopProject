@@ -111,7 +111,8 @@ class Dev extends React.Component {
                 return (
                     <Grid item>
                         <div onClick={event => {
-                            if (!window.getSelection().toString()) {
+                            let clickedClassName = event.target.className.toString();
+                            if (!window.getSelection().toString() && (clickedClassName.includes("MuiTypography") || clickedClassName.includes("MuiPaper") || clickedClassName.includes("MuiGrid"))) {
                                 currentCallResponse.showCompleteResponse = (!currentCallResponse.showCompleteResponse);
                                 this.forceUpdate()
                             }
