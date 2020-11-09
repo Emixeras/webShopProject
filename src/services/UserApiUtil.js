@@ -1,6 +1,6 @@
 import axios from "axios";
 import {getSessionUser, setSessionUser, setUserLoggedIn} from "./StorageUtil";
-import {showToast} from "./Utilities";
+import {showToast} from "../Utilities/Utilities";
 
 const apiBaseUrlUserRegister = "http://localhost:8080/user";
 const apiBaseUrlUserLogin = "http://localhost:8080/user";

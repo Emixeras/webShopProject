@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {titles} from "../services/Utilities";
+import React, {Component, useState} from 'react';
+import {titles} from "../Utilities/Utilities";
 import Grid from "@material-ui/core/Grid";
 import {
     Card,
@@ -18,7 +18,7 @@ import {Visibility, VisibilityOff, Edit, Save, ExitToApp, Delete} from "@materia
 import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {deleteUser, logoutUser, updateUser} from "../services/UserApiUtil";
-import {padding, showToast, shallowEqual, isEmail} from "../services/Utilities";
+import {padding, showToast, shallowEqual, isEmail} from "../Utilities/Utilities";
 import {
     addDrawerCallback,
     getSessionUser,
@@ -26,6 +26,8 @@ import {
 } from "../services/StorageUtil";
 import {useHistory} from "react-router-dom";
 import Login from "./Login";
+import {DialogBuilder} from "../Utilities/DialogBuilder";
+import {Triple} from "../Utilities/TsUtilities";
 
 class Profile extends Component {
     showPassword = false;
@@ -213,7 +215,7 @@ class Profile extends Component {
                                             />
                                         </FormControl>
                                     </Grid>
-                                    < Grid item>
+                                    {this.editMode && < Grid item>
                                         <FormControl margin={"normal"}
                                                      fullWidth
                                                      variant="outlined">
@@ -247,7 +249,7 @@ class Profile extends Component {
                                             <FormHelperText
                                                 error={this.passwordError}> {this.passwordError ? "Die Passwörter müssen übereinstimmen" : ""}</FormHelperText>
                                         </FormControl>
-                                    </Grid>
+                                    </Grid>}
 
                                 </Grid>
                             </Card>
@@ -395,19 +397,37 @@ class Profile extends Component {
 
 function DeleteAccountButton() {
     const history = useHistory();
+    const [open, setOpen] = useState(false);
 
     return (
-        <Button variant="contained"
-                onClick={() => {
-                    deleteUser(() => {
-                        showToast("Löschen Erfolgreich", "success")
-                        history.push("/");
-                    }, () => {
-                        showToast('Benutzer Löschen Fehlgeschlagen', "error")
-                    });
-                }}
-                endIcon={<Delete/>}
-                color="secondary">Account Löschen</Button>
+        <div>
+            <Button variant="contained"
+                    onClick={() => setOpen(true)}
+                    endIcon={<Delete/>}
+                    color="secondary">Account Löschen</Button>
+            {new DialogBuilder(open, dialogBuilder => setOpen(false))
+                .setTitle("Account Löschen")
+                .setText("Möchtesten sie wirklich den Account unwiederruflich löschen?")
+                .addButton("Abbrechen")
+                .addButton({
+                    label: "Löschen",
+                    color: "secondary",
+                    dismissOnClick: false,
+                    onClick: dialogBuilder => {
+                        deleteUser(() => {
+                            showToast("Löschen Erfolgreich", "success")
+                            dialogBuilder.dismiss()
+                            history.push("/");
+                        }, () => {
+                            showToast('Benutzer Löschen Fehlgeschlagen', "error")
+                        });
+                    },
+                    icon: <Delete/>,
+                    iconAtStart: true,
+                    isActionButton: true
+                })
+                .build()}
+        </div>
     )
 }
 
@@ -441,6 +461,7 @@ function LogoutAccountButton() {
 
 function ModeButtons(props) {
     let that = props.context;
+    const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     if (that.editMode) {
         return (
             <Grid
@@ -451,14 +472,27 @@ function ModeButtons(props) {
                 direction="row">
                 <Grid item>
                     <Button onClick={() => {
-                        if (!shallowEqual(that.state, that.unchangedState)) {
-                            if (window.confirm('Alle ungespeicherten Änderungen werden verworfen')) {
+                        if (!shallowEqual(that.state, that.unchangedState))
+                            setCancelDialogOpen(true);
+                        else
+                            that.toggleEditMode();
+                    }}>Abbrechen</Button>
+                    {new DialogBuilder(cancelDialogOpen, dialogBuilder => setCancelDialogOpen(false))
+                        .setTitle("Änderungen Verwerfen?")
+                        .setText("Sollen alle ungespeicherten Änderungen verworfen werden?")
+                        .addButton("Nein")
+                        .addButton({
+                            label: "Ja", color: "primary", onClick: dialogBuilder => {
+                                that.passwordState = {
+                                    password: that.unchangedState.password,
+                                    passwordRepeat: that.unchangedState.password
+                                };
+                                that.passwordError = false;
                                 that.setState(that.unchangedState);
                                 that.toggleEditMode(true);
                             }
-                        } else
-                            that.toggleEditMode();
-                    }}>Abbrechen</Button>
+                        })
+                        .build()}
                 </Grid>
                 <Grid item>
                     <Button variant="contained"

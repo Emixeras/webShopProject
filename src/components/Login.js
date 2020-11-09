@@ -13,7 +13,7 @@ import {
     removeDrawerCallback
 } from "../services/StorageUtil";
 import {makeStyles} from '@material-ui/core/styles';
-import {isEmail, padding} from "../services/Utilities";
+import {isEmail, padding} from "../Utilities/Utilities";
 import {
     Card,
     Avatar,
@@ -102,6 +102,16 @@ function LogInForm(props) {
     const history = useHistory();
     const [showPassword, setShowPassword] = useState(false);
     const validEmail = that.state.email.length === 0 || isEmail(that.state.email);
+    let login = () => {
+        loginUser(that.state.email, that.state.password, () => {
+            history.push("/")
+        })
+    };
+    let onKeyPress = (event) => {
+        if (event.key === 'Enter' && (validEmail && that.state.email && that.state.password)) {
+            login();
+        }
+    };
     return (
         <div>
             <MenuDrawer/>
@@ -129,6 +139,7 @@ function LogInForm(props) {
                                        helperText={validEmail ? "" : "Eine valide E-MailAdresse eingeben"}
                                        value={that.state.email}
                                        name="email"
+                                       onKeyPress={onKeyPress}
                                        onChange={event => that.setState({email: event.target.value})}/>
                             <FormControl margin={"normal"}
                                          fullWidth
@@ -138,6 +149,7 @@ function LogInForm(props) {
                                     type={showPassword ? 'text' : 'password'}
                                     value={that.state.password}
                                     onChange={event => that.setState({password: event.target.value})}
+                                    onKeyPress={onKeyPress}
                                     endAdornment={
                                         <InputAdornment position="end">
                                             <IconButton
@@ -164,11 +176,7 @@ function LogInForm(props) {
                                 fullWidth
                                 variant="contained"
                                 color="primary"
-                                onClick={() => {
-                                    loginUser(that.state.email, that.state.password, () => {
-                                        history.push("/")
-                                    })
-                                }}
+                                onClick={login}
                                 disabled={!(validEmail && that.state.email && that.state.password)}
                                 style={{marginBottom: 12, marginTop: 12}}
                             >Anmelden</Button>

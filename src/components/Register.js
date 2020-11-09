@@ -1,4 +1,4 @@
-import {titles} from "../services/Utilities";
+import {titles} from "../Utilities/Utilities";
 import {
     Card,
     Avatar,
@@ -21,7 +21,7 @@ import {
     isUserLoggedIn,
     removeDrawerCallback
 } from "../services/StorageUtil";
-import {isEmail, padding, showToast} from "../services/Utilities";
+import {isEmail, padding, showToast} from "../Utilities/Utilities";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import {Visibility, VisibilityOff} from "@material-ui/icons";
 import {makeStyles} from "@material-ui/core/styles";

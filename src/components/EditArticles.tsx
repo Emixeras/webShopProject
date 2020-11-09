@@ -15,12 +15,14 @@ import {
 } from "@material-ui/core";
 import MenuDrawer from "./MenuDrawer";
 import {addDrawerCallback, isDrawerVisible, removeDrawerCallback} from "../services/StorageUtil";
-import {padding, showToast} from "../services/Utilities";
+import {padding, showToast} from "../Utilities/Utilities";
 import SimpleReactFileUpload from "./SimpleReactFileUpload";
 import {Combobox, DropdownList} from 'react-widgets'
 import 'react-widgets/dist/css/react-widgets.css';
 // import '../themes/react-widgets.css'
 import AddIcon from '@material-ui/icons/Add';
+import {DialogBuilder} from "../Utilities/DialogBuilder";
+import {Pair, Triple} from "../Utilities/TsUtilities";
 
 interface IProps {
 }
@@ -375,80 +377,50 @@ export default class EditArticles extends React.Component<IProps, IState> {
 function DialogComponent(arg: any) {
     const that: EditArticles = arg.context;
     const [open, setOpen] = React.useState(false);
-    const [input, setInput] = React.useState("");
-    const [error, setError] = React.useState("");
 
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-        setInput("")
-    };
-
-    let onSubmit = (event?: any) => {
-        let netArtist = {
-            id: that.artists.length + 1,
-            name: input.trim()
-        };
-        that.artists.push(netArtist);
-        that.setState({artists: netArtist});
-        handleClose()
-    };
     return (
         <div>
             <IconButton style={{maxHeight: 38, maxWidth: 38}}
-                        onClick={handleClickOpen}
+                        onClick={event => setOpen(true)}
                         onMouseDown={(event) => {
                             event.preventDefault();
                         }}>
                 {<AddIcon/>}
             </IconButton>
 
-            <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-                <DialogTitle id="form-dialog-title">Künstler Anlegen</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Bitte den Namen des neuen Künstlers eingeben und auf 'Anlegen' klicken.
-                    </DialogContentText>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        label="Künstler Name"
-                        fullWidth
-                        onKeyPress={(event) => {
-                            if (event.key === 'Enter' && !error) {
-                                onSubmit()
+            {new DialogBuilder(open, dialogBuilder => setOpen(false))
+                .setTitle("Künstler Anlegen")
+                .setText("Bitte den Namen des neuen Künstlers eingeben und auf 'Anlegen' klicken.")
+                .setInput({
+                    label: "Künstler Name",
+                    inputValidator: text => {
+                        let newInput = text;
+                        let result = "";
+                        for (let artist of that.artists) {
+                            if (artist.name.toLowerCase() === newInput.toLowerCase().trim()) {
+                                result = "Der Künstler existiert bereits";
+                                break
                             }
-                        }}
-                        error={!!error}
-                        helperText={error}
-                        onChange={event => {
-                            let newInput = event.target.value;
-                            let result = "";
-                            for (let artist of that.artists) {
-                                if (artist.name.toLowerCase() === newInput.toLowerCase().trim()) {
-                                    result = "Künstler existiert bereits";
-                                    break
-                                }
-                            }
-                            setError(result);
-                            setInput(newInput);
-                        }}
-                        value={input}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose} color="primary">
-                        Abbrechen
-                    </Button>
-                    <Button variant="contained" disabled={!input || !!error}
-                            onClick={onSubmit} color="primary">
-                        Anlegen
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                        }
+                        return Pair.make(result, !text.trim() || !!result);
+                    }
+
+                })
+                .addButton("Abbrechen")
+                .addButton({
+                    label: "Anlegen",
+                    isActionButton: true,
+                    onClick: dialogBuilder => {
+                        let netArtist = {
+                            id: that.artists.length + 1,
+                            name: dialogBuilder.getInputText().trim()
+                        };
+                        that.artists.push(netArtist);
+                        that.setState({artists: netArtist});
+                    }
+                })
+                .build()
+            }
         </div>
     )
 

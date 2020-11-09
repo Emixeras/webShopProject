@@ -9,7 +9,7 @@ import {
     isEmail,
     addAlphaToHexColor,
     hexToRgbA,
-} from "../services/Utilities";
+} from "../Utilities/Utilities";
 import MenuDrawer from "./MenuDrawer";
 import Box from "@material-ui/core/Box";
 import {Visibility, VisibilityOff} from "@material-ui/icons";
