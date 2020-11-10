@@ -1,9 +1,5 @@
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import RaisedButton from 'material-ui/RaisedButton';
 import React, {Component, useState} from 'react';
 import {Link} from "react-router-dom";
-
-import Profile from "./Profile";
 import MenuDrawer from "./MenuDrawer";
 import {loginUser} from "../services/UserApiUtil";
 import {
@@ -25,13 +21,10 @@ import {
     Typography,
     Container, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton,
 } from '@material-ui/core';
-import Box from '@material-ui/core/Box';
-
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import {useHistory} from "react-router-dom";
-import CssBaseline from '@material-ui/core/CssBaseline';
 import {Visibility, VisibilityOff} from "@material-ui/icons";
-
+import {NavigationComponent} from "../Utilities/Utilities.js"
 
 class Login extends Component {
     showPassword = false;
@@ -60,22 +53,12 @@ class Login extends Component {
         if (!isUserLoggedIn()) {
             return <LogInForm context={this}/>
         } else {
-            {/*<NavigateToProfile/>*/
-            }
-            return (
-                <Profile/>
-            );
+            return <NavigationComponent to={"/Profile"}/>;
         }
     }
 
     componentWillUnmount() {removeDrawerCallback(this.drawerCallback)}
 }
-
-function NavigateToProfile() {
-    const history = useHistory();
-    history.push("/Profile")
-}
-
 
 const useStyles = makeStyles((theme) => ({
     paper: {

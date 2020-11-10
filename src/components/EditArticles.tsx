@@ -153,80 +153,22 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                           ' | e: ' + dataItem.ean
                                       }
                                       itemComponent={({item}) => {
-                                          // return (
-                                          //     <Box  style={{
-                                          //         width: "100%",
-                                          //         backgroundColor: "red",
-                                          //         alignContent:"start",alignItems:"start"
-                                          //     }} display="flex" justifyContent="flex-start">
-                                          //         <Box  style={{backgroundColor: "green"}}>
-                                          //             <strong>i: </strong>
-                                          //             {item.id + " | "}
-                                          //             <strong>t: </strong>
-                                          //             {item.title + " | "}
-                                          //             <strong>a: </strong>
-                                          //             {item.artists.name + " | "}
-                                          //             <strong>g: </strong>
-                                          //             {item.genre.name + " | "}
-                                          //             <strong>p: </strong>
-                                          //             {item.price + " | "}
-                                          //             <strong>e: </strong>
-                                          //             {item.ean}
-                                          //         </Box>
-                                          //         <Grid item xs>
-                                          //         </Grid>
-                                          //     </Box>
-                                          // );
-
                                           return (
-                                              <Grid container style={{
-                                                  width: "100%",
-                                                  /*backgroundColor: "red",
-                                                  alignContent:"start",alignItems:"start"*/
-                                              }}>
-                                                  <Grid item /*style={{backgroundColor: "green"}}*/>
-                                                      <strong>i: </strong>
-                                                      {item.id + " | "}
-                                                      <strong>t: </strong>
-                                                      {item.title + " | "}
-                                                      <strong>a: </strong>
-                                                      {item.artists.name + " | "}
-                                                      <strong>g: </strong>
-                                                      {item.genre.name + " | "}
-                                                      <strong>p: </strong>
-                                                      {item.price + " | "}
-                                                      <strong>e: </strong>
-                                                      {item.ean}
-                                                  </Grid>
-                                                  <Grid item xs>
-                                                  </Grid>
-                                              </Grid>
+                                              <div>
+                                                  <strong>i: </strong>
+                                                  {item.id + " | "}
+                                                  <strong>t: </strong>
+                                                  {item.title + " | "}
+                                                  <strong>a: </strong>
+                                                  {item.artists.name + " | "}
+                                                  <strong>g: </strong>
+                                                  {item.genre.name + " | "}
+                                                  <strong>p: </strong>
+                                                  {item.price + " | "}
+                                                  <strong>e: </strong>
+                                                  {item.ean}
+                                              </div>
                                           );
-                                          // return (
-                                          //     /*<div  style={{*/
-                                          //         // width: "100%",
-                                          //         // backgroundColor: "red",
-                                          //         // alignContent:"start",alignItems:"start",
-                                          //         // justifySelf:"baseline"
-                                          //     // }} >
-                                          //         <div  style={{backgroundColor: "green", justifyContent:"start", justifyItems:"start", textJustify:"none", justifySelf:"start"}}>
-                                          //             {/*a*/}
-                                          //             <strong>i: </strong>
-                                          //             {item.id + " | "}
-                                          //             <strong>t: </strong>
-                                          //             {item.title + " | "}
-                                          //             <strong>a: </strong>
-                                          //             {item.artists.name + " | "}
-                                          //             <strong>g: </strong>
-                                          //             {item.genre.name + " | "}
-                                          //             <strong>p: </strong>
-                                          //             {item.price + " | "}
-                                          //             <strong>e: </strong>
-                                          //             {item.ean}
-                                          //         </div>
-                                          //     // </div>
-                                          // );
-
                                       }}
                                       filter={(dataItem: Article, searchItem: string): boolean => {
                                           searchItem = searchItem.toLowerCase();
@@ -239,7 +181,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                               let type: boolean | string = sub.length > 1 && sub.charAt(1) === ":";
                                               if (type) {
                                                   type = sub.substr(0, 1);
-                                                  sub = sub.substr(2);
+                                                  sub = sub.substr(2).trim();
                                               }
 
                                               if (sub.length === 0 && length > 1) {
@@ -249,21 +191,14 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                               }
 
                                               if ((!type || type === "i") && dataItem.id.toString().toLowerCase().includes(sub)) {
-                                                  if (++found >= length) {
-                                                      // debugger
+                                                  if (++found >= length)
                                                       return true;
-                                                  }
-                                              }
-                                              if ((!type || type === "t") && dataItem.title.toLowerCase().includes(sub)) {
-                                                  if (++found >= length) {
-                                                      // debugger
+                                              } else if ((!type || type === "t") && dataItem.title.toLowerCase().includes(sub)) {
+                                                  if (++found >= length)
                                                       return true;
-                                                  }
                                               } else if ((!type || type === "a") && dataItem.artists.name.toLowerCase().includes(sub)) {
-                                                  // debugger
-                                                  if (++found >= length) {
+                                                  if (++found >= length)
                                                       return true;
-                                                  }
                                               } else if ((!type || type === "g") && dataItem.genre.name.toLowerCase().includes(sub)) {
                                                   if (++found >= length)
                                                       return true;
@@ -273,6 +208,18 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                               } else if ((!type || type === "e") && dataItem.ean.toString().includes(sub)) {
                                                   if (++found >= length)
                                                       return true;
+                                              } else if ((!type || type === "p")) {
+                                                  sub = sub.replaceAll(",", ".");
+                                                  if (sub.includes("-")) {
+                                                      let fromTo = sub.split("-");
+                                                      if ((dataItem.price >= fromTo[0] || !fromTo[0]) && (dataItem.price <= fromTo[1] || !fromTo[1])) {
+                                                          if (++found >= length)
+                                                              return true;
+                                                      }
+                                                  } else if (dataItem.price == sub) {
+                                                      if (++found >= length)
+                                                          return true;
+                                                  }
                                               }
                                           }
                                           return false;
@@ -318,7 +265,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                         />
                                     </Grid>
                                     <Grid item sm={6} xs={12}>
-                                        <Grid container>
+                                        <Grid container style={{alignItems:"center"}} spacing={1}>
                                             <Grid item xs={11}>
                                                 <Combobox busy={this.articles.length === 0}
                                                           name={"Künstler"}
@@ -380,7 +327,7 @@ function DialogComponent(arg: any) {
 
     return (
         <div>
-            <IconButton style={{maxHeight: 38, maxWidth: 38}}
+            <IconButton style={{maxHeight: 30, maxWidth: 30}}
                         onClick={event => setOpen(true)}
                         onMouseDown={(event) => {
                             event.preventDefault();

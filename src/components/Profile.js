@@ -1,5 +1,5 @@
 import React, {Component, useState} from 'react';
-import {titles} from "../Utilities/Utilities";
+import {NavigationComponent, titles} from "../Utilities/Utilities";
 import Grid from "@material-ui/core/Grid";
 import {
     Card,
@@ -27,7 +27,7 @@ import {
 import {useHistory} from "react-router-dom";
 import Login from "./Login";
 import {DialogBuilder} from "../Utilities/DialogBuilder";
-import {Triple} from "../Utilities/TsUtilities";
+import {Pair, Triple} from "../Utilities/TsUtilities";
 
 class Profile extends Component {
     showPassword = false;
@@ -39,6 +39,7 @@ class Profile extends Component {
     editMode = false;
     currentEdiModeToastId = 0;
     drawerState = isDrawerVisible();
+    scrollHelper = Triple.make(this.editMode, 0, undefined);
 
     drawerCallback = state => {
         this.drawerState = state;
@@ -320,7 +321,7 @@ class Profile extends Component {
                             </Card>
                         </Grid>
                         <Grid item xs={12}>
-                            <Grid container
+                            <Grid container ref={element => this.scrollHelper.third = element}
                                   wrap={"wrap-reverse"}
                                   direction="row"
                                   justify="flex-end"
@@ -339,9 +340,15 @@ class Profile extends Component {
                 </div>
             </div>;
         } else {
-            return (
-                <Login/>
-            );
+            return <NavigationComponent to={"/login"}/>;
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.scrollHelper.first !== this.editMode) {
+            this.scrollHelper.first = this.editMode;
+            if (this.scrollHelper.third)
+                window.scrollBy(0, this.scrollHelper.third.getBoundingClientRect().top - this.scrollHelper.second)
         }
     }
 
@@ -390,6 +397,7 @@ class Profile extends Component {
 
     toggleEditMode(notForce) {
         this.editMode = !this.editMode;
+        this.scrollHelper.second = this.scrollHelper.third.getBoundingClientRect().top;
         if (!notForce)
             this.forceUpdate()
     }
@@ -462,6 +470,7 @@ function LogoutAccountButton() {
 function ModeButtons(props) {
     let that = props.context;
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+
     if (that.editMode) {
         return (
             <Grid

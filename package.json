@@ -33,7 +33,8 @@
     "react-widgets": "^4.6.1",
     "typescript": "^4.0.5",
     "typescript-collections": "^1.3.3",
-    "write-json-file": "^4.3.0"
+    "write-json-file": "^4.3.0",
+    "prop-types": "latest"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -1,5 +1,8 @@
 import {toast, Flip} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {useHistory} from "react-router-dom";
+import React, {Component, useState} from 'react';
+import PropTypes from 'prop-types';
 
 export function titles() {
     return (
@@ -60,7 +63,7 @@ export function padding(a, b, c, d) {
 /**
  * @param {string} text Den anzuzeigenen Text
  * @param {(''|'info'|'success'|'warn'|'error'|'dark')} [type] Leer für 'Default', der eines der folgenden typen: 'info', 'success', 'warn', 'error', 'dark'
- * @param {object} [customOptions] Ein Objekt mit überschriebenen Optionen
+ * @param {ToastOptions} [customOptions] Ein Objekt mit überschriebenen Optionen
  * @returns {number} Gibt die Toast-ID zurück
  */
 export function showToast(text, type, customOptions) {
@@ -160,3 +163,19 @@ export function hexToRgbA(hex, alpha) {
 }
 
 //  <------------------------- Colors -------------------------
+
+
+//  ------------------------- Components ------------------------->
+export class NavigationComponent extends React.Component {render() {return <Navigate to={this.props.to}/>}}
+
+function Navigate(props) {
+    const history = useHistory();
+    history.push(props.to);
+    return null;
+}
+
+
+NavigationComponent.propTypes = {
+    to: PropTypes.string.isRequired
+};
+//  <------------------------- Components -------------------------
