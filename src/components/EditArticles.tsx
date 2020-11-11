@@ -22,7 +22,8 @@ import 'react-widgets/dist/css/react-widgets.css';
 // import '../themes/react-widgets.css'
 import AddIcon from '@material-ui/icons/Add';
 import {DialogBuilder} from "../Utilities/DialogBuilder";
-import {Pair, Triple} from "../Utilities/TsUtilities";
+import {ContextType, Pair, Triple} from "../Utilities/TsUtilities";
+import {Save} from "@material-ui/icons";
 
 interface IProps {
 }
@@ -127,8 +128,10 @@ export default class EditArticles extends React.Component<IProps, IState> {
 
     }
 
+    checkPrice = (price: string) => price.length > 0 && !/^(\d+([.,]\d{1,2})?)$/.test(price);
+
     render() {
-        const priceError = this.state.price.length > 0 && !/^(\d+([.,]\d{1,2})?)$/.test(this.state.price);
+        const priceError: boolean = this.checkPrice(this.state.price);
         return (
             <div>
                 <MenuDrawer/>
@@ -244,6 +247,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                         <TextField fullWidth
                                                    value={this.state.title}
                                                    label={"Album Titel"}
+                                                   onChange={event => this.setState({title: event.target.value})}
                                                    variant={"outlined"}/>
                                     </Grid>
                                     <Grid item sm={3} xs={12}>
@@ -265,7 +269,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                         />
                                     </Grid>
                                     <Grid item sm={6} xs={12}>
-                                        <Grid container style={{alignItems:"center"}} spacing={1}>
+                                        <Grid container style={{alignItems: "center"}} spacing={1}>
                                             <Grid item xs={11}>
                                                 <Combobox busy={this.articles.length === 0}
                                                           name={"Künstler"}
@@ -294,6 +298,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                    multiline
                                                    style={{height: "100%"}}
                                                    value={this.state.description ? this.state.description : ""}
+                                                   onChange={event => this.setState({description: event.target.value})}
                                                    label={"Beschreibung"}
                                                    variant={"outlined"}/>
                                     </Grid>
@@ -303,8 +308,20 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                     <Grid item sm={4} xs={12}>
                                         <TextField fullWidth
                                                    value={this.state.ean === 0 ? "" : this.state.ean}
+                                                   onChange={event => {
+                                                       let newValue = event.target.value;
+                                                       if (this.checkPrice(newValue))
+                                                           this.setState({ean: +newValue});
+                                                   }}
                                                    label={"EAN"}
                                                    variant={"outlined"}/>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Grid container justify="flex-end">
+                                            <Grid item>
+                                                <ActionButtons context={this}/>
+                                            </Grid>
+                                        </Grid>
                                     </Grid>
                                 </Grid>
                             </Card>
@@ -371,4 +388,18 @@ function DialogComponent(arg: any) {
         </div>
     )
 
+}
+
+function ActionButtons(props: ContextType<EditArticles>) {
+    let that: EditArticles = props.context;
+    return(
+        <Button endIcon={<Save/>}
+                onClick={event => {
+                    console.log(that.state.description);
+                }}
+                variant="contained"
+                color="primary">
+            Speichern
+        </Button>
+    )
 }
