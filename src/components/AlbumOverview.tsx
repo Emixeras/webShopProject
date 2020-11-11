@@ -1,23 +1,18 @@
 import React from 'react';
-import AppBar from '@material-ui/core/AppBar';
-import Button from '@material-ui/core/Button';
-import CameraIcon from '@material-ui/icons/PhotoCamera';
 import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import Grid from '@material-ui/core/Grid';
-import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import CardActionArea from "@material-ui/core/CardActionArea";
-import {NavLink} from "react-bootstrap";
-import IconButton from "@material-ui/core/IconButton";
-import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 import {showToast} from "../Utilities/Utilities";
-import {Link} from "@material-ui/core";
+import {Link} from "react-router-dom";
+import MenuDrawer from "./MenuDrawer";
+import {addDrawerCallback, isDrawerVisible, removeDrawerCallback} from "../services/StorageUtil";
+
+
 
 interface IProps {
 }
@@ -41,14 +36,29 @@ interface ArtistOrGenre {
 }
 
 export default class AlbumOverview extends React.Component<IProps, IState> {
+    drawerState = isDrawerVisible();
+    drawerCallback = (state: boolean) => {
+        this.drawerState = state;
+        this.forceUpdate()
+    };
 
     constructor(props: IProps, context: any) {
         super(props, context);
         this.loadArticles()
+        addDrawerCallback(this.drawerCallback)
     }
 
     render() {
-        return <Album/>
+        return (<div>
+                <MenuDrawer/>
+                <div style={{marginInlineStart: (this.drawerState ? 240 : 0)}}>
+                    <Album/>
+                </div>
+            </div>
+        )
+    }
+    componentWillUnmount() {
+        removeDrawerCallback(this.drawerCallback)
     }
 
     loadArticles() {
@@ -74,7 +84,7 @@ function Copyright() {
     return (
         <Typography variant="body2" color="textSecondary" align="center">
             {'Copyright © '}
-            <Link color="inherit" href="https://material-ui.com/">
+            <Link color="inherit" to="https://material-ui.com/">
                 Your Website
             </Link>{' '}
             {new Date().getFullYear()}
@@ -135,7 +145,7 @@ function Album() {
                     </Container>
                 </div>
                 <Container className={classes.cardGrid} maxWidth="lg">
-                    <Grid container spacing={4} >
+                    <Grid container spacing={4}>
                         {articleArray.map((article) => (
                             <ArticleComponent article={article}/>
                         ))}
@@ -160,10 +170,18 @@ function Album() {
 
 function ArticleComponent(props: any) {
     const classes = useStyles();
-    let article:Article = props.article;
+    let article: Article = props.article;
     return (
         <Grid item /*key={article}*/ xs={12} sm={6} md={4} lg={3}>
-            <CardActionArea href={"/editArticles"}>
+            <CardActionArea component={Link} to={(location: any) => {
+
+                location.pathname = "/article";
+
+                location.state = {article: article};
+
+                return location;
+
+            }} >
                 <Card className={classes.card}>
                     <CardMedia
                         className={classes.cardMedia}
@@ -177,9 +195,6 @@ function ArticleComponent(props: any) {
                         <Typography>
                             {article.description}
                         </Typography>
-                        <Link
-                            to={""}
-                        >Test Link</Link>
                     </CardContent>
                 </Card>
             </CardActionArea>

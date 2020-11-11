@@ -13,6 +13,7 @@
     "@types/node": "^14.14.6",
     "@types/react": "^16.9.55",
     "@types/react-dom": "^16.9.9",
+    "@types/react-router-dom": "^5.1.6",
     "@types/react-widgets": "^4.4.3",
     "axios": "^0.20.0",
     "collections": "^5.1.12",
