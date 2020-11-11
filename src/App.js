@@ -8,6 +8,7 @@ import ShoppingCart from "./components/ShoppingCart";
 import Profile from "./components/Profile";
 import SimpleReactFileUpload from "./components/SimpleReactFileUpload";
 import {toast} from 'react-toastify'
+import Albumansicht from "./components/Albumansicht";
 
 toast.configure();
 function App() {
@@ -20,6 +21,7 @@ function App() {
         <Route path="/shoppingcart" component={ShoppingCart} exact />
         <Route path="/profile" component={Profile} exact />
         <Route path="/upload" component={SimpleReactFileUpload} exact />
+        <Route path="/alben" component={Albumansicht} exact />
       </Switch>
     </div>
 
