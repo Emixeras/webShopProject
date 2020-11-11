@@ -1,7 +1,7 @@
 import {getSessionUser} from "./StorageUtil";
 import axios from "axios";
 
-const apiBaseUrlUpdateArticle = 'http://192.168.1.34:8080/article';
+const apiBaseUrlUpdateArticle = 'http://localhost:8080/article';
 
 export const createNewArticle = (metaDataPayload, pictureFile, onSuccess, onFail) => {
     var user = getSessionUser();
