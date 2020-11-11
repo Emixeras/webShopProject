@@ -36,13 +36,13 @@ export const isDrawerVisible = () =>{
 const drawerStateCallbackList = require("collections/list")();
 
 /**
- * @param {function} callback Der hinzuzufügende Clallback
+ * @param {function} drawerCallback Der hinzuzufügende Clallback
  */
-export function addDrawerCallback(callback) {
-    drawerStateCallbackList.push(callback)
+export function addDrawerCallback(drawerCallback) {
+    drawerStateCallbackList.push(drawerCallback)
 }
 
-export function removeDrawerCallback(callback) {
-    drawerStateCallbackList.delete(callback)
+export function removeDrawerCallback(drawerCallback) {
+    drawerStateCallbackList.delete(drawerCallback)
 }
 //  <------------------------- Drawer-Callbacks -------------------------

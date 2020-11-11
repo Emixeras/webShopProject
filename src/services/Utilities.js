@@ -1,5 +1,6 @@
-import { toast, Flip} from 'react-toastify';
+import {toast, Flip} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 export function titles() {
     return (
         [
@@ -30,6 +31,7 @@ export function titles() {
         ]
     )
 }
+
 //  ------------------------- Padding ------------------------->
 export function padding_extend(obj, a, b, c, d) {
     debugger
@@ -50,6 +52,7 @@ export function padding(a, b, c, d) {
         paddingLeft: d ? d : (b ? b : a)
     }
 }
+
 //  <------------------------- Padding -------------------------
 
 
@@ -74,6 +77,7 @@ export function showToast(text, type, customOptions, func) {
     else
         return toast(text, options);
 }
+
 //  <------------------------- Toast -------------------------
 
 
@@ -121,6 +125,7 @@ export function deepEqual(object1, object2) {
 export function isObject(object) {
     return object != null && typeof object === 'object';
 }
+
 //  <------------------------- ObjectComparisons -------------------------
 
 
@@ -136,4 +141,23 @@ export function isEmail(email) {
 export function isMobile(window) {
     return window.innerHeight > window.innerWidth
 }
+
 //  <------------------------- Checks -------------------------
+
+
+//  ------------------------- Colors ------------------------->
+export function hexToRgbA(hex, alpha) {
+    var c;
+    if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+        c = hex.substring(1).split('');
+        if (c.length == 3) {
+            c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+        }
+        c = '0x' + c.join('');
+        let s = 'rgba(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',' + alpha + ')';
+        return s;
+    }
+    throw new Error('Bad Hex');
+}
+
+//  <------------------------- Colors -------------------------

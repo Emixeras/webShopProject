@@ -6,7 +6,12 @@ import {Link} from "react-router-dom";
 import Profile from "./Profile";
 import MenuDrawer from "./MenuDrawer";
 import {loginUser} from "../services/UserApiUtil";
-import {addDrawerCallback, isDrawerVisible, isUserLoggedIn} from "../services/StorageUtil";
+import {
+    addDrawerCallback,
+    isDrawerVisible,
+    isUserLoggedIn,
+    removeDrawerCallback
+} from "../services/StorageUtil";
 import {makeStyles} from '@material-ui/core/styles';
 import {isEmail, padding} from "../services/Utilities";
 import {
@@ -36,16 +41,18 @@ class Login extends Component {
     drawerState = isDrawerVisible();
 
 
+    drawerCallback = state => {
+        this.drawerState = state;
+        this.forceUpdate()
+    };
+
     constructor(props) {
         super(props);
         this.state = {
             email: '',
             password: '',
         };
-        addDrawerCallback(state => {
-            this.drawerState = state;
-            this.forceUpdate()
-        })
+        addDrawerCallback(this.drawerCallback)
 
     }
 
@@ -61,6 +68,7 @@ class Login extends Component {
         }
     }
 
+    componentWillUnmount() {removeDrawerCallback(this.drawerCallback)}
 }
 
 function NavigateToProfile() {
