@@ -83,7 +83,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                 if (response.status === 200) {
                     return response.json();
                 } else {
-                    throw new Error('Fehler bei der Anfrage: ' + response.status + " " + response.statusText);
+                    throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
                 }
             })
             .then((response: Array<Article>) => {
@@ -122,7 +122,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
 
             })
             .catch(reason => {
-                showToast("Beim laden der Artikel ist ein Fehler aufgetreten", "error")
+                showToast(reason.message, "error")
             })
 
     }

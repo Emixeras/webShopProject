@@ -1,4 +1,3 @@
-
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
@@ -11,14 +10,65 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Grid from '@material-ui/core/Grid';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import Link from '@material-ui/core/Link';
 import CardActionArea from "@material-ui/core/CardActionArea";
 import {NavLink} from "react-bootstrap";
 import IconButton from "@material-ui/core/IconButton";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
-import {showToast} from "../services/Utilities";
+import {showToast} from "../Utilities/Utilities";
+import {Link} from "@material-ui/core";
+
+interface IProps {
+}
+
+interface IState {
+}
+
+interface Article {
+    id: number;
+    title: string;
+    description: string;
+    ean: number;
+    price: string;
+    artists: ArtistOrGenre;
+    genre: ArtistOrGenre;
+}
+
+interface ArtistOrGenre {
+    id: number;
+    name: string;
+}
+
+export default class AlbumOverview extends React.Component<IProps, IState> {
+
+    constructor(props: IProps, context: any) {
+        super(props, context);
+        this.loadArticles()
+    }
+
+    render() {
+        return <Album/>
+    }
+
+    loadArticles() {
+        fetch(new Request("http://localhost:8080/article", {method: 'GET'}))
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
+                }
+            })
+            .then((response) => {
+                articleArray = response;
+                this.forceUpdate()
+            })
+            .catch(reason => {
+                showToast(reason.message, "error")
+            })
+    }
+}
 
 function Copyright() {
     return (
@@ -32,8 +82,6 @@ function Copyright() {
         </Typography>
     );
 }
-
-
 
 const useStyles = makeStyles((theme) => ({
     icon: {
@@ -67,10 +115,9 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-let cards = [];
-loadArticles()
+let articleArray: Array<Article> = [];
 
-export default function Album() {
+function Album() {
     const classes = useStyles();
     return (
         <React.Fragment>
@@ -78,19 +125,19 @@ export default function Album() {
                 {/* Hero unit */}
                 <div className={classes.heroContent}>
                     <Container maxWidth="sm">
-                        <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
+                        <Typography component="h1" variant="h2" align="center" color="textPrimary"
+                                    gutterBottom>
                             Unsere Alben
                         </Typography>
                         <Typography variant="h5" align="center" color="textSecondary" paragraph>
-                            Auf dieser Seite können sie durch unsere Angebote stöbern
+                            Auf dieser Seite können Sie durch unsere Angebote stöbern
                         </Typography>
                     </Container>
                 </div>
-                <Container className={classes.cardGrid} maxWidth="md">
-                    {/* End hero unit */}
-                    <Grid container spacing={4}>
-                        {cards.map((card) => (
-                            <ArticleComponent card={card}/>
+                <Container className={classes.cardGrid} maxWidth="lg">
+                    <Grid container spacing={4} >
+                        {articleArray.map((article) => (
+                            <ArticleComponent article={article}/>
                         ))}
                     </Grid>
                 </Container>
@@ -103,7 +150,7 @@ export default function Album() {
                 <Typography variant="subtitle1" align="center" color="textSecondary" component="p">
                     Something here to give the footer a purpose!
                 </Typography>
-                <Copyright />
+                <Copyright/>
             </footer>
             {/* End footer */}
         </React.Fragment>
@@ -111,12 +158,12 @@ export default function Album() {
 }
 
 
-function ArticleComponent (props){
+function ArticleComponent(props: any) {
     const classes = useStyles();
-    let card = props.card
-    return(
-        <Grid item key={card} xs={12} sm={6} md={4}>
-            <CardActionArea component={Link} href={{pathname: "/"}}>
+    let article:Article = props.article;
+    return (
+        <Grid item /*key={article}*/ xs={12} sm={6} md={4} lg={3}>
+            <CardActionArea href={"/editArticles"}>
                 <Card className={classes.card}>
                     <CardMedia
                         className={classes.cardMedia}
@@ -125,35 +172,17 @@ function ArticleComponent (props){
                     />
                     <CardContent className={classes.cardContent}>
                         <Typography gutterBottom variant="h5" component="h2">
-                            Heading
+                            {article.title}
                         </Typography>
                         <Typography>
-                            This is a media card. You can use this section to describe the content.
+                            {article.description}
                         </Typography>
+                        <Link
+                            to={""}
+                        >Test Link</Link>
                     </CardContent>
                 </Card>
             </CardActionArea>
         </Grid>
     )
 }
-
-function loadArticles() {
-    fetch(new Request("http://localhost:8080/article", {method: 'GET'}))
-        .then(response => {
-            debugger
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error('Fehler bei der Anfrage: ' + response.status + " " + response.statusText);
-            }
-        })
-        .then((response) => {
-
-            cards = response;
-        })
-        .catch(reason => {
-            showToast("Beim laden der Artikel ist ein Fehler aufgetreten", "error")
-        })
-
-}
-
