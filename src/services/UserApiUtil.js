@@ -20,7 +20,8 @@ export const registerUser = (payload, onSuccess, onFail) => {
                 console.log(response.data);
                 setSessionUser(response.data);
                 setUserLoggedIn(true);
-                onSuccess(response)
+                if (onSuccess)
+                    onSuccess(response)
             } else {
                 console.log("register failed");
                 if (onFail)
@@ -114,8 +115,8 @@ export const deleteUser = (onSuccess, onFail) => {
                 localStorage.clear();
                 onSuccess();
             } else {
-                if(onFail)
-                onFail()
+                if (onFail)
+                    onFail()
             }
         })
 }
@@ -126,9 +127,9 @@ export const logoutUser = (onSuccess, onFail) => {
         localStorage.clear();
         setUserLoggedIn(false);
         onSuccess();
-    }catch(e){
-        if(onFail)
-        onFail(e);
+    } catch (e) {
+        if (onFail)
+            onFail(e);
     }
 
 }

@@ -1,5 +1,6 @@
 import React from 'react'
-import axios from 'axios';
+import {createNewArticle, updateArticle} from "../services/ItemApiUtil";
+import {showToast} from "../Utilities/Utilities";
 
 
 class SimpleReactFileUpload extends React.Component {
@@ -11,12 +12,11 @@ class SimpleReactFileUpload extends React.Component {
         }
         this.onClickHandler = this.onClickHandler.bind(this)
         this.onChangeHandler = this.onChangeHandler.bind(this)
-        this.fileUpload = this.fileUpload.bind(this)
     }
 
     onFormSubmit(e){
         e.preventDefault() // Stop form submit
-        this.fileUpload(this.state.file)
+        this.onClickHandler();
     }
 
 
@@ -27,44 +27,25 @@ class SimpleReactFileUpload extends React.Component {
         })
     }
     onClickHandler = () => {
-        const formData = new FormData()
-        formData.append('Picture', this.state.selectedFile)
-        this.fileUpload(formData)
-    }
-    fileUpload(formData){
-        //todo insert data from UI here
         var payload = {
 
             "artists": {
                 "name": "POSTMAN"
             },
-            "description": "PENIS",
+            "id":1,
+            "description": "penis",
             "ean": 123,
             "genre": {
-
                 "name": "rock"
             },
-            "price": 12.99,
+            "price": 12.98,
             "title": "desc1"
         }
-        const json = JSON.stringify(payload);
-        const blob = new Blob([json], {
-            type: 'application/json'
-        });
-        const url = 'http://localhost:8080/article';
-        formData.append('Article', blob)
-        const config = {
-            headers: {
-                'content-type': 'multipart/form-data'
-            }
-        }
-        axios.post(url, formData,config)
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+        updateArticle(payload, this.state.selectedFile, ()=>{
+            showToast('Artikel wurde erfolgreich erstellt', "success");
+        }, (error)=>{
+            showToast('Artikel erstellen fehlgeschlagen: ' + error.message, "error");
+        })
     }
     render() {
         return (
