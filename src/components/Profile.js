@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {titles} from "../services/Utilities";
+import React, {Component, useState} from 'react';
+import {NavigationComponent, titles} from "../Utilities/Utilities";
 import Grid from "@material-ui/core/Grid";
 import {
     Card,
@@ -18,14 +18,16 @@ import {Visibility, VisibilityOff, Edit, Save, ExitToApp, Delete} from "@materia
 import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {deleteUser, logoutUser, updateUser} from "../services/UserApiUtil";
-import {padding, showToast, shallowEqual, isEmail} from "../services/Utilities";
+import {padding, showToast, shallowEqual, isEmail} from "../Utilities/Utilities";
 import {
     addDrawerCallback,
     getSessionUser,
-    isDrawerVisible, removeDrawerCallback
+    isDrawerVisible, isUserLoggedIn, removeDrawerCallback
 } from "../services/StorageUtil";
 import {useHistory} from "react-router-dom";
 import Login from "./Login";
+import {DialogBuilder} from "../Utilities/DialogBuilder";
+import {Pair, Triple} from "../Utilities/TsUtilities";
 
 class Profile extends Component {
     showPassword = false;
@@ -37,6 +39,7 @@ class Profile extends Component {
     editMode = false;
     currentEdiModeToastId = 0;
     drawerState = isDrawerVisible();
+    scrollHelper = Triple.make(this.editMode, 0, undefined);
 
     drawerCallback = state => {
         this.drawerState = state;
@@ -68,10 +71,8 @@ class Profile extends Component {
     }
 
     render() {
-        if (localStorage.getItem('isLoggedIn') === "1") {
+        if (isUserLoggedIn()) {
             return <div>
-                {/*<MuiThemeProvider>*/}
-                {/*    <div>*/}
                 <MenuDrawer/>
                 <div style={{
                     marginTop: 8,
@@ -184,18 +185,6 @@ class Profile extends Component {
                                                    helperText={this.emailError ? "Bitte eine Korrekte E-MailAdresse eingeben" : ""}
                                                    fullWidth/>
                                     </Grid>
-                                    <Grid item
-                                          fullWidth>
-                                        <TextField required
-                                                   label="Geburtsdatum"
-                                                   type="date"
-                                                   variant="outlined"
-                                                   margin={"normal"}
-                                                   fullWidth
-                                                   value={this.state.birth}
-                                                   onChange={event => this.changeStateItem("birth", event)}
-                                        />
-                                    </Grid>
                                     < Grid item>
                                         <FormControl margin={"normal"}
                                                      fullWidth
@@ -227,7 +216,7 @@ class Profile extends Component {
                                             />
                                         </FormControl>
                                     </Grid>
-                                    < Grid item>
+                                    {this.editMode && < Grid item>
                                         <FormControl margin={"normal"}
                                                      fullWidth
                                                      variant="outlined">
@@ -261,7 +250,7 @@ class Profile extends Component {
                                             <FormHelperText
                                                 error={this.passwordError}> {this.passwordError ? "Die Passwörter müssen übereinstimmen" : ""}</FormHelperText>
                                         </FormControl>
-                                    </Grid>
+                                    </Grid>}
 
                                 </Grid>
                             </Card>
@@ -332,7 +321,7 @@ class Profile extends Component {
                             </Card>
                         </Grid>
                         <Grid item xs={12}>
-                            <Grid container
+                            <Grid container ref={element => this.scrollHelper.third = element}
                                   wrap={"wrap-reverse"}
                                   direction="row"
                                   justify="flex-end"
@@ -349,17 +338,23 @@ class Profile extends Component {
                         <LogoutAccountButton context={this}/>
                     </Grid>
                 </div>
-                {/*    </div>*/}
-                {/*</MuiThemeProvider>*/}
             </div>;
         } else {
-            return (
-                <Login/>
-            );
+            return <NavigationComponent to={"/login"}/>;
         }
     }
 
-    componentWillUnmount() {removeDrawerCallback(this.drawerCallback)}
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.scrollHelper.first !== this.editMode) {
+            this.scrollHelper.first = this.editMode;
+            if (this.scrollHelper.third)
+                window.scrollBy(0, this.scrollHelper.third.getBoundingClientRect().top - this.scrollHelper.second)
+        }
+    }
+
+    componentWillUnmount() {
+        removeDrawerCallback(this.drawerCallback)
+    }
 
     // ---------------
 
@@ -402,6 +397,7 @@ class Profile extends Component {
 
     toggleEditMode(notForce) {
         this.editMode = !this.editMode;
+        this.scrollHelper.second = this.scrollHelper.third.getBoundingClientRect().top;
         if (!notForce)
             this.forceUpdate()
     }
@@ -409,19 +405,37 @@ class Profile extends Component {
 
 function DeleteAccountButton() {
     const history = useHistory();
+    const [open, setOpen] = useState(false);
 
     return (
-        <Button variant="contained"
-                onClick={() => {
-                    deleteUser(() => {
-                        showToast("Löschen Erfolgreich", "success")
-                        history.push("/");
-                    }, () => {
-                        showToast('Benutzer Löschen Fehlgeschlagen', "error")
-                    });
-                }}
-                endIcon={<Delete/>}
-                color="secondary">Account Löschen</Button>
+        <div>
+            <Button variant="contained"
+                    onClick={() => setOpen(true)}
+                    endIcon={<Delete/>}
+                    color="secondary">Account Löschen</Button>
+            {new DialogBuilder(open, dialogBuilder => setOpen(false))
+                .setTitle("Account Löschen")
+                .setText("Möchtesten sie wirklich den Account unwiederruflich löschen?")
+                .addButton("Abbrechen")
+                .addButton({
+                    label: "Löschen",
+                    color: "secondary",
+                    dismissOnClick: false,
+                    onClick: dialogBuilder => {
+                        deleteUser(() => {
+                            showToast("Löschen Erfolgreich", "success")
+                            dialogBuilder.dismiss()
+                            history.push("/");
+                        }, () => {
+                            showToast('Benutzer Löschen Fehlgeschlagen', "error")
+                        });
+                    },
+                    icon: <Delete/>,
+                    iconAtStart: true,
+                    isActionButton: true
+                })
+                .build()}
+        </div>
     )
 }
 
@@ -455,6 +469,8 @@ function LogoutAccountButton() {
 
 function ModeButtons(props) {
     let that = props.context;
+    const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+
     if (that.editMode) {
         return (
             <Grid
@@ -465,14 +481,27 @@ function ModeButtons(props) {
                 direction="row">
                 <Grid item>
                     <Button onClick={() => {
-                        if (!shallowEqual(that.state, that.unchangedState)) {
-                            if (window.confirm('Alle ungespeicherten Änderungen werden verworfen')) {
+                        if (!shallowEqual(that.state, that.unchangedState))
+                            setCancelDialogOpen(true);
+                        else
+                            that.toggleEditMode();
+                    }}>Abbrechen</Button>
+                    {new DialogBuilder(cancelDialogOpen, dialogBuilder => setCancelDialogOpen(false))
+                        .setTitle("Änderungen Verwerfen?")
+                        .setText("Sollen alle ungespeicherten Änderungen verworfen werden?")
+                        .addButton("Nein")
+                        .addButton({
+                            label: "Ja", color: "primary", onClick: dialogBuilder => {
+                                that.passwordState = {
+                                    password: that.unchangedState.password,
+                                    passwordRepeat: that.unchangedState.password
+                                };
+                                that.passwordError = false;
                                 that.setState(that.unchangedState);
                                 that.toggleEditMode(true);
                             }
-                        } else
-                            that.toggleEditMode();
-                    }}>Abbrechen</Button>
+                        })
+                        .build()}
                 </Grid>
                 <Grid item>
                     <Button variant="contained"
@@ -481,25 +510,22 @@ function ModeButtons(props) {
                                 console.log(that.state);
                                 if (shallowEqual(that.unchangedState, that.state)) {
                                     showToast('Es wurden keine Änderungen vorgenommen', "info");
+                                    that.toggleEditMode();
                                 } else {
                                     let payload = {
                                         ...that.state,
-                                        birth: (that.unchangedState.birth + "T00:00:00Z[UTC]")
+                                        birth: (that.state.birth + "T00:00:00Z[UTC]")
                                     };
-                                    debugger
                                     updateUser(payload, response => {
                                         console.log(response);
                                         that.unchangedState = that.state;
-                                        debugger
                                         showToast('Die Daten wurden gespeichert', "success");
-                                        //setSessionUser(response.data);
+                                        that.toggleEditMode();
                                     }, error => {
                                         console.log(error);
                                         showToast("Beim Speichern ist ein Fehler aufgetreten:\n" + error.message, "error");
-                                        debugger
                                     })
                                 }
-                                that.toggleEditMode();
                             }}
                             endIcon={<Save/>}
                             color="primary">Speichern</Button>

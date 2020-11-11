@@ -10,6 +10,7 @@ import Dev from "./components/Dev";
 import SimpleReactFileUpload from "./components/SimpleReactFileUpload";
 import {toast} from 'react-toastify'
 import Albumansicht from "./components/Albumansicht";
+import EditArticles from "./components/EditArticles";
 
 toast.configure();
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route path="/shoppingcart" component={ShoppingCart} exact />
         <Route path="/profile" component={Profile} exact />
         <Route path="/upload" component={SimpleReactFileUpload} exact />
+        <Route path="/editArticles" component={EditArticles} exact />
         <Route path="/dev" component={Dev} exact />
         <Route component={Home}/>
         <Route path="/alben" component={Albumansicht} exact />

@@ -1,6 +1,6 @@
 import axios from "axios";
 import {getSessionUser, setSessionUser, setUserLoggedIn} from "./StorageUtil";
-import {showToast} from "./Utilities";
+import {showToast} from "../Utilities/Utilities";
 
 const apiBaseUrlUserRegister = "http://localhost:8080/user";
 const apiBaseUrlUserLogin = "http://localhost:8080/user";
@@ -79,7 +79,6 @@ export const updateUser = (payload, onSuccess, onFail) => {
         }
     })
         .then(function (response) {
-            debugger
             console.log(response);
             if (response.status === 200) {
                 console.log("update successfull");
@@ -94,7 +93,6 @@ export const updateUser = (payload, onSuccess, onFail) => {
             }
         })
         .catch(function (error) {
-            debugger
             console.log("user update failed")
             console.log(error);
             if (onFail)
