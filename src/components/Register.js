@@ -1,4 +1,4 @@
-import {titles} from "../Utilities/Utilities";
+import {NavigationComponent, titles} from "../Utilities/Utilities";
 import {
     Card,
     Avatar,
@@ -63,11 +63,7 @@ class Register extends Component {
         if (!isUserLoggedIn()) {
             return <RegisterForm context={this}/>
         } else {
-            {/*<NavigateToProfile/>*/
-            }
-            return (
-                <Profile/>
-            );
+            return (<NavigationComponent to={"/profile"}/>);
         }
     }
 
@@ -123,6 +119,29 @@ function RegisterForm(props) {
     const that = props.context;
     const classes = useStyles();
     const history = useHistory();
+    let register = () => {
+        var payload = {
+            "title": that.state.title,
+            "birth": that.state.birthdayDate + "T00:00:00Z[UTC]",
+            "email": that.state.email,
+            "password": that.state.password,
+            "firstName": that.state.firstName,
+            "lastName": that.state.lastName,
+        };
+        console.log(payload);
+        registerUser(payload, () => {
+                showToast('Registrieren erfolgreich', "success");
+                history.push("/");
+            },
+            (error) => {
+                showToast("Beim Registrieren ist ein Fehler aufgetreten:\n" + error.message, "error");
+            })
+    };
+    let onKeyPress = (event) => {
+        if (event.key === 'Enter' && !that.getButtonState()) {
+            register()
+        }
+    };
     return (
         <div>
             <MenuDrawer/>
@@ -167,6 +186,7 @@ function RegisterForm(props) {
                                                fullWidth
                                                label="Vorname"
                                                variant="outlined"
+                                               onKeyPress={onKeyPress}
                                                onChange={event => that.setState({firstName: event.target.value})}
                                                value={that.state.firstName}
                                                margin={"normal"}/>
@@ -176,6 +196,7 @@ function RegisterForm(props) {
                                                fullWidth
                                                label="Nachname"
                                                variant="outlined"
+                                               onKeyPress={onKeyPress}
                                                onChange={event => that.setState({lastName: event.target.value})}
                                                value={that.state.lastName}
                                                margin={"normal"}/>
@@ -188,6 +209,7 @@ function RegisterForm(props) {
                                        margin={"normal"}
                                        fullWidth
                                        value={that.state.birthdayDate}
+                                       onKeyPress={onKeyPress}
                                        onChange={event => that.setState({"birthdayDate": event.target.value})}
                             />
                             <TextField required
@@ -199,6 +221,7 @@ function RegisterForm(props) {
                                        value={that.state.email}
                                        helperText={that.emailError ? "Bitte eine Korrekte E-MailAdresse eingeben" : ""}
                                        name="email"
+                                       onKeyPress={onKeyPress}
                                        onChange={event => that.setState({email: event.target.value})}/>
                             <FormControl margin={"normal"}
                                          fullWidth
@@ -208,6 +231,7 @@ function RegisterForm(props) {
                                     type={that.state.showPassword ? 'text' : 'password'}
                                     value={that.passwordState.password}
                                     onChange={that.handlePasswordChange("password")}
+                                    onKeyPress={onKeyPress}
                                     endAdornment={
                                         <InputAdornment position="end">
                                             <IconButton
@@ -238,6 +262,7 @@ function RegisterForm(props) {
                                     value={that.passwordState.passwordRepeat}
                                     error={that.passwordError}
                                     onChange={that.handlePasswordChange("passwordRepeat")}
+                                    onKeyPress={onKeyPress}
                                     endAdornment={
                                         <InputAdornment position="end">
                                             <IconButton
@@ -269,24 +294,7 @@ function RegisterForm(props) {
                                 fullWidth
                                 variant="contained"
                                 color="primary"
-                                onClick={() => {
-
-                                    var payload = {
-                                        "birth": that.state.birthdayDate + "T00:00:00Z[UTC]",
-                                        "email": that.state.email,
-                                        "password": that.state.password,
-                                        "firstName": that.state.firstName,
-                                        "lastName": that.state.lastName,
-                                    };
-                                    console.log(payload);
-                                    registerUser(payload, () => {
-                                            showToast('Registrieren erfolgreich', "success");
-                                            history.push("/");
-                                        },
-                                        (error) => {
-                                            showToast("Beim Registrieren ist ein Fehler aufgetreten:\n" + error.message, "error");
-                                        })
-                                }}
+                                onClick={register}
                                 //disabled={!(validEmail && this.state.email && this.state.password)}
                                 style={{marginBottom: 12, marginTop: 12}}
                             >Registrieren</Button>
