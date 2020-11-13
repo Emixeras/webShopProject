@@ -286,6 +286,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                           name={"Künstler"}
                                                           textField={"name"}
                                                           filter={"contains"}
+                                                          onChange={value => this.setState({artists: value})}
                                                           value={this.state.artists}
                                                           data={this.artists}
                                                 />
@@ -300,6 +301,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                         <Combobox busy={this.articles.length === 0}
                                                   textField={"name"}
                                                   filter={"contains"}
+                                                  onChange={value => this.setState({genre: value})}
                                                   value={this.state.genre}
                                                   data={this.genres}
                                         />

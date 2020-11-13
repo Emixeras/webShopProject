@@ -18,7 +18,7 @@ function App() {
   return (
     <div className="App">
       <Switch>
-        <Route path="/" component={Home} exact />
+        <Route path="/" component={AlbumOverview} exact />
         <Route path="/login" component={Login} exact />
         <Route path="/register" component={Register} exact />
         <Route path="/shoppingcart" component={ShoppingCart} exact />
@@ -28,7 +28,7 @@ function App() {
         <Route path="/dev" component={Dev} exact />
         <Route path="/albums" component={AlbumOverview} exact />
         <Route path="/genres" component={GenreOverview} exact />
-        <Route component={Home}/>
+        <Route component={AlbumOverview}/>
       </Switch>
     </div>
 

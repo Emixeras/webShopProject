@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import CardActionArea from "@material-ui/core/CardActionArea";
-import {showToast} from "../Utilities/Utilities";
+import {NavigationComponent, showToast} from "../Utilities/Utilities";
 import {LazyImage, base64ToDataUri, ContextType} from "../Utilities/TsUtilities";
 import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
@@ -62,6 +62,9 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     }
 
     render() {
+        if (window.location.pathname === "/") {
+            return <NavigationComponent to={"/albums"}/>;
+        }
         return (
             <div>
                 <MenuDrawer/>
@@ -193,9 +196,11 @@ function Album(props: ContextType<AlbumOverview>) {
                                     onMouseUp={event => {
                                         // @ts-ignore
                                         let value = +event.target.ariaValueNow;
-                                        context.imageResolution = value;
-                                        localStorage.setItem("IMAGE_RESOLUTION", value + "");
-                                        context.imageReloadArray.forEach(reload => reload())
+                                        if (context.imageResolution !== value) {
+                                            context.imageResolution = value;
+                                            localStorage.setItem("IMAGE_RESOLUTION", value + "");
+                                            context.imageReloadArray.forEach(reload => reload())
+                                        }
                                     }}
                                     valueLabelDisplay="auto"
                                 />
