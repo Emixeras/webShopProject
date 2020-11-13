@@ -16,7 +16,7 @@ import Profile from "./Profile";
 import MenuDrawer from "./MenuDrawer";
 import {registerUser} from "../services/UserApiUtil";
 import {
-    addDrawerCallback,
+    addDrawerCallback, getDrawerState,
     isDrawerVisible,
     isUserLoggedIn,
     removeDrawerCallback
@@ -33,7 +33,7 @@ class Register extends Component {
     passwordError = false;
     passwordState = {password: "", passwordRepeat: ""};
     emailError = false;
-    drawerState = isDrawerVisible();
+    drawerState = getDrawerState();
     user = {};
     unchangedState;
     editMode = false;

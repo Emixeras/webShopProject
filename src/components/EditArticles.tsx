@@ -14,7 +14,12 @@ import {
     DialogActions
 } from "@material-ui/core";
 import MenuDrawer from "./MenuDrawer";
-import {addDrawerCallback, isDrawerVisible, removeDrawerCallback} from "../services/StorageUtil";
+import {
+    addDrawerCallback,
+    getDrawerState,
+    isDrawerVisible,
+    removeDrawerCallback
+} from "../services/StorageUtil";
 import {padding, showToast} from "../Utilities/Utilities";
 import SimpleReactFileUpload from "./SimpleReactFileUpload";
 import {Combobox, DropdownList} from 'react-widgets'
@@ -54,7 +59,7 @@ interface ArtistOrGenre {
 
 export default class EditArticles extends React.Component<IProps, IState> {
 
-    drawerState: boolean = isDrawerVisible();
+    drawerState: boolean = getDrawerState();
     articles: Array<Article> = [];
     artists: Array<ArtistOrGenre> = [];
     genres: Array<ArtistOrGenre> = [];

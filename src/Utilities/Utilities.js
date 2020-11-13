@@ -1,8 +1,11 @@
 import {toast, Flip} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {useHistory} from "react-router-dom";
-import React, {Component, useState} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
+import CardMedia from "@material-ui/core/CardMedia";
+import {base64ToDataUri} from "./TsUtilities";
+import Card from "@material-ui/core/Card/Card";
 
 export function titles() {
     return (
@@ -140,7 +143,7 @@ export function isEmail(email) {
 
 // ---------------
 
-export function isMobile(window) {
+export function isMobile() {
     return window.innerHeight > window.innerWidth
 }
 
@@ -166,7 +169,11 @@ export function hexToRgbA(hex, alpha) {
 
 
 //  ------------------------- Components ------------------------->
-export class NavigationComponent extends React.Component {render() {return <Navigate to={this.props.to}/>}}
+export class NavigationComponent extends React.Component {
+    render() {
+        return <Navigate to={this.props.to}/>
+    }
+}
 
 function Navigate(props) {
     const history = useHistory();
@@ -179,3 +186,5 @@ NavigationComponent.propTypes = {
     to: PropTypes.string.isRequired
 };
 //  <------------------------- Components -------------------------
+
+
