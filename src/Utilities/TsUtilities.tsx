@@ -103,6 +103,7 @@ const placeHolder = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAA
 export interface LazyImageProperties {
     alt: string;
     getSrc: (onResult: ((result: string) => void)) => void;
+    reload?: (reload: () => void) => void
 }
 
 interface GetSrcType {
@@ -110,20 +111,20 @@ interface GetSrcType {
 }
 
 // @ts-ignore
-export const LazyImage = ({ alt, getSrc }: LazyImageProperties): CardMedia => {
-    let test: LazyImageProperties = {alt: "", getSrc: result => {
-
-        }}
+export const LazyImage = ({ alt, getSrc, reload}: LazyImageProperties): CardMedia => {
     const [imageSrc, setImageSrc] = useState(placeHolder);
     const [imageRef, setImageRef] = useState<Element>();
 
-    const onLoad = (event: any) => {
-        event.target.classList.add('loaded')
-    };
+    if (reload)
+        reload(() => setImageSrc(placeHolder));
 
-    const onError = (event: any) => {
-        event.target.classList.add('has-error')
-    };
+    // const onLoad = (event: any) => {
+    //     event.target.classList.add('loaded')
+    // };
+    //
+    // const onError = (event: any) => {
+    //     event.target.classList.add('has-error')
+    // };
 
     useEffect(() => {
         let observer: IntersectionObserver;

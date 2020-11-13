@@ -18,7 +18,6 @@ import {
 } from "../services/StorageUtil";
 import {Slider} from "@material-ui/core";
 
-
 interface IProps {
 }
 
@@ -54,6 +53,7 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     };
     IMAGE_RESOLUTION: string = "IMAGE_RESOLUTION";
     imageResolution: number = +(localStorage.getItem(this.IMAGE_RESOLUTION) as string);
+    imageReloadArray: Array<() => void> = [];
 
     constructor(props: IProps, context: any) {
         super(props, context);
@@ -111,7 +111,6 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
             })
     }
 }
-
 
 function Copyright() {
     return (
@@ -191,11 +190,12 @@ function Album(props: ContextType<AlbumOverview>) {
                                     marks
                                     min={100}
                                     max={1000}
-                                    onChange={(event, value) => {
-                                        if (typeof value === "number") {
-                                            context.imageResolution = value;
-                                            localStorage.setItem("IMAGE_RESOLUTION", value + "");
-                                        }
+                                    onMouseUp={event => {
+                                        // @ts-ignore
+                                        let value = +event.target.ariaValueNow;
+                                        context.imageResolution = value;
+                                        localStorage.setItem("IMAGE_RESOLUTION", value + "");
+                                        context.imageReloadArray.forEach(reload => reload())
                                     }}
                                     valueLabelDisplay="auto"
                                 />
@@ -227,31 +227,11 @@ function Album(props: ContextType<AlbumOverview>) {
     );
 }
 
-// function QualitySlider() {
-//     <Grid container>
-//         <Grid item>
-//             <Slider
-//                 defaultValue={250}
-//                 getAriaValueText={value => `${value} Pixel`}
-//                 aria-labelledby="discrete-slider-small-steps"
-//                 step={50}
-//                 marks
-//                 min={100}
-//                 max={1000}
-//                 valueLabelDisplay="auto"
-//             />
-//         </Grid>
-//     </Grid>
-//
-// }
-
 function ArticleComponent(props: any) {
     const classes = useStyles();
     let article: Article = props.article;
     let context: AlbumOverview = props.context;
     let isDummy: boolean = article.id === -1;
-    // if (article.id === 100)
-    //     debugger
     if (isDummy) {
         return (
             <Grid item xs={12} sm={6} md={4} lg={3}>
@@ -297,6 +277,7 @@ function ArticleComponent(props: any) {
                                     });
                                 }
                             }}
+                            reload={reload => context.imageReloadArray.push(reload)}
                         />
                         <CardContent className={classes.cardContent}>
                             <Typography gutterBottom variant="h5" component="h2">
@@ -318,7 +299,6 @@ function ArticleComponent(props: any) {
         )
     }
 }
-
 
 function buildDummyData() {
     for (let i = 0; i < 12; i++) {
