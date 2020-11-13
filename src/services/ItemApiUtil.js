@@ -47,8 +47,8 @@ export const updateArticle = (metaDataPayload, pictureFile, onSuccess, onFail) =
     const blob = new Blob([json], {
         type: 'application/json'
     });
-    if(pictureFile !== undefined)
-    formData.append('Picture', pictureFile);
+    if(pictureFile)
+        formData.append('Picture', pictureFile);
     formData.append('Article', blob);
     const config = {
         auth: {
@@ -59,16 +59,13 @@ export const updateArticle = (metaDataPayload, pictureFile, onSuccess, onFail) =
             'content-type': 'multipart/form-data'
         }
     };
-    debugger
     axios.put(apiBaseUrlUpdateArticle, formData,config)
         .then(function (response) {
-            debugger
             console.log(response);
             if(onSuccess)
                 onSuccess(response)
         })
         .catch(function (error) {
-            debugger
             console.log(error);
             if(onFail)
                 onFail(error);

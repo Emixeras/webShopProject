@@ -163,7 +163,7 @@ export const LazyImage = ({ alt, getSrc }: LazyImageProperties): CardMedia => {
             }
         }
     }, [imageSrc, imageRef]);
-    return <CardMedia style={{paddingTop: '56.25%', backgroundColor: "lightgrey"}} image={imageSrc} ref={element => {
+    return <CardMedia style={{paddingTop: '100%', backgroundColor: "lightgrey"}} image={imageSrc} ref={element => {
         if (element)
             setImageRef(element)
     }

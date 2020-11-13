@@ -35,6 +35,7 @@ interface IProps {
 }
 
 interface IState {
+    id: number;
     title: string
     description?: string
     ean: number;
@@ -59,6 +60,7 @@ interface ArtistOrGenre {
 }
 
 export default class EditArticles extends React.Component<IProps, IState> {
+    currentPicture: File|undefined = undefined;
 
     drawerState: boolean = getDrawerState();
     articles: Array<Article> = [];
@@ -73,6 +75,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
     constructor(props: IProps, context: any) {
         super(props, context);
         this.state = {
+            id: -1,
             title: "",
             price: "",
             ean: -1,
@@ -236,6 +239,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                       }}
                                       onSelect={(article: Article) => {
                                           this.setState({
+                                              id: article.id,
                                               title: article.title,
                                               price: article.price,
                                               artists: article.artists,
@@ -310,7 +314,10 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                    variant={"outlined"}/>
                                     </Grid>
                                     <Grid item sm={8} xs={12}>
-                                        <SimpleReactFileUpload/>
+                                        <SimpleReactFileUpload onFileSelected={(file:any) => {
+                                            console.log(file);
+                                            this.currentPicture = file;
+                                        }}/>
                                     </Grid>
                                     <Grid item sm={4} xs={12}>
                                         <TextField fullWidth
@@ -404,10 +411,9 @@ function ActionButtons(props: ContextType<EditArticles>) {
     return(
         <Button endIcon={<Save/>}
                 onClick={event => {
-                    debugger
                     console.log(that.state.description);
-                    updateArticle(that.state, null, (response: any) => {
-                        debugger
+                    updateArticle(that.state, that.currentPicture, (response: any) => {
+                        showToast("Artikel wurde aktualisiert", "success");
                     }, (response: any) => {
                         debugger
                     })

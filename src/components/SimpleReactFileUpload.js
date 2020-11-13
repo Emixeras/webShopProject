@@ -4,28 +4,31 @@ import {showToast} from "../Utilities/Utilities";
 
 
 class SimpleReactFileUpload extends React.Component {
-
+    onFileSelected;
     constructor(props) {
         super(props);
         this.state ={
             file:null,
-        }
-        this.onClickHandler = this.onClickHandler.bind(this)
+        };
+        this.onFileSelected = this.props.onFileSelected;
+        this.onClickHandler = this.onClickHandler.bind(this);
         this.onChangeHandler = this.onChangeHandler.bind(this)
     }
 
     onFormSubmit(e){
-        e.preventDefault() // Stop form submit
+        e.preventDefault(); // Stop form submit
         this.onClickHandler();
     }
 
 
     onChangeHandler=event=>{
+        let file = event.target.files[0];
+        this.onFileSelected(file);
         this.setState({
-            selectedFile: event.target.files[0],
+            selectedFile: file,
             loaded: 0,
         })
-    }
+    };
     onClickHandler = () => {
         var payload =  {
             "artists": {
@@ -41,13 +44,13 @@ class SimpleReactFileUpload extends React.Component {
             "id": 2,
             "price": 38.44,
             "title": "Graham, Beahan and Jacobs"
-        }
+        };
         updateArticle(payload, this.state.selectedFile, ()=>{
             showToast('Artikel wurde erfolgreich erstellt', "success");
         }, (error)=>{
             showToast('Artikel erstellen fehlgeschlagen: ' + error.message, "error");
         })
-    }
+    };
     render() {
         return (
             <div  className="container">

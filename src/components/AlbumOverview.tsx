@@ -81,7 +81,8 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
                     throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
                 }
             })
-            .then((response) => {
+            .then((response : Article[]) => {
+                response.sort((a, b) => a.id - b.id);
                 articleArray = response;
                 this.forceUpdate();
                 // this.performanceTest(context);
@@ -89,65 +90,6 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
             .catch(reason => {
                 showToast(reason.message, "error")
             })
-    }
-
-    performanceTest(context: AlbumOverview) {
-        let from = Date.now();
-        this.loadSingleImage(0, () => {
-            let to = Date.now();
-            this.showTimeToast((to - from) / 1000);
-            from = to;
-            this.loadSingleImage(1, () => {
-                let to = Date.now();
-                this.showTimeToast((to - from) / 1000);
-                from = to;
-                this.loadSingleImage(3, () => {
-                    let to = Date.now();
-                    this.showTimeToast((to - from) / 1000);
-                    from = to;
-                    this.loadSingleImage(6, () => {
-                        let to = Date.now();
-                        this.showTimeToast((to - from) / 1000);
-                        from = to;
-                        this.loadSingleImage(11, () => {
-                            let to = Date.now();
-                            this.showTimeToast((to - from) / 1000);
-                            from = to;
-                            this.loadSingleImage(16, () => {
-                                let to = Date.now();
-                                this.showTimeToast((to - from) / 1000);
-                                from = to;
-                                this.loadSingleImage(23, () => {
-                                    let to = Date.now();
-                                    this.showTimeToast((to - from) / 1000);
-                                    from = to;
-                                    this.loadSingleImage(31, () => {
-                                        let to = Date.now();
-                                        this.showTimeToast((to - from) / 1000);
-                                        from = to;
-                                        this.loadSingleImage(40, () => {
-                                            let to = Date.now();
-                                            this.showTimeToast((to - from) / 1000);
-                                            from = to;
-                                            this.loadSingleImage(60, () => {
-                                                let to = Date.now();
-                                                this.showTimeToast((to - from) / 1000);
-                                                from = to;
-                                                this.forceUpdate()
-                                            })
-                                        })
-                                    })
-                                })
-                            })
-                        })
-                    })
-                })
-            })
-        })
-    }
-
-    showTimeToast(seconds: number) {
-        showToast(`Sekunden: ${seconds}`, "", {autoClose: false})
     }
 
     loadSingleImage(id: number, onFinish: (imageResponse?: ImageResponseType) => void) {
@@ -159,18 +101,7 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
                     throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
                 }
             })
-            .then((response: ImageResponseType[]) => {
-                for (let i = 0; i < response.length; i++) {
-                    let imageResponse = response[i];
-                    let article: Article = imageResponse.article;
-                    if (article.picture)
-                        articleArray[article.id - 1].picture = {
-                            id: article.picture.id,
-                            data: imageResponse.file
-                        };
-                }
-                onFinish(response[0]);
-            })
+            .then((response: ImageResponseType[]) => onFinish(response[0]))
             .catch(reason => {
                 showToast(reason.message, "error")
             })
@@ -212,7 +143,7 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
     },
     cardMedia: {
-        paddingTop: '56.25%', // 16:9
+        paddingTop: '100%', // 16:9
         backgroundColor: "lightgrey"
     },
     cardContent: {
