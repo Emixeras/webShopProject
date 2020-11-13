@@ -326,7 +326,13 @@ function ArticleComponent(props: any) {
                                 {article.title}
                             </Typography>
                             <Typography>
-                                {article.description}
+                                {article.artists.name}
+                            </Typography>
+                            <Typography>
+                                {article.genre.name}
+                            </Typography>
+                            <Typography>
+                                {article.price + " €"}
                             </Typography>
                         </CardContent>
                     </Card>

@@ -29,6 +29,7 @@ import AddIcon from '@material-ui/icons/Add';
 import {DialogBuilder} from "../Utilities/DialogBuilder";
 import {ContextType, Pair, Triple} from "../Utilities/TsUtilities";
 import {Save} from "@material-ui/icons";
+import {updateArticle} from "../services/ItemApiUtil";
 
 interface IProps {
 }
@@ -74,7 +75,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
         this.state = {
             title: "",
             price: "",
-            ean: 0,
+            ean: -1,
             description: "",
             artists: undefined,
             genre: undefined
@@ -137,6 +138,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
 
     render() {
         const priceError: boolean = this.checkPrice(this.state.price);
+        const eanError: boolean = !/^(-1|\d{8}|\d{13})$/.test(this.state.ean + "");
         return (
             <div>
                 <MenuDrawer/>
@@ -312,12 +314,14 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                     </Grid>
                                     <Grid item sm={4} xs={12}>
                                         <TextField fullWidth
-                                                   value={this.state.ean === 0 ? "" : this.state.ean}
+                                                   value={this.state.ean === -1 ? "" : this.state.ean}
                                                    onChange={event => {
                                                        let newValue = event.target.value;
-                                                       if (this.checkPrice(newValue))
-                                                           this.setState({ean: +newValue});
+                                                       if (/\d*/.test(newValue))
+                                                           this.setState({ean: newValue ? +newValue : -1});
                                                    }}
+                                                   error={eanError}
+                                                   helperText={eanError ? "Keine valide EAN" : ""}
                                                    label={"EAN"}
                                                    variant={"outlined"}/>
                                     </Grid>
@@ -400,7 +404,13 @@ function ActionButtons(props: ContextType<EditArticles>) {
     return(
         <Button endIcon={<Save/>}
                 onClick={event => {
+                    debugger
                     console.log(that.state.description);
+                    updateArticle(that.state, null, (response: any) => {
+                        debugger
+                    }, (response: any) => {
+                        debugger
+                    })
                 }}
                 variant="contained"
                 color="primary">
