@@ -11,6 +11,7 @@ import SimpleReactFileUpload from "./components/SimpleReactFileUpload";
 import {toast} from 'react-toastify'
 import AlbumOverview from "./components/AlbumOverview";
 import EditArticles from "./components/EditArticles";
+import GenreOverview from "./components/GenreOverview";
 
 toast.configure();
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route path="/editArticles" component={EditArticles} exact />
         <Route path="/dev" component={Dev} exact />
         <Route path="/albums" component={AlbumOverview} exact />
+        <Route path="/genres" component={GenreOverview} exact />
         <Route component={Home}/>
       </Switch>
     </div>

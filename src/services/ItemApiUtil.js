@@ -47,7 +47,7 @@ export const updateArticle = (metaDataPayload, pictureFile, onSuccess, onFail) =
     const blob = new Blob([json], {
         type: 'application/json'
     });
-
+    if(pictureFile !== undefined)
     formData.append('Picture', pictureFile);
     formData.append('Article', blob);
     const config = {

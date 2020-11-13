@@ -1,5 +1,5 @@
 import React from 'react'
-import {createNewArticle, updateArticle} from "../services/ItemApiUtil";
+import {updateArticle} from "../services/ItemApiUtil";
 import {showToast} from "../Utilities/Utilities";
 
 
@@ -27,19 +27,20 @@ class SimpleReactFileUpload extends React.Component {
         })
     }
     onClickHandler = () => {
-        var payload = {
-
+        var payload =  {
             "artists": {
-                "name": "POSTMAN"
+                "id": 2,
+                "name": "Britney Spears"
             },
-            "id":1,
-            "description": "penis",
-            "ean": 123,
+            "description": "Fusce consequat.",
+            "ean": 2967861,
             "genre": {
-                "name": "rock"
+                "id": 14,
+                "name": "Techno"
             },
-            "price": 12.98,
-            "title": "desc1"
+            "id": 2,
+            "price": 38.44,
+            "title": "Graham, Beahan and Jacobs"
         }
         updateArticle(payload, this.state.selectedFile, ()=>{
             showToast('Artikel wurde erfolgreich erstellt', "success");
