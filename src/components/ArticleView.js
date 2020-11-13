@@ -33,14 +33,7 @@ class ArticleView extends React.Component {
 
 
     generateView(){
-        return (
-
-
-
-            
-
-
-        )
+       
 
 
     }

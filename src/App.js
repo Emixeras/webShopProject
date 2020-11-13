@@ -26,11 +26,8 @@ function App() {
         <Route path="/upload" component={SimpleReactFileUpload} exact />
         <Route path="/editArticles" component={EditArticles} exact />
         <Route path="/dev" component={Dev} exact />
-<<<<<<< HEAD
         <Route path="/articleview" component={ArticleView} exact />
-=======
         <Route path="/albums" component={AlbumOverview} exact />
->>>>>>> 952c50c02689488c9b60b2ccda100a215dc170cc
         <Route component={Home}/>
       </Switch>
     </div>
