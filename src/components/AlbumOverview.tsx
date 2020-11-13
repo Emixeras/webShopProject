@@ -16,6 +16,7 @@ import {
     getDrawerState,
     removeDrawerCallback
 } from "../services/StorageUtil";
+import {Slider} from "@material-ui/core";
 
 
 interface IProps {
@@ -51,6 +52,8 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
         this.drawerState = state;
         this.forceUpdate()
     };
+    IMAGE_RESOLUTION: string = "IMAGE_RESOLUTION";
+    imageResolution: number = +(localStorage.getItem(this.IMAGE_RESOLUTION) as string);
 
     constructor(props: IProps, context: any) {
         super(props, context);
@@ -59,7 +62,8 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     }
 
     render() {
-        return (<div>
+        return (
+            <div>
                 <MenuDrawer/>
                 <div style={{marginInlineStart: (this.drawerState ? 240 : 0)}}>
                     <Album context={this}/>
@@ -81,7 +85,7 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
                     throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
                 }
             })
-            .then((response : Article[]) => {
+            .then((response: Article[]) => {
                 response.sort((a, b) => a.id - b.id);
                 articleArray = response;
                 this.forceUpdate();
@@ -93,7 +97,7 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     }
 
     loadSingleImage(id: number, onFinish: (imageResponse?: ImageResponseType) => void) {
-        fetch(new Request(`http://localhost:8080/article/range;start=${id};end=${id}`, {method: 'GET'}))
+        fetch(new Request(`http://localhost:8080/article/range;start=${id};end=${id};quality=${this.imageResolution}`, {method: 'GET'}))
             .then(response => {
                 if (response.status === 200) {
                     return response.json();
@@ -159,6 +163,8 @@ let articleArray: Array<Article> = [];
 
 function Album(props: ContextType<AlbumOverview>) {
     const classes = useStyles();
+    let context = props.context;
+
     if (articleArray.length === 0)
         buildDummyData();
     return (
@@ -174,12 +180,34 @@ function Album(props: ContextType<AlbumOverview>) {
                         <Typography variant="h5" align="center" color="textSecondary" paragraph>
                             Auf dieser Seite können Sie durch unsere Angebote stöbern
                         </Typography>
+                        <Grid container style={{width: "100%"}}>
+                            <Grid item xs>
+                                <Slider
+                                    style={{width: "100%"}}
+                                    defaultValue={context.imageResolution}
+                                    getAriaValueText={value => `${value} Pixel`}
+                                    aria-labelledby="discrete-slider-small-steps"
+                                    step={50}
+                                    marks
+                                    min={100}
+                                    max={1000}
+                                    onChange={(event, value) => {
+                                        if (typeof value === "number") {
+                                            context.imageResolution = value;
+                                            localStorage.setItem("IMAGE_RESOLUTION", value + "");
+                                        }
+                                    }}
+                                    valueLabelDisplay="auto"
+                                />
+                            </Grid>
+                        </Grid>
+
                     </Container>
                 </div>
                 <Container className={classes.cardGrid} maxWidth="lg">
                     <Grid container spacing={4}>
                         {articleArray.map((article) => (
-                            <ArticleComponent context={props.context} article={article}/>
+                            <ArticleComponent context={context} article={article}/>
                         ))}
                     </Grid>
                 </Container>
@@ -198,6 +226,24 @@ function Album(props: ContextType<AlbumOverview>) {
         </React.Fragment>
     );
 }
+
+// function QualitySlider() {
+//     <Grid container>
+//         <Grid item>
+//             <Slider
+//                 defaultValue={250}
+//                 getAriaValueText={value => `${value} Pixel`}
+//                 aria-labelledby="discrete-slider-small-steps"
+//                 step={50}
+//                 marks
+//                 min={100}
+//                 max={1000}
+//                 valueLabelDisplay="auto"
+//             />
+//         </Grid>
+//     </Grid>
+//
+// }
 
 function ArticleComponent(props: any) {
     const classes = useStyles();
