@@ -10,6 +10,8 @@ import Dev from "./components/Dev";
 import ArticleView from "./components/ArticleView";
 import SimpleReactFileUpload from "./components/SimpleReactFileUpload";
 import {toast} from 'react-toastify'
+import AlbumOverview from "./components/AlbumOverview";
+import EditArticles from "./components/EditArticles";
 
 toast.configure();
 function App() {
@@ -22,8 +24,13 @@ function App() {
         <Route path="/shoppingcart" component={ShoppingCart} exact />
         <Route path="/profile" component={Profile} exact />
         <Route path="/upload" component={SimpleReactFileUpload} exact />
+        <Route path="/editArticles" component={EditArticles} exact />
         <Route path="/dev" component={Dev} exact />
+<<<<<<< HEAD
         <Route path="/articleview" component={ArticleView} exact />
+=======
+        <Route path="/albums" component={AlbumOverview} exact />
+>>>>>>> 952c50c02689488c9b60b2ccda100a215dc170cc
         <Route component={Home}/>
       </Switch>
     </div>

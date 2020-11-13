@@ -1,6 +1,6 @@
 import axios from "axios";
 import {getSessionUser, setSessionUser, setUserLoggedIn} from "./StorageUtil";
-import {showToast} from "./Utilities";
+import {showToast} from "../Utilities/Utilities";
 
 const apiBaseUrlUserRegister = "http://localhost:8080/user";
 const apiBaseUrlUserLogin = "http://localhost:8080/user";
@@ -20,7 +20,8 @@ export const registerUser = (payload, onSuccess, onFail) => {
                 console.log(response.data);
                 setSessionUser(response.data);
                 setUserLoggedIn(true);
-                onSuccess(response)
+                if (onSuccess)
+                    onSuccess(response)
             } else {
                 console.log("register failed");
                 if (onFail)
@@ -79,7 +80,6 @@ export const updateUser = (payload, onSuccess, onFail) => {
         }
     })
         .then(function (response) {
-            debugger
             console.log(response);
             if (response.status === 200) {
                 console.log("update successfull");
@@ -94,7 +94,6 @@ export const updateUser = (payload, onSuccess, onFail) => {
             }
         })
         .catch(function (error) {
-            debugger
             console.log("user update failed")
             console.log(error);
             if (onFail)
@@ -116,8 +115,8 @@ export const deleteUser = (onSuccess, onFail) => {
                 localStorage.clear();
                 onSuccess();
             } else {
-                if(onFail)
-                onFail()
+                if (onFail)
+                    onFail()
             }
         })
 }
@@ -128,9 +127,9 @@ export const logoutUser = (onSuccess, onFail) => {
         localStorage.clear();
         setUserLoggedIn(false);
         onSuccess();
-    }catch(e){
-        if(onFail)
-        onFail(e);
+    } catch (e) {
+        if (onFail)
+            onFail(e);
     }
 
 }

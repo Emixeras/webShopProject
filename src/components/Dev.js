@@ -9,7 +9,7 @@ import {
     isEmail,
     addAlphaToHexColor,
     hexToRgbA,
-} from "../services/Utilities";
+} from "../Utilities/Utilities";
 import MenuDrawer from "./MenuDrawer";
 import Box from "@material-ui/core/Box";
 import {Visibility, VisibilityOff} from "@material-ui/icons";
@@ -33,10 +33,6 @@ class Dev extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            email: '',
-            password: '',
-        };
         addDrawerCallback(this.drawerCallback)
     }
 
@@ -61,7 +57,9 @@ class Dev extends React.Component {
         )
     }
 
-    componentWillUnmount() {removeDrawerCallback(this.drawerCallback)}
+    componentWillUnmount() {
+        removeDrawerCallback(this.drawerCallback)
+    }
 
     // ---------------
 
@@ -112,70 +110,80 @@ class Dev extends React.Component {
                 const currentCallResponse = this.callResultMap[key]
                 return (
                     <Grid item>
-                        <Card style={{
-                            ...padding(18),
-                            backgroundColor: hexToRgbA((this.buttonColors[call.type]), 0.2)
-                        }} fullWidth>
-                            <Grid container>
-                                <Grid item xs={12}>
-                                    <Grid container
-                                          style={{maxHeight: 52}}
-                                          alignContent={"center"}
-                                          alignItems={"center"}
-                                          justify={"center"}
-                                          spacing={2}>
-                                        <Grid item>
-                                            <Button style={{
-                                                backgroundColor: (this.buttonColors[call.type]),
-                                                fontWeight: "bold",
-                                                color: "#FFFFFF"
-                                            }} onClick={(event) => {
-                                                this.callResultMap[key] = {
-                                                    result: "Wird geladen...",
-                                                    completeResponse: "",
-                                                    showCompleteResponse: false
-                                                };
-                                                this.forceUpdate();
-                                                call.callback((result, completeResponse) => {
-                                                    if (result !== undefined) {
-                                                        this.callResultMap[key] = {
-                                                            result: result,
-                                                            completeResponse: completeResponse,
-                                                            showCompleteResponse: false
-                                                        };
-                                                        showToast("Anfrage Erfolgreich", "success");
-                                                    } else {
-                                                        showToast("Ein Fehler ist aufgetreten" + (completeResponse ? ": " + completeResponse : ""), "error");
-                                                        this.callResultMap[key] = {
-                                                            result: result,
-                                                            completeResponse: completeResponse,
-                                                            showCompleteResponse: false
-                                                        };
-                                                    }
+                        <div onClick={event => {
+                            let clickedClassName = event.target.className.toString();
+                            if (!window.getSelection().toString() && (clickedClassName.includes("MuiTypography") || clickedClassName.includes("MuiPaper") || clickedClassName.includes("MuiGrid"))) {
+                                currentCallResponse.showCompleteResponse = (!currentCallResponse.showCompleteResponse);
+                                this.forceUpdate()
+                            }
+                        }}>
+                            <Card style={{
+                                ...padding(18),
+                                backgroundColor: hexToRgbA((this.buttonColors[call.type]), 0.2)
+                            }}
+                                  fullWidth>
+                                <Grid container>
+                                    <Grid item xs={12}>
+                                        <Grid container
+                                              style={{maxHeight: 52}}
+                                              alignContent={"center"}
+                                              alignItems={"center"}
+                                              justify={"center"}
+                                              spacing={2}>
+                                            <Grid item>
+                                                <Button style={{
+                                                    backgroundColor: (this.buttonColors[call.type]),
+                                                    fontWeight: "bold",
+                                                    color: "#FFFFFF"
+                                                }} onClick={(event) => {
+                                                    this.callResultMap[key] = {
+                                                        result: "Wird geladen...",
+                                                        completeResponse: "",
+                                                        showCompleteResponse: false
+                                                    };
                                                     this.forceUpdate();
-                                                });
-                                            }}>
-                                                {call.type}
-                                            </Button>
+                                                    call.callback((result, completeResponse) => {
+                                                        if (result !== undefined) {
+                                                            this.callResultMap[key] = {
+                                                                result: result,
+                                                                completeResponse: completeResponse,
+                                                                showCompleteResponse: false
+                                                            };
+                                                            showToast("Anfrage Erfolgreich", "success");
+                                                        } else {
+                                                            showToast("Ein Fehler ist aufgetreten" + (completeResponse ? ": " + completeResponse : ""), "error");
+                                                            this.callResultMap[key] = {
+                                                                result: result,
+                                                                completeResponse: completeResponse,
+                                                                showCompleteResponse: false
+                                                            };
+                                                        }
+                                                        this.forceUpdate();
+                                                    });
+                                                }}>
+                                                    {call.type}
+                                                </Button>
+                                            </Grid>
+                                            <Grid item>
+                                                <Typography component="h1" variant="h6"
+                                                            allign="left">
+                                                    {call.name}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs>
+                                                <Typography
+                                                    style={currentCallResponse.result === undefined ? {color: "red"} : {}}
+                                                    component="h1" variant="h6" align={"right"}>
+                                                    {currentCallResponse.result !== undefined ? currentCallResponse.result : "Error"}
+                                                </Typography>
+                                            </Grid>
+                                            {this.showCompleteResultButton(currentCallResponse)}
                                         </Grid>
-                                        <Grid item>
-                                            <Typography component="h1" variant="h6" allign="left">
-                                                {call.name}
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs>
-                                            <Typography
-                                                style={currentCallResponse.result === undefined ? {color: "red"} : {}}
-                                                component="h1" variant="h6" align={"right"}>
-                                                {currentCallResponse.result !== undefined ? currentCallResponse.result : "Error"}
-                                            </Typography>
-                                        </Grid>
-                                        {this.showCompleteResultButton(currentCallResponse)}
                                     </Grid>
+                                    {this.showCompleteResult(currentCallResponse)}
                                 </Grid>
-                                {this.showCompleteResult(currentCallResponse)}
-                            </Grid>
-                        </Card>
+                            </Card>
+                        </div>
                     </Grid>
                 )
             })
@@ -216,8 +224,8 @@ class Dev extends React.Component {
         }
     }
 
-    apiTestData(resultCallback, endpoint, label) {
-        fetch(new Request("http://localhost:8080/test/" + endpoint, {method: 'GET'}))
+    apiGetData(resultCallback, endpoint, label) {
+        fetch(new Request("http://localhost:8080/" + endpoint, {method: 'GET'}))
             .then(response => {
                 if (response.status === 200) {
                     return response.json();
@@ -244,14 +252,26 @@ class Dev extends React.Component {
                     type: "GET",
                     name: "/userTestData",
                     description: "provides basic test Functions and example Data",
-                    callback: func => this.apiTestData(func, "userTestData", "Benutzer")
+                    callback: func => this.apiGetData(func, "test/userTestData", "Benutzer")
                 },
                 {
                     type: "GET",
                     name: "/articleTestData",
                     description: "provides basic test Functions and example Data",
-                    callback: func => this.apiTestData(func, "articleTestData", "Artikel")
+                    callback: func => this.apiGetData(func, "test/articleTestData", "Artikel")
                 }
+            ]
+        },
+        {
+            title: "article",
+            description: "test Api - provides basic test Functions and example Data",
+            content: [
+                {
+                    type: "GET",
+                    name: "/article",
+                    description: "gets All Article Metadata Objects",
+                    callback: func => this.apiGetData(func, "/article/", "Artikel")
+                },
             ]
         },
         {
