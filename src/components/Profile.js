@@ -20,7 +20,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import {deleteUser, logoutUser, updateUser} from "../services/UserApiUtil";
 import {padding, showToast, shallowEqual, isEmail} from "../Utilities/Utilities";
 import {
-    addDrawerCallback,
+    addDrawerCallback, getDrawerState,
     getSessionUser,
     isDrawerVisible, isUserLoggedIn, removeDrawerCallback
 } from "../services/StorageUtil";
@@ -38,7 +38,7 @@ class Profile extends Component {
     unchangedState;
     editMode = false;
     currentEdiModeToastId = 0;
-    drawerState = isDrawerVisible();
+    drawerState = getDrawerState();
     scrollHelper = Triple.make(this.editMode, 0, undefined);
 
     drawerCallback = state => {
@@ -334,8 +334,10 @@ class Profile extends Component {
                                 </Grid>
                             </Grid>
                         </Grid>
-
-                        <LogoutAccountButton context={this}/>
+                        <Grid item>
+                            <div style={{marginBottom: 8}}/>
+                        </Grid>
+                        {/*<LogoutAccountButton context={this}/>*/}
                     </Grid>
                 </div>
             </div>;

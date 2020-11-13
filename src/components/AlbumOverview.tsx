@@ -8,10 +8,14 @@ import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import CardActionArea from "@material-ui/core/CardActionArea";
 import {showToast} from "../Utilities/Utilities";
+import {LazyImage, base64ToDataUri, ContextType} from "../Utilities/TsUtilities";
 import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
-import {addDrawerCallback, isDrawerVisible, removeDrawerCallback} from "../services/StorageUtil";
-
+import {
+    addDrawerCallback,
+    getDrawerState,
+    removeDrawerCallback
+} from "../services/StorageUtil";
 
 
 interface IProps {
@@ -28,6 +32,7 @@ interface Article {
     price: string;
     artists: ArtistOrGenre;
     genre: ArtistOrGenre;
+    picture?: { id: number, data: string };
 }
 
 interface ArtistOrGenre {
@@ -35,8 +40,13 @@ interface ArtistOrGenre {
     name: string;
 }
 
+interface ImageResponseType {
+    article: Article;
+    file: string;
+}
+
 export default class AlbumOverview extends React.Component<IProps, IState> {
-    drawerState = isDrawerVisible();
+    drawerState = getDrawerState();
     drawerCallback = (state: boolean) => {
         this.drawerState = state;
         this.forceUpdate()
@@ -44,7 +54,7 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
 
     constructor(props: IProps, context: any) {
         super(props, context);
-        this.loadArticles()
+        this.loadArticles(this);
         addDrawerCallback(this.drawerCallback)
     }
 
@@ -52,16 +62,17 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
         return (<div>
                 <MenuDrawer/>
                 <div style={{marginInlineStart: (this.drawerState ? 240 : 0)}}>
-                    <Album/>
+                    <Album context={this}/>
                 </div>
             </div>
         )
     }
+
     componentWillUnmount() {
         removeDrawerCallback(this.drawerCallback)
     }
 
-    loadArticles() {
+    loadArticles(context: AlbumOverview) {
         fetch(new Request("http://localhost:8080/article", {method: 'GET'}))
             .then(response => {
                 if (response.status === 200) {
@@ -72,13 +83,100 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
             })
             .then((response) => {
                 articleArray = response;
-                this.forceUpdate()
+                this.forceUpdate();
+                // this.performanceTest(context);
+            })
+            .catch(reason => {
+                showToast(reason.message, "error")
+            })
+    }
+
+    performanceTest(context: AlbumOverview) {
+        let from = Date.now();
+        this.loadSingleImage(0, () => {
+            let to = Date.now();
+            this.showTimeToast((to - from) / 1000);
+            from = to;
+            this.loadSingleImage(1, () => {
+                let to = Date.now();
+                this.showTimeToast((to - from) / 1000);
+                from = to;
+                this.loadSingleImage(3, () => {
+                    let to = Date.now();
+                    this.showTimeToast((to - from) / 1000);
+                    from = to;
+                    this.loadSingleImage(6, () => {
+                        let to = Date.now();
+                        this.showTimeToast((to - from) / 1000);
+                        from = to;
+                        this.loadSingleImage(11, () => {
+                            let to = Date.now();
+                            this.showTimeToast((to - from) / 1000);
+                            from = to;
+                            this.loadSingleImage(16, () => {
+                                let to = Date.now();
+                                this.showTimeToast((to - from) / 1000);
+                                from = to;
+                                this.loadSingleImage(23, () => {
+                                    let to = Date.now();
+                                    this.showTimeToast((to - from) / 1000);
+                                    from = to;
+                                    this.loadSingleImage(31, () => {
+                                        let to = Date.now();
+                                        this.showTimeToast((to - from) / 1000);
+                                        from = to;
+                                        this.loadSingleImage(40, () => {
+                                            let to = Date.now();
+                                            this.showTimeToast((to - from) / 1000);
+                                            from = to;
+                                            this.loadSingleImage(60, () => {
+                                                let to = Date.now();
+                                                this.showTimeToast((to - from) / 1000);
+                                                from = to;
+                                                this.forceUpdate()
+                                            })
+                                        })
+                                    })
+                                })
+                            })
+                        })
+                    })
+                })
+            })
+        })
+    }
+
+    showTimeToast(seconds: number) {
+        showToast(`Sekunden: ${seconds}`, "", {autoClose: false})
+    }
+
+    loadSingleImage(id: number, onFinish: (imageResponse?: ImageResponseType) => void) {
+        fetch(new Request(`http://localhost:8080/article/range;start=${id};end=${id}`, {method: 'GET'}))
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
+                }
+            })
+            .then((response: ImageResponseType[]) => {
+                for (let i = 0; i < response.length; i++) {
+                    let imageResponse = response[i];
+                    let article: Article = imageResponse.article;
+                    if (article.picture)
+                        articleArray[article.id - 1].picture = {
+                            id: article.picture.id,
+                            data: imageResponse.file
+                        };
+                }
+                onFinish(response[0]);
             })
             .catch(reason => {
                 showToast(reason.message, "error")
             })
     }
 }
+
 
 function Copyright() {
     return (
@@ -115,6 +213,7 @@ const useStyles = makeStyles((theme) => ({
     },
     cardMedia: {
         paddingTop: '56.25%', // 16:9
+        backgroundColor: "lightgrey"
     },
     cardContent: {
         flexGrow: 1,
@@ -127,8 +226,10 @@ const useStyles = makeStyles((theme) => ({
 
 let articleArray: Array<Article> = [];
 
-function Album() {
+function Album(props: ContextType<AlbumOverview>) {
     const classes = useStyles();
+    if (articleArray.length === 0)
+        buildDummyData();
     return (
         <React.Fragment>
             <main>
@@ -147,7 +248,7 @@ function Album() {
                 <Container className={classes.cardGrid} maxWidth="lg">
                     <Grid container spacing={4}>
                         {articleArray.map((article) => (
-                            <ArticleComponent article={article}/>
+                            <ArticleComponent context={props.context} article={article}/>
                         ))}
                     </Grid>
                 </Container>
@@ -167,37 +268,86 @@ function Album() {
     );
 }
 
-
 function ArticleComponent(props: any) {
     const classes = useStyles();
     let article: Article = props.article;
-    return (
-        <Grid item /*key={article}*/ xs={12} sm={6} md={4} lg={3}>
-            <CardActionArea component={Link} to={(location: any) => {
-
-                location.pathname = "/article";
-
-                location.state = {article: article};
-
-                return location;
-
-            }} >
+    let context: AlbumOverview = props.context;
+    let isDummy: boolean = article.id === -1;
+    // if (article.id === 100)
+    //     debugger
+    if (isDummy) {
+        return (
+            <Grid item xs={12} sm={6} md={4} lg={3}>
                 <Card className={classes.card}>
-                    <CardMedia
-                        className={classes.cardMedia}
-                        image="https://source.unsplash.com/random"
-                        title="Image title"
-                    />
+                    <CardMedia className={classes.cardMedia}/>
                     <CardContent className={classes.cardContent}>
-                        <Typography gutterBottom variant="h5" component="h2">
+                        <Typography gutterBottom variant="h5" component="h2"
+                                    style={{backgroundColor: "lightgrey"}}>
                             {article.title}
                         </Typography>
-                        <Typography>
+                        <Typography style={{backgroundColor: "lightgrey"}}>
+                            {article.description}
+                        </Typography>
+                        <Typography
+                            style={{backgroundColor: "lightgrey", width: "40%", marginTop: 5}}>
                             {article.description}
                         </Typography>
                     </CardContent>
                 </Card>
-            </CardActionArea>
-        </Grid>
-    )
+            </Grid>
+        )
+    } else {
+        return (
+            <Grid item xs={12} sm={6} md={4} lg={3}>
+                <CardActionArea component={Link} to={(location: any) => {
+                    location.pathname = "/article";
+
+                    location.state = {article: article};
+
+                    return location;
+
+                }}>
+                    <Card className={classes.card}>
+                        <LazyImage
+                            alt={article.title}
+                            getSrc={onResult => {
+                                if (article.picture && article.picture.data) {
+                                    onResult(base64ToDataUri(article.picture.data))
+                                } else {
+                                    context.loadSingleImage(article.id, imageResponse => {
+                                        if (imageResponse)
+                                            onResult(base64ToDataUri(imageResponse.file));
+                                    });
+                                }
+                            }}
+                        />
+                        <CardContent className={classes.cardContent}>
+                            <Typography gutterBottom variant="h5" component="h2">
+                                {article.title}
+                            </Typography>
+                            <Typography>
+                                {article.description}
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </CardActionArea>
+            </Grid>
+        )
+    }
+}
+
+
+function buildDummyData() {
+    for (let i = 0; i < 12; i++) {
+        articleArray.push({
+            id: -1,
+            title: "⠀",
+            description: "⠀",
+            price: "",
+            ean: -1,
+            genre: {id: -1, name: ""},
+            artists: {id: -1, name: ""},
+            picture: undefined
+        })
+    }
 }

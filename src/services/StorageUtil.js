@@ -1,3 +1,4 @@
+import {isMobile} from "../Utilities/Utilities";
 
 export const getSessionUser = () => {
     return JSON.parse(localStorage.getItem('myUser'));
@@ -5,7 +6,7 @@ export const getSessionUser = () => {
 
 export const setSessionUser = (user) => {
     localStorage.setItem('myUser', JSON.stringify(user));
-}
+};
 
 export const setUserLoggedIn = (bool) => {
     if(bool === true){
@@ -13,11 +14,11 @@ export const setUserLoggedIn = (bool) => {
     }else{
         localStorage.setItem('isLoggedIn', undefined)
     }
-}
+};
 
 export const isUserLoggedIn = () => {
     return localStorage.getItem('isLoggedIn') === '1';
-}
+};
 
 export const setDrawerVisible = (bool) =>{
     if (bool){
@@ -25,11 +26,15 @@ export const setDrawerVisible = (bool) =>{
     }else{
         localStorage.setItem('isDrawerVisible',undefined)
     }
-    drawerStateCallbackList.forEach(value => value(bool))
-}
+    callDrawerCallbacks()
+};
 
 export const isDrawerVisible = () =>{
     return localStorage.getItem('isDrawerVisible') === '1';
+};
+
+export function getDrawerState() {
+    return isDrawerVisible() && !isMobile();
 }
 
 //  ------------------------- Drawer-Callbacks ------------------------->
@@ -45,4 +50,22 @@ export function addDrawerCallback(drawerCallback) {
 export function removeDrawerCallback(drawerCallback) {
     drawerStateCallbackList.delete(drawerCallback)
 }
+
+export function callDrawerCallbacks() {
+    let state = isDrawerVisible() && !isMobile();
+    drawerStateCallbackList.forEach(value => value(state))
+}
+
+function resizeListener() {
+    let prevState = isMobile();
+    window.addEventListener('resize', ev => {
+        let newState = isMobile();
+        if (newState !== prevState) {
+            prevState = newState;
+            if (isDrawerVisible())
+                callDrawerCallbacks();
+        }
+    });
+}
+resizeListener();
 //  <------------------------- Drawer-Callbacks -------------------------

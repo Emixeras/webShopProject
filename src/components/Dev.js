@@ -13,7 +13,12 @@ import {
 import MenuDrawer from "./MenuDrawer";
 import Box from "@material-ui/core/Box";
 import {Visibility, VisibilityOff} from "@material-ui/icons";
-import {addDrawerCallback, isDrawerVisible, removeDrawerCallback} from "../services/StorageUtil";
+import {
+    addDrawerCallback,
+    getDrawerState,
+    isDrawerVisible,
+    removeDrawerCallback
+} from "../services/StorageUtil";
 
 class Dev extends React.Component {
 
@@ -24,7 +29,7 @@ class Dev extends React.Component {
         "DELETE": "#f93e3e"
     };
 
-    drawerState = isDrawerVisible();
+    drawerState = getDrawerState();
 
     drawerCallback = state => {
         this.drawerState = state;
@@ -244,24 +249,6 @@ class Dev extends React.Component {
     callResultMap = {};
 
     allComponents = [
-        {
-            title: "test",
-            description: "test Api - provides basic test Functions and example Data",
-            content: [
-                {
-                    type: "GET",
-                    name: "/userTestData",
-                    description: "provides basic test Functions and example Data",
-                    callback: func => this.apiGetData(func, "test/userTestData", "Benutzer")
-                },
-                {
-                    type: "GET",
-                    name: "/articleTestData",
-                    description: "provides basic test Functions and example Data",
-                    callback: func => this.apiGetData(func, "test/articleTestData", "Artikel")
-                }
-            ]
-        },
         {
             title: "article",
             description: "test Api - provides basic test Functions and example Data",
