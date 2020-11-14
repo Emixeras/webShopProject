@@ -243,17 +243,34 @@ function ArticleComponent(props: any) {
                 <Card className={classes.card}>
                     <CardMedia className={classes.cardMedia}/>
                     <CardContent className={classes.cardContent}>
-                        <Typography gutterBottom variant="h5" component="h2"
-                                    style={{backgroundColor: "lightgrey"}}>
-                            {article.title}
-                        </Typography>
-                        <Typography style={{backgroundColor: "lightgrey"}}>
-                            {article.description}
-                        </Typography>
-                        <Typography
-                            style={{backgroundColor: "lightgrey", width: "40%", marginTop: 5}}>
-                            {article.description}
-                        </Typography>
+                        <Grid container justify={"flex-end"}>
+                            <Grid item xs={12}>
+                                <Typography gutterBottom variant="h5" component="h2"
+                                            style={{backgroundColor: "lightgrey"}}>
+                                    {article.title}
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Grid container justify={"space-between"}>
+                                    <Grid item xs={5}>
+                                        <Typography style={{backgroundColor: "lightgrey"}}>
+                                            {article.description}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={5}>
+                                        <Typography style={{backgroundColor: "lightgrey"}}>
+                                            {article.description}
+                                        </Typography>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                            <Grid item style={{width: "20%"}} >
+                                <Typography
+                                    style={{backgroundColor: "lightgrey", marginTop: 5, justifySelf: "end"}}>
+                                    {article.description}
+                                </Typography>
+                            </Grid>
+                        </Grid>
                     </CardContent>
                 </Card>
             </Grid>
@@ -285,18 +302,32 @@ function ArticleComponent(props: any) {
                             reload={reload => context.imageReloadArray.push(reload)}
                         />
                         <CardContent className={classes.cardContent}>
-                            <Typography gutterBottom variant="h5" component="h2">
-                                {article.title}
-                            </Typography>
-                            <Typography>
-                                {article.artists.name}
-                            </Typography>
-                            <Typography>
-                                {article.genre.name}
-                            </Typography>
-                            <Typography>
-                                {article.price + " €"}
-                            </Typography>
+                            <Grid container>
+                                <Grid item xs={12}>
+                                    <Typography gutterBottom variant="h5" component="h2">
+                                        {article.title}
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs>
+                                            <Typography>
+                                                {article.artists.name}
+                                            </Typography>
+                                        </Grid>
+                                        <Grid item>
+                                            <Typography style={{textAlign: "end"}}>
+                                                {article.genre.name}
+                                            </Typography>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Typography style={{textAlign: "end"}}>
+                                        {article.price + " €"}
+                                    </Typography>
+                                </Grid>
+                            </Grid>
                         </CardContent>
                     </Card>
                 </CardActionArea>
