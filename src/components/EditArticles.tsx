@@ -23,10 +23,16 @@ import {DialogBuilder} from "../Utilities/DialogBuilder";
 import {base64ToDataUri, ContextType, LazyImage, Pair, Triple} from "../Utilities/TsUtilities";
 import {Save} from "@material-ui/icons";
 import {updateArticle} from "../services/ItemApiUtil";
+import context from "react-bootstrap/CardContext";
+import {makeStyles} from "@material-ui/core/styles";
 
 interface IProps {
 }
 
+interface ImageResponseType {
+    article: Article;
+    file: string;
+}
 
 interface IState {
     id: number;
@@ -48,6 +54,7 @@ interface Article {
     genre: ArtistOrGenre;
 }
 
+
 interface ArtistOrGenre {
     id: number;
     name: string;
@@ -55,8 +62,10 @@ interface ArtistOrGenre {
 
 export default class EditArticles extends React.Component<IProps, IState> {
     currentPicture: File|undefined = undefined;
-
+    IMAGE_RESOLUTION: string = "IMAGE_RESOLUTION";
+    imageResolution: number = +(localStorage.getItem(this.IMAGE_RESOLUTION) as string);
     drawerState: boolean = getDrawerState();
+    imageReloadFile: (() => void)| undefined=undefined;
     articles: Array<Article> = [];
     artists: Array<ArtistOrGenre> = [];
     genres: Array<ArtistOrGenre> = [];
@@ -136,6 +145,8 @@ export default class EditArticles extends React.Component<IProps, IState> {
     render() {
         const priceError: boolean = this.checkPrice(this.state.price);
         const eanError: boolean = !/^(-1|\d{8}|\d{13})$/.test(this.state.ean + "");
+        if (this.imageReloadFile)
+            this.imageReloadFile()
         return (
             <div>
                 <MenuDrawer/>
@@ -329,6 +340,21 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                             console.log(file);
                                             this.currentPicture = file;
                                         }}/>
+                                        <LazyImage
+                                            alt={this.state.title}
+                                            getSrc={onResult => {
+                                                debugger
+                                                if (this.state.id != -1)
+                                                    this.loadSingleImage(this.state.id, imageResponse => {
+                                                        debugger
+                                                        if (imageResponse)
+                                                            onResult(base64ToDataUri(imageResponse.file));
+
+                                                    });
+
+                                                }}
+                                            reload={reload => this.imageReloadFile = (reload)}
+                                        />
                                     </Grid>
                                     </Grid>
                                     <Grid item xs={12}>
@@ -347,7 +373,20 @@ export default class EditArticles extends React.Component<IProps, IState> {
             </div>
         )
     }
-
+    loadSingleImage(id: number, onFinish: (imageResponse?: ImageResponseType) => void) {
+        fetch(new Request(`http://localhost:8080/article/range;start=${id};end=${id};quality=${this.imageResolution}`, {method: 'GET'}))
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
+                }
+            })
+            .then((response: ImageResponseType[]) => onFinish(response[0]))
+            .catch(reason => {
+                showToast(reason.message, "error")
+            })
+    }
 
     componentWillUnmount() {
         removeDrawerCallback(this.drawerCallback)
