@@ -31,6 +31,7 @@ import Grid from "@material-ui/core/Grid";
 import {logoutUser} from "../services/UserApiUtil";
 import {showToast} from "../Utilities/Utilities";
 import ListAltIcon from '@material-ui/icons/ListAlt';
+import EditIcon from '@material-ui/icons/Edit';
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -208,6 +209,11 @@ export default function MenuDrawer() {
                         to="/profile"
                         primary="Benutzer"
                         icon={<AccountCircleIcon/>}
+                    />
+                    <ListItemLink
+                        to="/editArticles"
+                        primary="Artikel bearbeiten"
+                        icon={<EditIcon/>}
                     />
                     <ListItemLink
                         to="/Impressum"

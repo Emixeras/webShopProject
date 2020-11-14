@@ -53,19 +53,10 @@ class SimpleReactFileUpload extends React.Component {
     };
     render() {
         return (
-            <div  className="container">
-                <div className="row">
-                    <div style={{alignSelf: 'center'}}  className="col-md-6">
-                        <form style={{alignSelf: 'center'}}   method="post" action="#" id="#">
-                            <div className="form-group files">
-                                <label>Upload Your File </label>
-                                <input type="file" name="file" onChange={this.onChangeHandler}/>
-                            </div>
-                            <button type="button" className="btn btn-success btn-block"
-                                    onClick={this.onClickHandler}>Upload
-                            </button>
-                        </form>
-                    </div>
+            <div>
+                <div className="form-group files">
+                    <label>Artikelbild hochladen </label>
+                    <input type="file" name="file" onChange={this.onChangeHandler}/>
                 </div>
             </div>
             )

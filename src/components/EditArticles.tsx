@@ -7,32 +7,26 @@ import {
     TextField,
     InputAdornment,
     IconButton,
-    Dialog,
-    DialogContent,
-    DialogTitle,
-    DialogContentText,
-    DialogActions
 } from "@material-ui/core";
 import MenuDrawer from "./MenuDrawer";
 import {
     addDrawerCallback,
     getDrawerState,
-    isDrawerVisible,
     removeDrawerCallback
 } from "../services/StorageUtil";
 import {padding, showToast} from "../Utilities/Utilities";
 import SimpleReactFileUpload from "./SimpleReactFileUpload";
 import {Combobox, DropdownList} from 'react-widgets'
 import 'react-widgets/dist/css/react-widgets.css';
-// import '../themes/react-widgets.css'
 import AddIcon from '@material-ui/icons/Add';
 import {DialogBuilder} from "../Utilities/DialogBuilder";
-import {ContextType, Pair, Triple} from "../Utilities/TsUtilities";
+import {base64ToDataUri, ContextType, LazyImage, Pair, Triple} from "../Utilities/TsUtilities";
 import {Save} from "@material-ui/icons";
 import {updateArticle} from "../services/ItemApiUtil";
 
 interface IProps {
 }
+
 
 interface IState {
     id: number;
@@ -315,12 +309,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                    label={"Beschreibung"}
                                                    variant={"outlined"}/>
                                     </Grid>
-                                    <Grid item sm={8} xs={12}>
-                                        <SimpleReactFileUpload onFileSelected={(file:any) => {
-                                            console.log(file);
-                                            this.currentPicture = file;
-                                        }}/>
-                                    </Grid>
+
                                     <Grid item sm={4} xs={12}>
                                         <TextField fullWidth
                                                    value={this.state.ean === -1 ? "" : this.state.ean}
@@ -334,6 +323,14 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                    label={"EAN"}
                                                    variant={"outlined"}/>
                                     </Grid>
+                                    <Grid container style={{alignItems: "center"}} spacing={1}>
+                                    <Grid item sm={8} xs={12}>
+                                        <SimpleReactFileUpload onFileSelected={(file:any) => {
+                                            console.log(file);
+                                            this.currentPicture = file;
+                                        }}/>
+                                    </Grid>
+                                    </Grid>
                                     <Grid item xs={12}>
                                         <Grid container justify="flex-end">
                                             <Grid item>
@@ -341,6 +338,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                             </Grid>
                                         </Grid>
                                     </Grid>
+
                                 </Grid>
                             </Card>
                         </Grid>
