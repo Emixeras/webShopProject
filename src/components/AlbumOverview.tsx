@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import CardActionArea from "@material-ui/core/CardActionArea";
-import {NavigationComponent, showToast} from "../Utilities/Utilities";
+import {margin, NavigationComponent, showToast} from "../Utilities/Utilities";
 import {LazyImage, base64ToDataUri, ContextType} from "../Utilities/TsUtilities";
 import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
@@ -16,7 +16,9 @@ import {
     getDrawerState,
     removeDrawerCallback
 } from "../services/StorageUtil";
-import {Slider} from "@material-ui/core";
+import {Button, FormControlLabel, Slider, Switch} from "@material-ui/core";
+import {DialogBuilder} from "../Utilities/DialogBuilder";
+import SettingsIcon from '@material-ui/icons/Settings';
 
 interface IProps {
 }
@@ -53,6 +55,8 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     };
     IMAGE_RESOLUTION: string = "IMAGE_RESOLUTION";
     imageResolution: number = +(localStorage.getItem(this.IMAGE_RESOLUTION) as string);
+    UNLOAD_IMAGES: string = "UNLOAD_IMAGES";
+    unloadImages: boolean = (localStorage.getItem(this.UNLOAD_IMAGES) as string) == 'true';
     imageReloadArray: Array<() => void> = [];
 
     constructor(props: IProps, context: any) {
@@ -182,31 +186,7 @@ function Album(props: ContextType<AlbumOverview>) {
                         <Typography variant="h5" align="center" color="textSecondary" paragraph>
                             Auf dieser Seite können Sie durch unsere Angebote stöbern
                         </Typography>
-                        <Grid container style={{width: "100%"}}>
-                            <Grid item xs>
-                                <Slider
-                                    style={{width: "100%"}}
-                                    defaultValue={context.imageResolution}
-                                    getAriaValueText={value => `${value} Pixel`}
-                                    aria-labelledby="discrete-slider-small-steps"
-                                    step={50}
-                                    marks
-                                    min={100}
-                                    max={1000}
-                                    onMouseUp={event => {
-                                        // @ts-ignore
-                                        let value = +event.target.ariaValueNow;
-                                        if (context.imageResolution !== value) {
-                                            context.imageResolution = value;
-                                            localStorage.setItem("IMAGE_RESOLUTION", value + "");
-                                            context.imageReloadArray.forEach(reload => reload())
-                                        }
-                                    }}
-                                    valueLabelDisplay="auto"
-                                />
-                            </Grid>
-                        </Grid>
-
+                        <UiSettings context={context}/>
                     </Container>
                 </div>
                 <Container className={classes.cardGrid} maxWidth="lg">
@@ -230,6 +210,82 @@ function Album(props: ContextType<AlbumOverview>) {
             {/* End footer */}
         </React.Fragment>
     );
+}
+
+function UiSettings({context}: ContextType<AlbumOverview>) {
+    const [open, setOpen] = useState(false);
+    const [checked, setChecked] = useState(context.unloadImages);
+    return (
+        <div>
+            <Button onClick={event => {
+                setOpen(true)
+            }} endIcon={<SettingsIcon/>}>Einstellungen</Button>
+            {new DialogBuilder(open, dialogBuilder => setOpen(false))
+                .setTitle("UI Einstellungen")
+                .setText("Die Qualität der Vorschaubilder und das Bilder-Ladeverhalten können angepasst werden")
+                .setContent(dialogBuilder => {
+                    return (
+                        <div>
+                            <Slider
+                                style={{width: "95%", ...margin(30, 15, 0)}}
+                                defaultValue={context.imageResolution}
+                                getAriaValueText={value => `${value} Pixel`}
+                                aria-labelledby="discrete-slider-small-steps"
+                                step={50}
+                                min={100}
+                                max={500}
+                                onMouseUp={event => {
+                                    // @ts-ignore
+                                    let value = +event.target.ariaValueNow;
+                                    if (context.imageResolution !== value) {
+                                        context.imageResolution = value;
+                                        localStorage.setItem("IMAGE_RESOLUTION", `${value}`);
+                                        context.imageReloadArray.forEach(reload => reload())
+                                    }
+                                }}
+                                marks={[
+                                    {
+                                        value: 100,
+                                        label: 'Klein',
+                                    },
+                                    {
+                                        value: 250,
+                                        label: 'Mittel',
+                                    },
+                                    {
+                                        value: 400,
+                                        label: 'Groß',
+                                    },
+                                    {
+                                        value: 500,
+                                        label: 'Full',
+                                    },
+                                ]}
+                                valueLabelDisplay="on"
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={checked}
+                                        onChange={(event, checked) => {
+                                            context.unloadImages = checked;
+                                            setChecked(checked);
+                                            localStorage.setItem(context.UNLOAD_IMAGES, `${checked}`)
+                                        }}
+                                        name="checkedB"
+                                        color="primary"
+                                    />
+                                }
+                                label="Bilder automatisch entladen"
+                            />
+                        </div>
+                    )
+                })
+                // .addButton("Abbrechen")
+                .addButton({label: "Ok", isActionButton: true})
+                .build()}
+        </div>
+    )
 }
 
 function ArticleComponent(props: any) {
@@ -289,6 +345,7 @@ function ArticleComponent(props: any) {
                     <Card className={classes.card}>
                         <LazyImage
                             alt={article.title}
+                            className={classes.cardMedia}
                             getSrc={onResult => {
                                 if (article.picture && article.picture.data) {
                                     onResult(base64ToDataUri(article.picture.data))

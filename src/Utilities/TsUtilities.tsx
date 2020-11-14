@@ -99,19 +99,19 @@ export function base64ToDataUri (base64: string): string {
 // ---------------
 /* Credit: https://slashgear.github.io/creating-an-image-lazy-loading-component-with-react/*/
 
-const placeHolder = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII=';
-export interface LazyImageProperties {
-    alt: string;
-    getSrc: (onResult: ((result: string) => void)) => void;
-    reload?: (reload: () => void) => void
-}
+const placeHolder = "" //'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII=';
 
-interface GetSrcType {
-    (onResult: ((result: string) => void)): void;
+export interface LazyImageProperties {
+    getSrc: (onResult: ((result: string) => void)) => void;
+    alt?: string;
+    reload?: (reload: () => void) => void
+    style?: React.CSSProperties;
+    className?: string
+    autoUnloadImages?: boolean;
 }
 
 // @ts-ignore
-export const LazyImage = ({ alt, getSrc, reload}: LazyImageProperties): CardMedia => {
+export const LazyImage = ({alt, getSrc, reload, style, className}: LazyImageProperties): CardMedia => {
     const [imageSrc, setImageSrc] = useState(placeHolder);
     const [imageRef, setImageRef] = useState<Element>();
 
@@ -135,10 +135,15 @@ export const LazyImage = ({ alt, getSrc, reload}: LazyImageProperties): CardMedi
                 observer = new IntersectionObserver(
                     entries => {
                         entries.forEach(entry => {
+                            if (alt === "Davis LLC")
+                                debugger
                             if (!didCancel && (entry.intersectionRatio > 0 || entry.isIntersecting)) {
                                 getSrc(result => {
                                     setImageSrc(result);
-                                    observer.unobserve(imageRef)
+                                    if (alt !== "Davis LLC")
+                                        observer.unobserve(imageRef)
+                                    else
+                                        debugger
                                 })
                             }
                         })
@@ -160,11 +165,13 @@ export const LazyImage = ({ alt, getSrc, reload}: LazyImageProperties): CardMedi
             didCancel = true;
             // on component cleanup, we remove the listner
             if (observer && observer.unobserve && imageRef) {
+                if (alt === "Davis LLC")
+                    debugger
                 observer.unobserve(imageRef)
             }
         }
     }, [imageSrc, imageRef]);
-    return <CardMedia style={{paddingTop: '100%', backgroundColor: "lightgrey"}} image={imageSrc} ref={element => {
+    return <CardMedia className={className} style={style} image={imageSrc} ref={element => {
         if (element)
             setImageRef(element)
     }
