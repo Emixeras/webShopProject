@@ -38,18 +38,14 @@ export function titles() {
     )
 }
 
-//  ------------------------- Padding ------------------------->
-export function padding_extend(obj, a, b, c, d) {
-    debugger
-    return {
-        ...obj,
-        paddingTop: a,
-        paddingRight: b ? b : a,
-        paddingBottom: c ? c : a,
-        paddingLeft: d ? d : (b ? b : a)
-    }
-}
-
+//  ------------------------- Padding & Margin ------------------------->
+/**
+ * @param {number} a Alle oder Vertikal oder Oben
+ * @param {number} [b] Horizontal oder Rechts
+ * @param {number} [c] Unten
+ * @param {number} [d] Links
+ * @returns {{paddingBottom: (*), paddingRight: (*), paddingTop: *, paddingLeft: (*)}}
+ */
 export function padding(a, b, c, d) {
     return {
         paddingTop: a,
@@ -58,8 +54,22 @@ export function padding(a, b, c, d) {
         paddingLeft: d ? d : (b ? b : a)
     }
 }
-
-//  <------------------------- Padding -------------------------
+/**
+ * @param {number} a Alle oder Vertikal oder Oben
+ * @param {number} [b] Horizontal oder Rechts
+ * @param {number} [c] Unten
+ * @param {number} [d] Links
+ * @returns {{marginBottom: (*), marginRight: (*), marginTop: *, marginLeft: (*)}}
+ */
+export function margin(a, b, c, d) {
+    return {
+        marginTop: a,
+        marginRight: b ? b : a,
+        marginBottom: c ? c : a,
+        marginLeft: d ? d : (b ? b : a)
+    }
+}
+//  <------------------------- Padding & Margin -------------------------
 
 
 //  ------------------------- Toast ------------------------->
