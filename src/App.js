@@ -1,7 +1,6 @@
 import React from 'react';
 import './App.css';
 import { Route, Switch } from "react-router-dom";
-import Home from './components/Home'
 import Login from "./components/Login";
 import Register from "./components/Register";
 import ShoppingCart from "./components/ShoppingCart";
@@ -12,6 +11,7 @@ import {toast} from 'react-toastify'
 import AlbumOverview from "./components/AlbumOverview";
 import EditArticles from "./components/EditArticles";
 import GenreOverview from "./components/GenreOverview";
+import ArtistOverview from "./components/ArtistOverview";
 
 toast.configure();
 function App() {
@@ -28,6 +28,7 @@ function App() {
         <Route path="/dev" component={Dev} exact />
         <Route path="/albums" component={AlbumOverview} exact />
         <Route path="/genres" component={GenreOverview} exact />
+        <Route path="/artists" component={ArtistOverview} exact />
         <Route component={AlbumOverview}/>
       </Switch>
     </div>
