@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
+import banner1 from "../assets/1.png";
+import banner2 from "../assets/2.png";
+import banner3 from "../assets/3.png";
 import {
     addDrawerCallback,
     isDrawerVisible,
@@ -18,6 +21,8 @@ import CardActionArea from "@material-ui/core/CardActionArea";
 import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 import axios from "axios";
+import { Carousel } from 'react-responsive-carousel';
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 class ArtistOverview extends Component {
 
@@ -38,6 +43,17 @@ class ArtistOverview extends Component {
         return (<div>
                 <MenuDrawer/>
                 <div style={{marginInlineStart: (this.drawerState ? 240 : 0)}}>
+                    <Carousel showArrows={false} showStatus={false} infiniteLoop={true} showThumbs={false} autoPlay={true}>
+                        <div>
+                            <img src={banner1}/>
+                        </div>
+                        <div>
+                            <img src={banner2}/>
+                        </div>
+                        <div>
+                            <img src={banner3}/>
+                        </div>
+                    </Carousel>
                     <Artist/>
                 </div>
             </div>
