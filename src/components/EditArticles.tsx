@@ -6,7 +6,7 @@ import {
     Card,
     TextField,
     InputAdornment,
-    IconButton,
+    IconButton, Typography,
 } from "@material-ui/core";
 import MenuDrawer from "./MenuDrawer";
 import {
@@ -20,11 +20,19 @@ import {Combobox, DropdownList} from 'react-widgets'
 import 'react-widgets/dist/css/react-widgets.css';
 import AddIcon from '@material-ui/icons/Add';
 import {DialogBuilder} from "../Utilities/DialogBuilder";
-import {base64ToDataUri, ContextType, LazyImage, Pair, Triple} from "../Utilities/TsUtilities";
+import {
+    base64ToDataUri,
+    ContextType,
+    LazyImage,
+    LazyImage_,
+    Pair,
+    Triple
+} from "../Utilities/TsUtilities";
 import {Save} from "@material-ui/icons";
 import {updateArticle} from "../services/ItemApiUtil";
 import context from "react-bootstrap/CardContext";
 import {makeStyles} from "@material-ui/core/styles";
+import zIndex from "@material-ui/core/styles/zIndex";
 
 interface IProps {
 }
@@ -61,11 +69,10 @@ interface ArtistOrGenre {
 }
 
 export default class EditArticles extends React.Component<IProps, IState> {
-    currentPicture: File|undefined = undefined;
+    currentPicture: File | undefined = undefined;
+    setFileUploaDefaultdVisibility: (visibility: boolean) => void = visibility => {};
     IMAGE_RESOLUTION: string = "IMAGE_RESOLUTION";
-    imageResolution: number = +(localStorage.getItem(this.IMAGE_RESOLUTION) as string);
     drawerState: boolean = getDrawerState();
-    imageReloadFile: (() => void)| undefined=undefined;
     articles: Array<Article> = [];
     artists: Array<ArtistOrGenre> = [];
     genres: Array<ArtistOrGenre> = [];
@@ -145,8 +152,10 @@ export default class EditArticles extends React.Component<IProps, IState> {
     render() {
         const priceError: boolean = this.checkPrice(this.state.price);
         const eanError: boolean = !/^(-1|\d{8}|\d{13})$/.test(this.state.ean + "");
-        if (this.imageReloadFile)
-            this.imageReloadFile()
+        // if (this.imageReloadFile) {
+        //     debugger
+        //     this.imageReloadFile()
+        // }
         return (
             <div>
                 <MenuDrawer/>
@@ -243,6 +252,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                           return false;
                                       }}
                                       onSelect={(article: Article) => {
+                                          this.currentPicture = undefined;
                                           this.setState({
                                               id: article.id,
                                               title: article.title,
@@ -259,14 +269,14 @@ export default class EditArticles extends React.Component<IProps, IState> {
                         <Grid item xs={12}>
                             <Card style={padding(18)}>
                                 <Grid container spacing={2}>
-                                    <Grid item sm={9} xs={12}>
+                                    <Grid item md={9} sm={12}>
                                         <TextField fullWidth
                                                    value={this.state.title}
                                                    label={"Album Titel"}
                                                    onChange={event => this.setState({title: event.target.value})}
                                                    variant={"outlined"}/>
                                     </Grid>
-                                    <Grid item sm={3} xs={12}>
+                                    <Grid item md={3} sm={12}>
                                         <TextField fullWidth
                                                    variant="outlined"
                                                    onChange={event => {
@@ -284,7 +294,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                    }}
                                         />
                                     </Grid>
-                                    <Grid item sm={6} xs={12}>
+                                    <Grid item md={6} sm={12}>
                                         <Grid container style={{alignItems: "center"}} spacing={1}>
                                             <Grid item xs={11}>
                                                 <Combobox busy={this.articles.length === 0}
@@ -302,7 +312,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
 
                                         </Grid>
                                     </Grid>
-                                    <Grid item sm={6} xs={12}>
+                                    <Grid item md={6} sm={12}>
                                         <Combobox busy={this.articles.length === 0}
                                                   textField={"name"}
                                                   filter={"contains"}
@@ -320,8 +330,61 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                    label={"Beschreibung"}
                                                    variant={"outlined"}/>
                                     </Grid>
+                                    <Grid item md={8} sm={12} >
+                                        <Typography variant="h6">Album Cover</Typography>
+                                        <div style={{width: 250, height: 250}}>
+                                            <div style={{
+                                                width: 250,
+                                                height: 250,
+                                                zIndex: 1,
+                                                position: "absolute"
+                                            }}>
+                                                <LazyImage_
+                                                    style={{
+                                                        width: "100%",
+                                                        height: "100%",
+                                                        zIndex: 5
+                                                    }}
+                                                    alt={this.state.title}
+                                                    payload={Pair.make(this.state.id, this.currentPicture)}
+                                                    shouldImageUpdate={(oldPayload: Pair<number, File>, newPayload: Pair<number, File>) => {
+                                                        return oldPayload.first !== newPayload.first || oldPayload.second !== newPayload.second
+                                                    }}
+                                                    getSrc={onResult => {
+                                                        if (this.currentPicture) {
+                                                            onResult(URL.createObjectURL(this.currentPicture));
+                                                            this.setFileUploaDefaultdVisibility(false);
+                                                        } else if (this.state.id !== -1) {
+                                                            this.loadSingleImage(this.state.id, imageResponse => {
+                                                                if (imageResponse) {
+                                                                    onResult(base64ToDataUri(imageResponse.file));
+                                                                    this.setFileUploaDefaultdVisibility(false);
+                                                                } else
+                                                                    this.setFileUploaDefaultdVisibility(true);
+                                                            });
+                                                        } else
+                                                            this.setFileUploaDefaultdVisibility(true);
 
-                                    <Grid item sm={4} xs={12}>
+                                                    }}
+                                                />
+                                            </div>
+                                            <div style={{
+                                                width: 250,
+                                                height: 250,
+                                                zIndex: 2,
+                                                position: "absolute",
+                                            }}>
+                                                <SimpleReactFileUpload
+                                                    onFileSelected={(file: File) => {
+                                                        this.currentPicture = file;
+                                                        this.forceUpdate();
+                                                    }}
+                                                    setDefaultVisibility={((setVisibility: (visibility: boolean) => void) => this.setFileUploaDefaultdVisibility = setVisibility)}
+                                                />
+                                            </div>
+                                        </div>
+                                    </Grid>
+                                    <Grid item md={4} sm={12}>
                                         <TextField fullWidth
                                                    value={this.state.ean === -1 ? "" : this.state.ean}
                                                    onChange={event => {
@@ -333,29 +396,6 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                    helperText={eanError ? "Keine valide EAN" : ""}
                                                    label={"EAN"}
                                                    variant={"outlined"}/>
-                                    </Grid>
-                                    <Grid container style={{alignItems: "center"}} spacing={1}>
-                                    <Grid item sm={8} xs={12}>
-                                        <SimpleReactFileUpload onFileSelected={(file:any) => {
-                                            console.log(file);
-                                            this.currentPicture = file;
-                                        }}/>
-                                        <LazyImage
-                                            alt={this.state.title}
-                                            getSrc={onResult => {
-                                                debugger
-                                                if (this.state.id != -1)
-                                                    this.loadSingleImage(this.state.id, imageResponse => {
-                                                        debugger
-                                                        if (imageResponse)
-                                                            onResult(base64ToDataUri(imageResponse.file));
-
-                                                    });
-
-                                                }}
-                                            reload={reload => this.imageReloadFile = (reload)}
-                                        />
-                                    </Grid>
                                     </Grid>
                                     <Grid item xs={12}>
                                         <Grid container justify="flex-end">
@@ -373,8 +413,9 @@ export default class EditArticles extends React.Component<IProps, IState> {
             </div>
         )
     }
+
     loadSingleImage(id: number, onFinish: (imageResponse?: ImageResponseType) => void) {
-        fetch(new Request(`http://localhost:8080/article/range;start=${id};end=${id};quality=${this.imageResolution}`, {method: 'GET'}))
+        fetch(new Request(`http://localhost:8080/article/range;start=${id};end=${id};quality=${300}`, {method: 'GET'}))
             .then(response => {
                 if (response.status === 200) {
                     return response.json();
@@ -447,7 +488,7 @@ function DialogComponent(arg: any) {
 
 function ActionButtons(props: ContextType<EditArticles>) {
     let that: EditArticles = props.context;
-    return(
+    return (
         <Button endIcon={<Save/>}
                 onClick={event => {
                     console.log(that.state.description);

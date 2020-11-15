@@ -21,7 +21,7 @@ export class Pair<A, B> {
         this.second = second;
     }
 
-    static make<A, B>(first: A, second: B): Pair<A,B> {
+    static make<A, B>(first: A, second: B): Pair<A, B> {
         return new Pair(first, second);
     }
 }
@@ -38,10 +38,11 @@ export class Triple<A, B, C> {
         this.third = third;
     }
 
-    static make<A, B, C>(first: A, second: B, third: C): Triple<A,B,C> {
+    static make<A, B, C>(first: A, second: B, third: C): Triple<A, B, C> {
         return new Triple(first, second, third);
     }
 }
+
 //  <------------------------- Tuple -------------------------
 
 
@@ -49,6 +50,7 @@ export class Triple<A, B, C> {
 export interface ContextType<T> {
     context: T;
 }
+
 //  <------------------------- Types -------------------------
 
 
@@ -60,7 +62,7 @@ var signatures = {
     iVBORw0KGgo: "image/png"
 };
 
-export function base64ToDataUri (base64: string): string {
+export function base64ToDataUri(base64: string): string {
     var mime;
     if (base64.startsWith("iVBORw0KGgo"))
         mime = "image/png";
@@ -68,11 +70,11 @@ export function base64ToDataUri (base64: string): string {
         mime = "image/jpeg";
 
     // for (let s in signatures) {
-        //     debugger
-        //     if (base64.startsWith(s)) {
-        //          mime = signatures[s as string] as string;
-        //     }
-        // }
+    //     debugger
+    //     if (base64.startsWith(s)) {
+    //          mime = signatures[s as string] as string;
+    //     }
+    // }
     // var a = new Uint8Array(buffer);
     // var nb = a.length;
     // if (nb < 4)
@@ -99,24 +101,41 @@ export function base64ToDataUri (base64: string): string {
 // ---------------
 /* Credit: https://slashgear.github.io/creating-an-image-lazy-loading-component-with-react/*/
 
-const placeHolder = "" //'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII=';
+const placeHolder = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="; //""; //'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII=';
 
-export interface LazyImageProperties {
+interface LazyImageProperties {
     getSrc: (onResult: ((result: string) => void)) => void;
     alt?: string;
     reload?: (reload: () => void) => void
     style?: React.CSSProperties;
     className?: string
     autoUnloadImages?: boolean;
+    returnMode?: RETURN_MODE;
+    // loadImageMode?: LOAD_IMAGE_MODE;
+    shouldImageUpdate?: ((oldPayload: any, newPayload: any) => boolean) | null;
+    payload?: any;
+    imageRef?: any;
 }
 
-// @ts-ignore
-export const LazyImage = ({alt, getSrc, reload, style, className}: LazyImageProperties): CardMedia => {
+interface LazyImageState {
+    imageSrc: string;
+    alt?: string;
+}
+
+export enum RETURN_MODE {
+    CARD_MEDIA, IMG
+}
+
+// export enum LOAD_IMAGE_MODE {
+//     ON_VISIBLE, ALWAYS
+// }
+
+export const LazyImage = ({alt, getSrc, reload, style, className, returnMode, shouldImageUpdate}: LazyImageProperties): JSX.Element => {
     const [imageSrc, setImageSrc] = useState(placeHolder);
     const [imageRef, setImageRef] = useState<Element>();
 
     if (reload)
-        reload(() => setImageSrc(placeHolder));
+        reload(() => getSrc(result => setImageSrc(result)));
 
     // const onLoad = (event: any) => {
     //     event.target.classList.add('loaded')
@@ -126,10 +145,17 @@ export const LazyImage = ({alt, getSrc, reload, style, className}: LazyImageProp
     //     event.target.classList.add('has-error')
     // };
 
+    if (shouldImageUpdate) {
+        if (shouldImageUpdate(null, null))
+            getSrc(result => setImageSrc(result))
+    }
     useEffect(() => {
+        if (shouldImageUpdate)
+            return () => {};
         let observer: IntersectionObserver;
         let didCancel = false;
 
+        debugger
         if (imageRef && imageSrc === placeHolder) {
             if (IntersectionObserver) {
                 observer = new IntersectionObserver(
@@ -141,7 +167,7 @@ export const LazyImage = ({alt, getSrc, reload, style, className}: LazyImageProp
                                 getSrc(result => {
                                     setImageSrc(result);
                                     if (alt !== "Davis LLC")
-                                        observer.unobserve(imageRef)
+                                        observer.unobserve(imageRef);
                                     else
                                         debugger
                                 })
@@ -171,12 +197,117 @@ export const LazyImage = ({alt, getSrc, reload, style, className}: LazyImageProp
             }
         }
     }, [imageSrc, imageRef]);
-    return <CardMedia className={className} style={style} image={imageSrc} ref={element => {
-        if (element)
-            setImageRef(element)
+
+    switch (returnMode) {
+        default:
+        case RETURN_MODE.IMG:
+            return <img className={className}
+                        style={style}
+                        src={imageSrc}
+                        ref={element => {
+                            if (element) setImageRef(element)
+                        }}
+                        alt={alt}
+            />;
+        case RETURN_MODE.CARD_MEDIA:
+            return <CardMedia className={className}
+                              style={style}
+                              image={imageSrc}
+                              ref={element => {
+                                  if (element) setImageRef(element)
+                              }}
+                              title={alt}/>;
     }
-    } title={alt}/>
 //    onLoad={onLoad}
 //     onError={onError}
 };
+
+export class LazyImage_ extends React.Component<LazyImageProperties, LazyImageState> {
+    imageSrc: string = placeHolder;
+    // @ts-ignore
+    getSrc: (onResult: ((result: string) => void)) => void;
+    alt?: string;
+    reload?: (reload: () => void) => void;
+    style?: React.CSSProperties;
+    className?: string;
+    returnMode?: RETURN_MODE;
+    // loadImageMode?: LOAD_IMAGE_MODE;
+    shouldImageUpdate?: ((oldPayload: any, newPayload: any) => boolean) | null;
+    payload?: any;
+    imageRef?: any = undefined;
+
+    constructor(props: LazyImageProperties, context: any) {
+        super(props, context);
+        this.updateVariables(props);
+        // this.state = {
+        //     imageSrc: placeHolder,
+        //     alt: props.alt,
+        // };
+        if (this.reload)
+            this.reload(() => this.getSrc(result => {
+                this.imageSrc = result;
+                this.forceUpdate();
+            }));
+
+    }
+
+    private updateVariables(props: Readonly<LazyImageProperties>) {
+        this.getSrc = props.getSrc;
+        this.reload = props.reload;
+        this.style = props.style;
+        this.className = props.className;
+        this.returnMode = props.returnMode;
+        this.shouldImageUpdate = props.shouldImageUpdate;
+        this.payload = props.payload;
+        this.alt = props.alt;
+    }
+
+    shouldComponentUpdate(nextProps: Readonly<LazyImageProperties>, nextState: Readonly<LazyImageState>, nextContext: any): boolean {
+        if (this.shouldImageUpdate !== undefined)
+            {
+                let shouldUpdate: boolean;
+                if (this.shouldImageUpdate === null)
+                    shouldUpdate = this.payload !== nextProps.payload;
+                else
+                    shouldUpdate = this.shouldImageUpdate(this.payload, nextProps.payload);
+                if (shouldUpdate) {
+                    this.getSrc(result => {
+                        this.imageSrc = result;
+                        this.forceUpdate();
+                    })
+                }
+                return false;
+            }
+        else
+            return true;
+    }
+
+    componentWillUpdate(nextProps: Readonly<LazyImageProperties>, nextState: Readonly<LazyImageState>, nextContext: any): void {
+        this.updateVariables(nextProps);
+    }
+
+    render() {
+        switch (this.returnMode) {
+            default:
+            case RETURN_MODE.IMG:
+                return <img className={this.className}
+                            style={this.style}
+                            src={this.imageSrc}
+                            ref={element => {
+                                if (element) this.imageRef = element
+                            }}
+                            alt={this.alt}
+                />;
+            case RETURN_MODE.CARD_MEDIA:
+                return <CardMedia className={this.className}
+                                  style={this.style}
+                                  image={this.imageSrc}
+                                  ref={element => {
+                                      if (element) this.imageRef = element
+                                  }}
+                                  title={this.alt}/>;
+        }
+
+    }
+}
 //  <------------------------- Image -------------------------

@@ -8,14 +8,10 @@ import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import CardActionArea from "@material-ui/core/CardActionArea";
 import {margin, NavigationComponent, showToast} from "../Utilities/Utilities";
-import {LazyImage, base64ToDataUri, ContextType} from "../Utilities/TsUtilities";
+import {base64ToDataUri, ContextType, LazyImage, RETURN_MODE} from "../Utilities/TsUtilities";
 import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
-import {
-    addDrawerCallback,
-    getDrawerState,
-    removeDrawerCallback
-} from "../services/StorageUtil";
+import {addDrawerCallback, getDrawerState, removeDrawerCallback} from "../services/StorageUtil";
 import {Button, FormControlLabel, Slider, Switch} from "@material-ui/core";
 import {DialogBuilder} from "../Utilities/DialogBuilder";
 import SettingsIcon from '@material-ui/icons/Settings';
@@ -344,6 +340,7 @@ function ArticleComponent(props: any) {
                 }}>
                     <Card className={classes.card}>
                         <LazyImage
+                            returnMode={RETURN_MODE.CARD_MEDIA}
                             alt={article.title}
                             className={classes.cardMedia}
                             getSrc={onResult => {
