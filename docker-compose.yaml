@@ -1,3 +1,5 @@
+#usage : docker-compose -f docker-compose.yml -f optional-service.yaml up
+
 version: '3'
 services:
   postgres:
@@ -20,15 +22,4 @@ services:
     ports:
       - '8080:8080'
 
-  frontend:
-    restart: always
-    image: stormer1911/frontend
-    build:
-      context: ./
-      dockerfile: ./Dockerfile
-    depends_on:
-      - backend
-      - postgres
-    ports:
-    - 3001:3000
-    stdin_open: true
+

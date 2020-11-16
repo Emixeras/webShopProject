@@ -1,22 +1,16 @@
-# Docker Image which is used as foundation to create
-# a custom Docker Image with this Dockerfile
-FROM node:10
-
-# A directory within the virtualized Docker environment
-# Becomes more relevant when using Docker Compose later
+### STAGE 1: Build ###
+FROM node as builder
+RUN mkdir /usr/src/app
 WORKDIR /usr/src/app
+ENV PATH /usr/src/app/node_modules/.bin:$PATH
+COPY package.json /usr/src/app/package.json
+RUN npm install --legacy-peer-deps
 
-# Copies package.json and package-lock.json to Docker environment
-COPY package*.json ./
-RUN CI=true
-# Installs all node packages
-RUN npm install
+COPY . /usr/src/app
+RUN npm run build
 
-# Copies everything over to Docker environment
-COPY . .
-
-# Uses port which is used by the actual application
-EXPOSE 3000
-
-# Finally runs the application
-CMD [ "npm", "start" ]
+### STAGE 2: Production Environment ###
+FROM nginx:alpine
+COPY --from=builder /usr/src/app/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
