@@ -1,4 +1,5 @@
 import React, {
+    Component,
     Dispatch,
     MouseEventHandler,
     ReactNode,
@@ -54,7 +55,7 @@ export class DialogBuilder {
     private input: InputObject | undefined = undefined;
     private dialogErrorState: Triple<string, boolean, string> = Triple.make("", false, "");
     private setPersistentErrorState:Dispatch<SetStateAction<Triple<string, boolean, string>>> = value => {};
-
+    private content: ((dialogBuilder: DialogBuilder) => JSX.Element) | undefined = undefined;
 
     //  ------------------------- Constructor ------------------------->
     constructor(open: boolean, handleClose: DialogOnClick) {
@@ -118,6 +119,11 @@ export class DialogBuilder {
 
     getInputText() {
         return this.dialogErrorState.third;
+    }
+
+    setContent(content: (dialogBuilder: DialogBuilder) => JSX.Element): DialogBuilder {
+        this.content = content;
+        return this;
     }
     //  <------------------------- Getter & Setter -------------------------
 
@@ -183,6 +189,7 @@ export class DialogBuilder {
                         {this.text}
                     </DialogContentText>
                     {this.buildInput()}
+                    {this.content ? this.content(this) : null}
                 </DialogContent>
                 <DialogActions>
                     {this._buttonList.toArray().map(buttonObject => {
