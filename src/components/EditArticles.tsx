@@ -22,9 +22,8 @@ import AddIcon from '@material-ui/icons/Add';
 import {DialogBuilder} from "../Utilities/DialogBuilder";
 import {
     base64ToDataUri,
-    ContextType,
+    ContextType, filterArticle,
     LazyImage,
-    LazyImage_,
     Pair,
     Triple
 } from "../Utilities/TsUtilities";
@@ -52,7 +51,7 @@ interface IState {
     genre?: ArtistOrGenre;
 }
 
-interface Article {
+export interface Article {
     id: number;
     title: string;
     description: string;
@@ -60,12 +59,14 @@ interface Article {
     price: string;
     artists: ArtistOrGenre;
     genre: ArtistOrGenre;
+    picture?: { id: number, data: string };
 }
 
 
 interface ArtistOrGenre {
     id: number;
     name: string;
+    file?: string;
 }
 
 export default class EditArticles extends React.Component<IProps, IState> {
@@ -93,6 +94,12 @@ export default class EditArticles extends React.Component<IProps, IState> {
             artists: undefined,
             genre: undefined
         };
+        // @ts-ignore
+        if (this.props.location.state) {
+            // @ts-ignore
+            const { article } = this.props.location.state;
+            this.state = article;
+        }
         addDrawerCallback(this.drawerCallback);
         this.loadArticles()
     }
@@ -127,7 +134,6 @@ export default class EditArticles extends React.Component<IProps, IState> {
                     if (nameA > nameB) {
                         return 1;
                     }
-
                     return 0;
                 };
                 this.artists.sort(nameComparetor)
@@ -139,6 +145,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                     this.genres.push(response[i].genre);
                 }
                 this.genres.sort(nameComparetor)
+
 
             })
             .catch(reason => {
@@ -198,58 +205,9 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                           );
                                       }}
                                       filter={(dataItem: Article, searchItem: string): boolean => {
-                                          searchItem = searchItem.toLowerCase();
+                                          searchItem = searchItem.toLowerCase().replaceAll("|", "&");
 
-                                          let subArray = searchItem.replaceAll("|", "&").split("&");
-                                          let length = subArray.length;
-                                          let found = 0;
-                                          for (let sub of subArray) {
-                                              sub = sub.trim();
-                                              let type: boolean | string = sub.length > 1 && sub.charAt(1) === ":";
-                                              if (type) {
-                                                  type = sub.substr(0, 1);
-                                                  sub = sub.substr(2).trim();
-                                              }
-
-                                              if (sub.length === 0 && length > 1) {
-                                                  if (++found >= length)
-                                                      return true;
-                                                  continue
-                                              }
-
-                                              if ((!type || type === "i") && dataItem.id.toString().toLowerCase().includes(sub)) {
-                                                  if (++found >= length)
-                                                      return true;
-                                              } else if ((!type || type === "t") && dataItem.title.toLowerCase().includes(sub)) {
-                                                  if (++found >= length)
-                                                      return true;
-                                              } else if ((!type || type === "a") && dataItem.artists.name.toLowerCase().includes(sub)) {
-                                                  if (++found >= length)
-                                                      return true;
-                                              } else if ((!type || type === "g") && dataItem.genre.name.toLowerCase().includes(sub)) {
-                                                  if (++found >= length)
-                                                      return true;
-                                              } else if ((!type || type === "d") && dataItem.description && dataItem.description.toLowerCase().includes(sub)) {
-                                                  if (++found >= length)
-                                                      return true;
-                                              } else if ((!type || type === "e") && dataItem.ean.toString().includes(sub)) {
-                                                  if (++found >= length)
-                                                      return true;
-                                              } else if ((!type || type === "p")) {
-                                                  sub = sub.replaceAll(",", ".");
-                                                  if (sub.includes("-")) {
-                                                      let fromTo = sub.split("-");
-                                                      if ((dataItem.price >= fromTo[0] || !fromTo[0]) && (dataItem.price <= fromTo[1] || !fromTo[1])) {
-                                                          if (++found >= length)
-                                                              return true;
-                                                      }
-                                                  } else if (dataItem.price == sub) {
-                                                      if (++found >= length)
-                                                          return true;
-                                                  }
-                                              }
-                                          }
-                                          return false;
+                                          return filterArticle(searchItem, dataItem);
                                       }}
                                       onSelect={(article: Article) => {
                                           this.currentPicture = undefined;
@@ -339,7 +297,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                 zIndex: 1,
                                                 position: "absolute"
                                             }}>
-                                                <LazyImage_
+                                                <LazyImage
                                                     style={{
                                                         width: "100%",
                                                         height: "100%",
@@ -350,14 +308,14 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                     shouldImageUpdate={(oldPayload: Pair<number, File>, newPayload: Pair<number, File>) => {
                                                         return oldPayload.first !== newPayload.first || oldPayload.second !== newPayload.second
                                                     }}
-                                                    getSrc={onResult => {
+                                                    getSrc={setImgSrc => {
                                                         if (this.currentPicture) {
-                                                            onResult(URL.createObjectURL(this.currentPicture));
+                                                            setImgSrc(URL.createObjectURL(this.currentPicture));
                                                             this.setFileUploaDefaultdVisibility(false);
                                                         } else if (this.state.id !== -1) {
                                                             this.loadSingleImage(this.state.id, imageResponse => {
                                                                 if (imageResponse) {
-                                                                    onResult(base64ToDataUri(imageResponse.file));
+                                                                    setImgSrc(base64ToDataUri(imageResponse.file));
                                                                     this.setFileUploaDefaultdVisibility(false);
                                                                 } else
                                                                     this.setFileUploaDefaultdVisibility(true);

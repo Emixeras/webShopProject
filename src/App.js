@@ -18,7 +18,7 @@ function App() {
   return (
     <div className="App">
       <Switch>
-        <Route path="/" component={EditArticles} exact />
+        <Route path="/" component={AlbumOverview} exact />
         <Route path="/login" component={Login} exact />
         <Route path="/register" component={Register} exact />
         <Route path="/shoppingcart" component={ShoppingCart} exact />

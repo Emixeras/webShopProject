@@ -8,13 +8,27 @@ import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import CardActionArea from "@material-ui/core/CardActionArea";
 import {margin, NavigationComponent, showToast} from "../Utilities/Utilities";
-import {base64ToDataUri, ContextType, LazyImage, RETURN_MODE} from "../Utilities/TsUtilities";
+import {
+    base64ToDataUri,
+    ContextType, filterArticle,
+    LazyImage, Pair,
+    RETURN_MODE
+} from "../Utilities/TsUtilities";
 import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
 import {addDrawerCallback, getDrawerState, removeDrawerCallback} from "../services/StorageUtil";
-import {Button, FormControlLabel, Slider, Switch} from "@material-ui/core";
+import {
+    Button, FormControl,
+    FormControlLabel, IconButton,
+    InputAdornment, InputLabel, OutlinedInput,
+    Slider,
+    Switch,
+    TextField
+} from "@material-ui/core";
 import {DialogBuilder} from "../Utilities/DialogBuilder";
 import SettingsIcon from '@material-ui/icons/Settings';
+import SearchIcon from '@material-ui/icons/Search';
+import {Article} from "./EditArticles";
 
 interface IProps {
 }
@@ -22,16 +36,16 @@ interface IProps {
 interface IState {
 }
 
-interface Article {
-    id: number;
-    title: string;
-    description: string;
-    ean: number;
-    price: string;
-    artists: ArtistOrGenre;
-    genre: ArtistOrGenre;
-    picture?: { id: number, data: string };
-}
+// interface Article {
+//     id: number;
+//     title: string;
+//     description: string;
+//     ean: number;
+//     price: string;
+//     artists: ArtistOrGenre;
+//     genre: ArtistOrGenre;
+//     picture?: { id: number, data: string };
+// }
 
 interface ArtistOrGenre {
     id: number;
@@ -54,6 +68,7 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     UNLOAD_IMAGES: string = "UNLOAD_IMAGES";
     unloadImages: boolean = (localStorage.getItem(this.UNLOAD_IMAGES) as string) == 'true';
     imageReloadArray: Array<() => void> = [];
+    query: Pair<string, boolean> = Pair.make("", false);
 
     constructor(props: IProps, context: any) {
         super(props, context);
@@ -113,6 +128,11 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
                 showToast(reason.message, "error")
             })
     }
+
+    componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any): void {
+        if (this.query.second)
+            reloadImages(this);
+    }
 }
 
 function Copyright() {
@@ -134,7 +154,7 @@ const useStyles = makeStyles((theme) => ({
     },
     heroContent: {
         backgroundColor: theme.palette.background.paper,
-        padding: theme.spacing(8, 0, 6),
+        padding: theme.spacing(5, 0, 2),
     },
     heroButtons: {
         marginTop: theme.spacing(4),
@@ -167,12 +187,18 @@ function Album(props: ContextType<AlbumOverview>) {
     const classes = useStyles();
     let context = props.context;
 
-    if (articleArray.length === 0)
+    let filteredArticleArray: Article[];
+
+    if (context.query.first) {
+        filteredArticleArray = articleArray.filter(article => filterArticle(context.query.first, article))
+    } else
+        filteredArticleArray = articleArray;
+
+    if (articleArray.length === 0){}
         buildDummyData();
     return (
         <React.Fragment>
             <main>
-                {/* Hero unit */}
                 <div className={classes.heroContent}>
                     <Container maxWidth="sm">
                         <Typography component="h1" variant="h2" align="center" color="textPrimary"
@@ -182,38 +208,78 @@ function Album(props: ContextType<AlbumOverview>) {
                         <Typography variant="h5" align="center" color="textSecondary" paragraph>
                             Auf dieser Seite können Sie durch unsere Angebote stöbern
                         </Typography>
+                    </Container>
+                    <Container maxWidth={"md"} style={{marginTop: 40}}>
+                        <FormControl fullWidth variant="outlined">
+                            <InputLabel htmlFor="albums-search">Suche</InputLabel>
+                            <OutlinedInput
+                                id="albums-search"
+                                onChange={event => context.query.first = event.target.value.toLowerCase()}
+                                onKeyUp={(event) => {
+                                    if (event.key === 'Enter') {
+                                        context.forceUpdate();
+                                        context.query.second = true;
+                                    }
+                                }}
+                                placeholder={"Titel: t, Künstler: a, Genre; g, Beschreibung: d, Preis: p (x-x), EAN: e"}
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={event => {
+                                                context.forceUpdate();
+                                                context.query.second = true;
+                                            }}
+                                            edge="end"
+                                        >
+                                            {<SearchIcon/>}
+                                        </IconButton>
+                                    </InputAdornment>
+                                }
+                                labelWidth={45}
+                            />
+                        </FormControl>
                         <UiSettings context={context}/>
                     </Container>
                 </div>
                 <Container className={classes.cardGrid} maxWidth="lg">
-                    <Grid container spacing={4}>
-                        {articleArray.map((article) => (
+                    {filteredArticleArray.length > 0 ? <Grid container spacing={4}>
+                        {filteredArticleArray.map((article) => (
                             <ArticleComponent context={context} article={article}/>
                         ))}
                     </Grid>
+                    :
+                        <Typography style={{marginTop: 50}} variant="h6" align="center" gutterBottom>
+                            Keine Alben gefunden
+                        </Typography>
+                    }
                 </Container>
             </main>
             {/* Footer */}
-            <footer className={classes.footer}>
-                <Typography variant="h6" align="center" gutterBottom>
-                    Footer
-                </Typography>
-                <Typography variant="subtitle1" align="center" color="textSecondary" component="p">
-                    Something here to give the footer a purpose!
-                </Typography>
-                <Copyright/>
-            </footer>
+            {/*<footer className={classes.footer}>*/}
+            {/*    <Typography variant="h6" align="center" gutterBottom>*/}
+            {/*        Footer*/}
+            {/*    </Typography>*/}
+            {/*    <Typography variant="subtitle1" align="center" color="textSecondary" component="p">*/}
+            {/*        Something here to give the footer a purpose!*/}
+            {/*    </Typography>*/}
+            {/*    <Copyright/>*/}
+            {/*</footer>*/}
             {/* End footer */}
         </React.Fragment>
     );
+}
+
+function reloadImages(context: AlbumOverview) {
+    context.imageReloadArray.forEach(reload => reload())
 }
 
 function UiSettings({context}: ContextType<AlbumOverview>) {
     const [open, setOpen] = useState(false);
     const [checked, setChecked] = useState(context.unloadImages);
     return (
-        <div>
-            <Button onClick={event => {
+        <div style={{float: "right"}}>
+            <Button style={{marginTop: 15}} onClick={event => {
                 setOpen(true)
             }} endIcon={<SettingsIcon/>}>Einstellungen</Button>
             {new DialogBuilder(open, dialogBuilder => setOpen(false))
@@ -236,7 +302,7 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
                                     if (context.imageResolution !== value) {
                                         context.imageResolution = value;
                                         localStorage.setItem("IMAGE_RESOLUTION", `${value}`);
-                                        context.imageReloadArray.forEach(reload => reload())
+                                        reloadImages(context);
                                     }
                                 }}
                                 marks={[
@@ -331,7 +397,7 @@ function ArticleComponent(props: any) {
         return (
             <Grid item xs={12} sm={6} md={4} lg={3}>
                 <CardActionArea component={Link} to={(location: any) => {
-                    location.pathname = "/article";
+                    location.pathname = "/editArticles";
 
                     location.state = {article: article};
 
@@ -343,13 +409,14 @@ function ArticleComponent(props: any) {
                             returnMode={RETURN_MODE.CARD_MEDIA}
                             alt={article.title}
                             className={classes.cardMedia}
-                            getSrc={onResult => {
+                            payload={article}
+                            getSrc={setImgSrc => {
                                 if (article.picture && article.picture.data) {
-                                    onResult(base64ToDataUri(article.picture.data))
+                                    setImgSrc(base64ToDataUri(article.picture.data))
                                 } else {
                                     context.loadSingleImage(article.id, imageResponse => {
                                         if (imageResponse)
-                                            onResult(base64ToDataUri(imageResponse.file));
+                                            setImgSrc(base64ToDataUri(imageResponse.file));
                                     });
                                 }
                             }}
