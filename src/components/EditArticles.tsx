@@ -187,6 +187,37 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                           ' | e: ' + dataItem.ean
                                       }
                                       itemComponent={({item}) => {
+                                          if ("true")
+                                              return(
+                                                  <table>
+                                                      <tr>
+                                                          <td title={"ID"} style={{width: "60px", textAlign: "left"}}>
+                                                              <strong>i: </strong>
+                                                              {item.id}
+                                                          </td>
+                                                          <td title={"Titel"} style={{width: "210px", textAlign: "left"}}>
+                                                              <strong>t: </strong>
+                                                              {item.title}
+                                                          </td>
+                                                          <td title={"Künstler"} style={{width: "123px", textAlign: "left"}}>
+                                                              <strong>a: </strong>
+                                                              {item.artists.name}
+                                                          </td>
+                                                          <td title={"Genre"} style={{width: "123px", textAlign: "left"}}>
+                                                              <strong>g: </strong>
+                                                              {item.genre.name}
+                                                          </td>
+                                                          <td title={"Preis"} style={{width: "90px", textAlign: "left"}}>
+                                                              <strong>p: </strong>
+                                                              {item.price}
+                                                          </td>
+                                                          <td title={"EAN"} style={{width: "100px", textAlign: "left"}}>
+                                                              <strong>e: </strong>
+                                                              {item.ean}
+                                                          </td>
+                                                      </tr>
+                                                  </table>
+                                              )
                                           return (
                                               <div>
                                                   <strong>i: </strong>
@@ -253,12 +284,14 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                         />
                                     </Grid>
                                     <Grid item md={6} sm={12}>
+                                        <Typography style={{color: "rgba(0, 0, 0, 0.54)", fontWeight: 500}}>Künstler</Typography>
                                         <Grid container style={{alignItems: "center"}} spacing={1}>
                                             <Grid item xs={11}>
                                                 <Combobox busy={this.articles.length === 0}
                                                           name={"Künstler"}
                                                           textField={"name"}
                                                           filter={"contains"}
+                                                          placeholder={"Künstler eingeben"}
                                                           onChange={value => this.setState({artists: value})}
                                                           value={this.state.artists}
                                                           data={this.artists}
@@ -271,9 +304,11 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                         </Grid>
                                     </Grid>
                                     <Grid item md={6} sm={12}>
+                                        <Typography style={{color: "rgba(0, 0, 0, 0.54)", fontWeight: 500}}>Genre</Typography>
                                         <Combobox busy={this.articles.length === 0}
                                                   textField={"name"}
                                                   filter={"contains"}
+                                                  placeholder={"Genre eingeben"}
                                                   onChange={value => this.setState({genre: value})}
                                                   value={this.state.genre}
                                                   data={this.genres}
@@ -303,6 +338,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                         height: "100%",
                                                         zIndex: 5
                                                     }}
+                                                    rounded
                                                     alt={this.state.title}
                                                     payload={Pair.make(this.state.id, this.currentPicture)}
                                                     shouldImageUpdate={(oldPayload: Pair<number, File>, newPayload: Pair<number, File>) => {

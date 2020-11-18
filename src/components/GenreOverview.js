@@ -18,6 +18,7 @@ import CardActionArea from "@material-ui/core/CardActionArea";
 import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 import axios from "axios";
+import {base64ToDataUri} from "../Utilities/TsUtilities";
 
 class GenreOverview extends Component {
 
@@ -46,7 +47,8 @@ class GenreOverview extends Component {
 
     loadGenre(){
         axios.get("http://localhost:8080/genre").then((response) => {
-            showToast("genre fetch ok", "success");
+            // showToast("genre fetch ok", "success");
+            genreArray = [];
             var genreresponse = response.data;
             console.log(genreresponse);
             Object.keys(genreresponse).forEach(function(key) {
@@ -99,13 +101,14 @@ function GenreComponent(props) {
         <Grid item /*key={article}*/ xs={12} sm={6} md={4} lg={3}>
             <CardActionArea component={Link} to={(location) => {
                 location.pathname = "/article";
+                location.state = {genre: genre};
                 return location;
             }} >
                 <Card className={classes.card}>
                     <CardMedia
                         component='img'
                         className={classes.cardMedia}
-                        src={"data:image/png;base64," + genre.file}
+                        src={base64ToDataUri(genre.file)}
                         title={genre.genre.name}
                     />
                     <CardContent className={classes.cardContent}>

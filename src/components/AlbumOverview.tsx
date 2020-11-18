@@ -7,23 +7,29 @@ import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import CardActionArea from "@material-ui/core/CardActionArea";
-import {margin, NavigationComponent, showToast} from "../Utilities/Utilities";
+import {margin, NavigationComponent, padding, showToast} from "../Utilities/Utilities";
 import {
     base64ToDataUri,
-    ContextType, filterArticle,
-    LazyImage, Pair,
+    ContextType,
+    filterArticle,
+    ifExistsReturnOrElse,
+    LazyImage,
+    Pair,
     RETURN_MODE
 } from "../Utilities/TsUtilities";
 import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
 import {addDrawerCallback, getDrawerState, removeDrawerCallback} from "../services/StorageUtil";
 import {
-    Button, FormControl,
-    FormControlLabel, IconButton,
-    InputAdornment, InputLabel, OutlinedInput,
+    Button,
+    FormControl,
+    FormControlLabel,
+    IconButton,
+    InputAdornment,
+    InputLabel,
+    OutlinedInput,
     Slider,
-    Switch,
-    TextField
+    Switch
 } from "@material-ui/core";
 import {DialogBuilder} from "../Utilities/DialogBuilder";
 import SettingsIcon from '@material-ui/icons/Settings';
@@ -31,6 +37,8 @@ import SearchIcon from '@material-ui/icons/Search';
 import {Article} from "./EditArticles";
 
 interface IProps {
+    // @ts-ignore
+    location: History.Location;
 }
 
 interface IState {
@@ -52,6 +60,11 @@ interface ArtistOrGenre {
     name: string;
 }
 
+interface GenrePayload {
+    file: string;
+    genre: ArtistOrGenre;
+}
+
 interface ImageResponseType {
     article: Article;
     file: string;
@@ -69,9 +82,13 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     unloadImages: boolean = (localStorage.getItem(this.UNLOAD_IMAGES) as string) == 'true';
     imageReloadArray: Array<() => void> = [];
     query: Pair<string, boolean> = Pair.make("", false);
+    genreFilter?: GenrePayload;
 
     constructor(props: IProps, context: any) {
         super(props, context);
+        if (this.props.location.state) {
+            this.genreFilter = this.props.location.state.genre
+        }
         this.loadArticles(this);
         addDrawerCallback(this.drawerCallback)
     }
@@ -154,7 +171,7 @@ const useStyles = makeStyles((theme) => ({
     },
     heroContent: {
         backgroundColor: theme.palette.background.paper,
-        padding: theme.spacing(5, 0, 2),
+        padding: theme.spacing(3, 0, 2),
     },
     heroButtons: {
         marginTop: theme.spacing(4),
@@ -187,27 +204,68 @@ function Album(props: ContextType<AlbumOverview>) {
     const classes = useStyles();
     let context = props.context;
 
+    if (articleArray.length === 0) {
+    }
+    buildDummyData();
+
     let filteredArticleArray: Article[];
 
-    if (context.query.first) {
-        filteredArticleArray = articleArray.filter(article => filterArticle(context.query.first, article))
+    // @ts-ignore
+    let queryText = context.query.first + ifExistsReturnOrElse(context.genreFilter, input => ifExistsReturnOrElse(context.query.first, input1 => " & ", "") + "g: " + input.genre.name.toLowerCase(), "");
+    if (queryText && articleArray[0].id !== -1) {
+        filteredArticleArray = articleArray.filter(article => filterArticle(queryText, article))
     } else
         filteredArticleArray = articleArray;
 
-    if (articleArray.length === 0){}
-        buildDummyData();
     return (
         <React.Fragment>
             <main>
                 <div className={classes.heroContent}>
                     <Container maxWidth="sm">
-                        <Typography component="h1" variant="h2" align="center" color="textPrimary"
-                                    gutterBottom>
-                            Unsere Alben
-                        </Typography>
-                        <Typography variant="h5" align="center" color="textSecondary" paragraph>
-                            Auf dieser Seite können Sie durch unsere Angebote stöbern
-                        </Typography>
+                        {!context.genreFilter ?
+                            <div>
+                                <Typography component="h1" variant="h2" align="center"
+                                            color="textPrimary"
+                                            gutterBottom>
+                                    Unsere Alben
+                                </Typography>
+                                < Typography variant="h5" align="center" color="textSecondary"
+                                             paragraph>
+                                    Auf dieser Seite können Sie durch unsere Angebote stöbern
+                                </Typography>
+                            </div>
+                            :
+                            <div style={{display: 'flex', justifyContent: 'center'}}>
+                                <Card style={{height: "250px", width: "500px"}}>
+                                    <Grid container spacing={2} alignItems={"flex-end"} direction={"row"}>
+                                        <Grid item>
+                                            <LazyImage
+                                                getSrc={setImgSrc => {
+                                                    // @ts-ignore
+                                                    setImgSrc(base64ToDataUri(context.genreFilter.file));
+                                                }}
+                                                returnMode={RETURN_MODE.CARD_MEDIA}
+                                                style={{
+                                                    width: "250px",
+                                                    height: "250px",
+                                                    backgroundColor: '#00BCD4'
+                                                }}
+                                                shouldImageUpdate={oldPayload => false}
+                                            />
+                                        </Grid>
+                                        <Grid item style={{maxWidth: "250px"}}>
+                                            <Typography  component="h1" variant="h2"
+                                                        color="textPrimary"
+                                                        gutterBottom>
+                                                {context.genreFilter.genre.name}
+                                            </Typography>
+                                        </Grid>
+                                    </Grid>
+                                    <CardContent>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        }
                     </Container>
                     <Container maxWidth={"md"} style={{marginTop: 40}}>
                         <FormControl fullWidth variant="outlined">
@@ -244,12 +302,13 @@ function Album(props: ContextType<AlbumOverview>) {
                 </div>
                 <Container className={classes.cardGrid} maxWidth="lg">
                     {filteredArticleArray.length > 0 ? <Grid container spacing={4}>
-                        {filteredArticleArray.map((article) => (
-                            <ArticleComponent context={context} article={article}/>
-                        ))}
-                    </Grid>
-                    :
-                        <Typography style={{marginTop: 50}} variant="h6" align="center" gutterBottom>
+                            {filteredArticleArray.map((article) => (
+                                <ArticleComponent context={context} article={article}/>
+                            ))}
+                        </Grid>
+                        :
+                        <Typography style={{marginTop: 50}} variant="h6" align="center"
+                                    gutterBottom>
                             Keine Alben gefunden
                         </Typography>
                     }
@@ -382,9 +441,13 @@ function ArticleComponent(props: any) {
                                     </Grid>
                                 </Grid>
                             </Grid>
-                            <Grid item style={{width: "20%"}} >
+                            <Grid item style={{width: "20%"}}>
                                 <Typography
-                                    style={{backgroundColor: "lightgrey", marginTop: 5, justifySelf: "end"}}>
+                                    style={{
+                                        backgroundColor: "lightgrey",
+                                        marginTop: 5,
+                                        justifySelf: "end"
+                                    }}>
                                     {article.description}
                                 </Typography>
                             </Grid>
@@ -402,7 +465,6 @@ function ArticleComponent(props: any) {
                     location.state = {article: article};
 
                     return location;
-
                 }}>
                     <Card className={classes.card}>
                         <LazyImage

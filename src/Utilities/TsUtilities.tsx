@@ -116,6 +116,7 @@ interface LazyImageProperties {
     shouldImageUpdate?: ((oldPayload: any, newPayload: any) => boolean) | null;
     payload?: any;
     imageRef?: any;
+    rounded?: boolean | string | "circle" | "small" | "medium" | "large";
 }
 
 interface LazyImageState {
@@ -238,6 +239,7 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
     imageRef?: Element = undefined;
     initialLoad: boolean = true;
     observer?: IntersectionObserver;
+    rounded?: boolean | string | "circle" | "small" | "medium" | "large";
 
     constructor(props: LazyImageProperties, context: any) {
         super(props, context);
@@ -290,6 +292,7 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
         this.payload = props.payload;
         this.alt = props.alt;
         this.loadImageMode = orElse(props.loadImageMode, LOAD_IMAGE_MODE.ON_VISIBLE);
+        this.rounded = props.rounded;
     }
 
     shouldComponentUpdate(nextProps: Readonly<LazyImageProperties>, nextState: Readonly<LazyImageState>, nextContext: any): boolean {
@@ -333,16 +336,42 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
             this.forceUpdate();
         })
     }
+
     render() {
         if (this.initialLoad && this.loadImageMode === LOAD_IMAGE_MODE.ALWAYS) {
             this.initialLoad = false;
             this.loadImage();
         }
+        let borderRadius;
+        switch (this.rounded) {
+            default:
+                if (this.rounded === false)
+                    borderRadius = "";
+                else
+                    borderRadius = this.rounded;
+                break;
+            case true:
+                borderRadius = "4px";
+                break;
+            case "circle":
+                borderRadius = "50%";
+                break;
+            case "small":
+                borderRadius = "5%";
+                break;
+            case "medium":
+                borderRadius = "10%";
+                break;
+            case "large":
+                borderRadius = "15%";
+                break;
+
+        }
         switch (this.returnMode) {
             default:
             case RETURN_MODE.IMG:
                 return <img className={this.className}
-                            style={this.style}
+                            style={{borderRadius: borderRadius, ...this.style}}
                             src={this.imageSrc}
                             ref={element => {
                                 if (element) this.imageRef = element
@@ -351,7 +380,7 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
                 />;
             case RETURN_MODE.CARD_MEDIA:
                 return <CardMedia className={this.className}
-                                  style={this.style}
+                                  style={{borderRadius: borderRadius, ...this.style}}
                                   image={this.imageSrc}
                                   ref={element => {
                                       if (element) this.imageRef = element
@@ -418,9 +447,20 @@ export function filterArticle(query: string, article: Article) {
     return false;
 }
 
-export  function orElse<T>(input: T, orElse: T | (() => T)): T {
+export function orElse<T>(input: T, orElse: T | (() => T)): T {
     if (input)
         return input;
+    else {
+        if (typeof orElse === "function")
+            return (orElse as Function)();
+        else
+            return orElse;
+    }
+}
+
+export function ifExistsReturnOrElse<T,R>(input: T, returnFunction: (input:T) => R, orElse: R | (() => R)): R {
+    if (input)
+        return returnFunction(input);
     else {
         if (typeof orElse === "function")
             return (orElse as Function)();

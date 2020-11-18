@@ -2,6 +2,7 @@ import React from 'react'
 import {updateArticle} from "../services/ItemApiUtil";
 import {showToast} from "../Utilities/Utilities";
 import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
 
 
 class SimpleReactFileUpload extends React.Component {
@@ -66,12 +67,23 @@ class SimpleReactFileUpload extends React.Component {
                  onMouseEnter={event => this.setState({visible: true})}
                  onMouseLeave={event => this.setState({visible: false})}>
                 {showUpload &&
-                <div className="form-group files"
-                     style={!this.state.defaultVisibility ? {backgroundColor: "rgba(255,255,255,0.8)", height: "100%"} : undefined}>
-                    {/*<Button style={{position: "absolute",}} onClick={event => document.getElementById("upload-photo-button").click()}>Öffnen</Button>*/}
-                    <input /*style={{opacity: 1, position: "absolute", zIndex: -1}}*/
-                           type="file" name="photo" id="upload-photo-button" onChange={this.onChangeHandler}/>
-                </div>}
+                    <div className="form-group files"
+                         style={!this.state.defaultVisibility ? {/*backgroundColor: "rgba(255,255,255,0.8)",*/
+                             height: "100%"
+                         } : {height: "100%"}}>
+                        <Button color={"primary"} variant="contained" style={{
+                            position: "absolute",
+                            opacity: (this.state.defaultVisibility ? 1 : 0.8),
+                            fontWeight: 600
+                        }}
+                                onClick={event => document.getElementById("upload-photo-button").click()}>Öffnen</Button>
+                        <input style={{opacity: 0, position: "absolute", zIndex: -1}}
+                               type="file" name="photo" id="upload-photo-button"
+                               onChange={this.onChangeHandler}/>
+                               <Typography style={{width: "100%", opacity: 1, position: "absolute", zIndex: 1, textAlign: "center", color: "white", fontWeight: 600, marginTop: "170px"}}>
+                                   oder hierher ziehen
+                               </Typography>
+                    </div>}
             </div>
         )
     }
