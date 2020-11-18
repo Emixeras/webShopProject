@@ -34,6 +34,8 @@ import {makeStyles} from "@material-ui/core/styles";
 import zIndex from "@material-ui/core/styles/zIndex";
 
 interface IProps {
+    // @ts-ignore
+    location: history.Location;
 }
 
 interface ImageResponseType {
@@ -96,7 +98,6 @@ export default class EditArticles extends React.Component<IProps, IState> {
         };
         // @ts-ignore
         if (this.props.location.state) {
-            // @ts-ignore
             const { article } = this.props.location.state;
             this.state = article;
         }
