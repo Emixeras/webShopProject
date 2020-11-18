@@ -1,0 +1,25 @@
+#usage : docker-compose -f docker-compose.yml -f optional-service.yaml up
+
+version: '3'
+services:
+  postgres:
+    restart: always
+    image: stormer1911/database
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=Test1234
+
+  backend:
+    restart: always
+    image: stormer1911/webshop_backend
+    environment:
+      - quarkus.datasource.jdbc.url=jdbc:postgresql://postgres:5432/shop
+      - quarkus.log.level=INFO
+      - demo.data.lazy=true
+      - demo.data=true
+    depends_on:
+      - postgres
+    ports:
+      - '8080:8080'
+
+

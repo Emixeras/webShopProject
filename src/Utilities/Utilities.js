@@ -1,8 +1,11 @@
 import {toast, Flip} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {useHistory} from "react-router-dom";
-import React, {Component, useState} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
+import CardMedia from "@material-ui/core/CardMedia";
+import {base64ToDataUri} from "./TsUtilities";
+import Card from "@material-ui/core/Card/Card";
 
 export function titles() {
     return (
@@ -35,18 +38,14 @@ export function titles() {
     )
 }
 
-//  ------------------------- Padding ------------------------->
-export function padding_extend(obj, a, b, c, d) {
-    debugger
-    return {
-        ...obj,
-        paddingTop: a,
-        paddingRight: b ? b : a,
-        paddingBottom: c ? c : a,
-        paddingLeft: d ? d : (b ? b : a)
-    }
-}
-
+//  ------------------------- Padding & Margin ------------------------->
+/**
+ * @param {number} a Alle oder Vertikal oder Oben
+ * @param {number} [b] Horizontal oder Rechts
+ * @param {number} [c] Unten
+ * @param {number} [d] Links
+ * @returns {{paddingBottom: (*), paddingRight: (*), paddingTop: *, paddingLeft: (*)}}
+ */
 export function padding(a, b, c, d) {
     return {
         paddingTop: a,
@@ -55,8 +54,22 @@ export function padding(a, b, c, d) {
         paddingLeft: d ? d : (b ? b : a)
     }
 }
-
-//  <------------------------- Padding -------------------------
+/**
+ * @param {number} a Alle oder Vertikal oder Oben
+ * @param {number} [b] Horizontal oder Rechts
+ * @param {number} [c] Unten
+ * @param {number} [d] Links
+ * @returns {{marginBottom: (*), marginRight: (*), marginTop: *, marginLeft: (*)}}
+ */
+export function margin(a, b, c, d) {
+    return {
+        marginTop: a,
+        marginRight: b ? b : a,
+        marginBottom: c ? c : a,
+        marginLeft: d ? d : (b ? b : a)
+    }
+}
+//  <------------------------- Padding & Margin -------------------------
 
 
 //  ------------------------- Toast ------------------------->
@@ -140,7 +153,7 @@ export function isEmail(email) {
 
 // ---------------
 
-export function isMobile(window) {
+export function isMobile() {
     return window.innerHeight > window.innerWidth
 }
 
@@ -166,7 +179,11 @@ export function hexToRgbA(hex, alpha) {
 
 
 //  ------------------------- Components ------------------------->
-export class NavigationComponent extends React.Component {render() {return <Navigate to={this.props.to}/>}}
+export class NavigationComponent extends React.Component {
+    render() {
+        return <Navigate to={this.props.to}/>
+    }
+}
 
 function Navigate(props) {
     const history = useHistory();
@@ -179,3 +196,5 @@ NavigationComponent.propTypes = {
     to: PropTypes.string.isRequired
 };
 //  <------------------------- Components -------------------------
+
+

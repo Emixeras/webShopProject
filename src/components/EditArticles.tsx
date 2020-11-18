@@ -6,29 +6,43 @@ import {
     Card,
     TextField,
     InputAdornment,
-    IconButton,
-    Dialog,
-    DialogContent,
-    DialogTitle,
-    DialogContentText,
-    DialogActions
+    IconButton, Typography,
 } from "@material-ui/core";
 import MenuDrawer from "./MenuDrawer";
-import {addDrawerCallback, isDrawerVisible, removeDrawerCallback} from "../services/StorageUtil";
+import {
+    addDrawerCallback,
+    getDrawerState,
+    removeDrawerCallback
+} from "../services/StorageUtil";
 import {padding, showToast} from "../Utilities/Utilities";
 import SimpleReactFileUpload from "./SimpleReactFileUpload";
 import {Combobox, DropdownList} from 'react-widgets'
 import 'react-widgets/dist/css/react-widgets.css';
-// import '../themes/react-widgets.css'
 import AddIcon from '@material-ui/icons/Add';
 import {DialogBuilder} from "../Utilities/DialogBuilder";
-import {ContextType, Pair, Triple} from "../Utilities/TsUtilities";
+import {
+    base64ToDataUri,
+    ContextType, filterArticle,
+    LazyImage,
+    Pair,
+    Triple
+} from "../Utilities/TsUtilities";
 import {Save} from "@material-ui/icons";
+import {updateArticle} from "../services/ItemApiUtil";
+import context from "react-bootstrap/CardContext";
+import {makeStyles} from "@material-ui/core/styles";
+import zIndex from "@material-ui/core/styles/zIndex";
 
 interface IProps {
 }
 
+interface ImageResponseType {
+    article: Article;
+    file: string;
+}
+
 interface IState {
+    id: number;
     title: string
     description?: string
     ean: number;
@@ -37,7 +51,7 @@ interface IState {
     genre?: ArtistOrGenre;
 }
 
-interface Article {
+export interface Article {
     id: number;
     title: string;
     description: string;
@@ -45,16 +59,21 @@ interface Article {
     price: string;
     artists: ArtistOrGenre;
     genre: ArtistOrGenre;
+    picture?: { id: number, data: string };
 }
+
 
 interface ArtistOrGenre {
     id: number;
     name: string;
+    file?: string;
 }
 
 export default class EditArticles extends React.Component<IProps, IState> {
-
-    drawerState: boolean = isDrawerVisible();
+    currentPicture: File | undefined = undefined;
+    setFileUploaDefaultdVisibility: (visibility: boolean) => void = visibility => {};
+    IMAGE_RESOLUTION: string = "IMAGE_RESOLUTION";
+    drawerState: boolean = getDrawerState();
     articles: Array<Article> = [];
     artists: Array<ArtistOrGenre> = [];
     genres: Array<ArtistOrGenre> = [];
@@ -67,13 +86,20 @@ export default class EditArticles extends React.Component<IProps, IState> {
     constructor(props: IProps, context: any) {
         super(props, context);
         this.state = {
+            id: -1,
             title: "",
             price: "",
-            ean: 0,
+            ean: -1,
             description: "",
             artists: undefined,
             genre: undefined
         };
+        // @ts-ignore
+        if (this.props.location.state) {
+            // @ts-ignore
+            const { article } = this.props.location.state;
+            this.state = article;
+        }
         addDrawerCallback(this.drawerCallback);
         this.loadArticles()
     }
@@ -108,7 +134,6 @@ export default class EditArticles extends React.Component<IProps, IState> {
                     if (nameA > nameB) {
                         return 1;
                     }
-
                     return 0;
                 };
                 this.artists.sort(nameComparetor)
@@ -121,6 +146,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                 }
                 this.genres.sort(nameComparetor)
 
+
             })
             .catch(reason => {
                 showToast(reason.message, "error")
@@ -132,6 +158,11 @@ export default class EditArticles extends React.Component<IProps, IState> {
 
     render() {
         const priceError: boolean = this.checkPrice(this.state.price);
+        const eanError: boolean = !/^(-1|\d{8}|\d{13})$/.test(this.state.ean + "");
+        // if (this.imageReloadFile) {
+        //     debugger
+        //     this.imageReloadFile()
+        // }
         return (
             <div>
                 <MenuDrawer/>
@@ -156,6 +187,37 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                           ' | e: ' + dataItem.ean
                                       }
                                       itemComponent={({item}) => {
+                                          if ("true")
+                                              return(
+                                                  <table>
+                                                      <tr>
+                                                          <td title={"ID"} style={{width: "60px", textAlign: "left"}}>
+                                                              <strong>i: </strong>
+                                                              {item.id}
+                                                          </td>
+                                                          <td title={"Titel"} style={{width: "210px", textAlign: "left"}}>
+                                                              <strong>t: </strong>
+                                                              {item.title}
+                                                          </td>
+                                                          <td title={"Künstler"} style={{width: "123px", textAlign: "left"}}>
+                                                              <strong>a: </strong>
+                                                              {item.artists.name}
+                                                          </td>
+                                                          <td title={"Genre"} style={{width: "123px", textAlign: "left"}}>
+                                                              <strong>g: </strong>
+                                                              {item.genre.name}
+                                                          </td>
+                                                          <td title={"Preis"} style={{width: "90px", textAlign: "left"}}>
+                                                              <strong>p: </strong>
+                                                              {item.price}
+                                                          </td>
+                                                          <td title={"EAN"} style={{width: "100px", textAlign: "left"}}>
+                                                              <strong>e: </strong>
+                                                              {item.ean}
+                                                          </td>
+                                                      </tr>
+                                                  </table>
+                                              )
                                           return (
                                               <div>
                                                   <strong>i: </strong>
@@ -174,61 +236,14 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                           );
                                       }}
                                       filter={(dataItem: Article, searchItem: string): boolean => {
-                                          searchItem = searchItem.toLowerCase();
+                                          searchItem = searchItem.toLowerCase().replaceAll("|", "&");
 
-                                          let subArray = searchItem.replaceAll("|", "&").split("&");
-                                          let length = subArray.length;
-                                          let found = 0;
-                                          for (let sub of subArray) {
-                                              sub = sub.trim();
-                                              let type: boolean | string = sub.length > 1 && sub.charAt(1) === ":";
-                                              if (type) {
-                                                  type = sub.substr(0, 1);
-                                                  sub = sub.substr(2).trim();
-                                              }
-
-                                              if (sub.length === 0 && length > 1) {
-                                                  if (++found >= length)
-                                                      return true;
-                                                  continue
-                                              }
-
-                                              if ((!type || type === "i") && dataItem.id.toString().toLowerCase().includes(sub)) {
-                                                  if (++found >= length)
-                                                      return true;
-                                              } else if ((!type || type === "t") && dataItem.title.toLowerCase().includes(sub)) {
-                                                  if (++found >= length)
-                                                      return true;
-                                              } else if ((!type || type === "a") && dataItem.artists.name.toLowerCase().includes(sub)) {
-                                                  if (++found >= length)
-                                                      return true;
-                                              } else if ((!type || type === "g") && dataItem.genre.name.toLowerCase().includes(sub)) {
-                                                  if (++found >= length)
-                                                      return true;
-                                              } else if ((!type || type === "d") && dataItem.description && dataItem.description.toLowerCase().includes(sub)) {
-                                                  if (++found >= length)
-                                                      return true;
-                                              } else if ((!type || type === "e") && dataItem.ean.toString().includes(sub)) {
-                                                  if (++found >= length)
-                                                      return true;
-                                              } else if ((!type || type === "p")) {
-                                                  sub = sub.replaceAll(",", ".");
-                                                  if (sub.includes("-")) {
-                                                      let fromTo = sub.split("-");
-                                                      if ((dataItem.price >= fromTo[0] || !fromTo[0]) && (dataItem.price <= fromTo[1] || !fromTo[1])) {
-                                                          if (++found >= length)
-                                                              return true;
-                                                      }
-                                                  } else if (dataItem.price == sub) {
-                                                      if (++found >= length)
-                                                          return true;
-                                                  }
-                                              }
-                                          }
-                                          return false;
+                                          return filterArticle(searchItem, dataItem);
                                       }}
                                       onSelect={(article: Article) => {
+                                          this.currentPicture = undefined;
                                           this.setState({
+                                              id: article.id,
                                               title: article.title,
                                               price: article.price,
                                               artists: article.artists,
@@ -243,14 +258,14 @@ export default class EditArticles extends React.Component<IProps, IState> {
                         <Grid item xs={12}>
                             <Card style={padding(18)}>
                                 <Grid container spacing={2}>
-                                    <Grid item sm={9} xs={12}>
+                                    <Grid item md={9} sm={12}>
                                         <TextField fullWidth
                                                    value={this.state.title}
                                                    label={"Album Titel"}
                                                    onChange={event => this.setState({title: event.target.value})}
                                                    variant={"outlined"}/>
                                     </Grid>
-                                    <Grid item sm={3} xs={12}>
+                                    <Grid item md={3} sm={12}>
                                         <TextField fullWidth
                                                    variant="outlined"
                                                    onChange={event => {
@@ -268,13 +283,16 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                    }}
                                         />
                                     </Grid>
-                                    <Grid item sm={6} xs={12}>
+                                    <Grid item md={6} sm={12}>
+                                        <Typography style={{color: "rgba(0, 0, 0, 0.54)", fontWeight: 500}}>Künstler</Typography>
                                         <Grid container style={{alignItems: "center"}} spacing={1}>
                                             <Grid item xs={11}>
                                                 <Combobox busy={this.articles.length === 0}
                                                           name={"Künstler"}
                                                           textField={"name"}
                                                           filter={"contains"}
+                                                          placeholder={"Künstler eingeben"}
+                                                          onChange={value => this.setState({artists: value})}
                                                           value={this.state.artists}
                                                           data={this.artists}
                                                 />
@@ -285,10 +303,13 @@ export default class EditArticles extends React.Component<IProps, IState> {
 
                                         </Grid>
                                     </Grid>
-                                    <Grid item sm={6} xs={12}>
+                                    <Grid item md={6} sm={12}>
+                                        <Typography style={{color: "rgba(0, 0, 0, 0.54)", fontWeight: 500}}>Genre</Typography>
                                         <Combobox busy={this.articles.length === 0}
                                                   textField={"name"}
                                                   filter={"contains"}
+                                                  placeholder={"Genre eingeben"}
+                                                  onChange={value => this.setState({genre: value})}
                                                   value={this.state.genre}
                                                   data={this.genres}
                                         />
@@ -302,17 +323,71 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                    label={"Beschreibung"}
                                                    variant={"outlined"}/>
                                     </Grid>
-                                    <Grid item sm={8} xs={12}>
-                                        <SimpleReactFileUpload/>
+                                    <Grid item md={8} sm={12} >
+                                        <Typography variant="h6">Album Cover</Typography>
+                                        <div style={{width: 250, height: 250}}>
+                                            <div style={{
+                                                width: 250,
+                                                height: 250,
+                                                zIndex: 1,
+                                                position: "absolute"
+                                            }}>
+                                                <LazyImage
+                                                    style={{
+                                                        width: "100%",
+                                                        height: "100%",
+                                                        zIndex: 5
+                                                    }}
+                                                    rounded
+                                                    alt={this.state.title}
+                                                    payload={Pair.make(this.state.id, this.currentPicture)}
+                                                    shouldImageUpdate={(oldPayload: Pair<number, File>, newPayload: Pair<number, File>) => {
+                                                        return oldPayload.first !== newPayload.first || oldPayload.second !== newPayload.second
+                                                    }}
+                                                    getSrc={setImgSrc => {
+                                                        if (this.currentPicture) {
+                                                            setImgSrc(URL.createObjectURL(this.currentPicture));
+                                                            this.setFileUploaDefaultdVisibility(false);
+                                                        } else if (this.state.id !== -1) {
+                                                            this.loadSingleImage(this.state.id, imageResponse => {
+                                                                if (imageResponse) {
+                                                                    setImgSrc(base64ToDataUri(imageResponse.file));
+                                                                    this.setFileUploaDefaultdVisibility(false);
+                                                                } else
+                                                                    this.setFileUploaDefaultdVisibility(true);
+                                                            });
+                                                        } else
+                                                            this.setFileUploaDefaultdVisibility(true);
+
+                                                    }}
+                                                />
+                                            </div>
+                                            <div style={{
+                                                width: 250,
+                                                height: 250,
+                                                zIndex: 2,
+                                                position: "absolute",
+                                            }}>
+                                                <SimpleReactFileUpload
+                                                    onFileSelected={(file: File) => {
+                                                        this.currentPicture = file;
+                                                        this.forceUpdate();
+                                                    }}
+                                                    setDefaultVisibility={((setVisibility: (visibility: boolean) => void) => this.setFileUploaDefaultdVisibility = setVisibility)}
+                                                />
+                                            </div>
+                                        </div>
                                     </Grid>
-                                    <Grid item sm={4} xs={12}>
+                                    <Grid item md={4} sm={12}>
                                         <TextField fullWidth
-                                                   value={this.state.ean === 0 ? "" : this.state.ean}
+                                                   value={this.state.ean === -1 ? "" : this.state.ean}
                                                    onChange={event => {
                                                        let newValue = event.target.value;
-                                                       if (this.checkPrice(newValue))
-                                                           this.setState({ean: +newValue});
+                                                       if (/\d*/.test(newValue))
+                                                           this.setState({ean: newValue ? +newValue : -1});
                                                    }}
+                                                   error={eanError}
+                                                   helperText={eanError ? "Keine valide EAN" : ""}
                                                    label={"EAN"}
                                                    variant={"outlined"}/>
                                     </Grid>
@@ -323,6 +398,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                             </Grid>
                                         </Grid>
                                     </Grid>
+
                                 </Grid>
                             </Card>
                         </Grid>
@@ -332,6 +408,20 @@ export default class EditArticles extends React.Component<IProps, IState> {
         )
     }
 
+    loadSingleImage(id: number, onFinish: (imageResponse?: ImageResponseType) => void) {
+        fetch(new Request(`http://localhost:8080/article/range;start=${id};end=${id};quality=${300}`, {method: 'GET'}))
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
+                }
+            })
+            .then((response: ImageResponseType[]) => onFinish(response[0]))
+            .catch(reason => {
+                showToast(reason.message, "error")
+            })
+    }
 
     componentWillUnmount() {
         removeDrawerCallback(this.drawerCallback)
@@ -392,10 +482,15 @@ function DialogComponent(arg: any) {
 
 function ActionButtons(props: ContextType<EditArticles>) {
     let that: EditArticles = props.context;
-    return(
+    return (
         <Button endIcon={<Save/>}
                 onClick={event => {
                     console.log(that.state.description);
+                    updateArticle(that.state, that.currentPicture, (response: any) => {
+                        showToast("Artikel wurde aktualisiert", "success");
+                    }, (response: any) => {
+                        debugger
+                    })
                 }}
                 variant="contained"
                 color="primary">

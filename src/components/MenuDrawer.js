@@ -13,7 +13,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import {Link} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
 import HomeIcon from "@material-ui/icons/Home";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
@@ -23,7 +23,15 @@ import AlbumIcon from '@material-ui/icons/Album';
 import LibraryMusicIcon from '@material-ui/icons/LibraryMusic';
 import RadioIcon from '@material-ui/icons/Radio';
 import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
-import {isDrawerVisible, setDrawerVisible} from "../services/StorageUtil";
+import {isDrawerVisible, isUserLoggedIn, setDrawerVisible} from "../services/StorageUtil";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import {ExitToApp} from "@material-ui/icons";
+import Grid from "@material-ui/core/Grid";
+import {logoutUser} from "../services/UserApiUtil";
+import {showToast} from "../Utilities/Utilities";
+import ListAltIcon from '@material-ui/icons/ListAlt';
+import EditIcon from '@material-ui/icons/Edit';
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -105,7 +113,6 @@ function ListItemLink(props) {
 
 
 export default function MenuDrawer() {
-
     const classes = useStyles();
     const theme = useTheme();
     const [open, setOpen] = React.useState(isDrawerVisible);
@@ -154,16 +161,9 @@ export default function MenuDrawer() {
                         <IconButton style={{margin: 5, color: "white"}} component="span">
                             <ShoppingCartIcon/>
                         </IconButton>
-                    </Link><Link to="/login">
-                    <IconButton style={{margin: 5, color: "white"}} component="span">
-                        <AccountCircleIcon/>
-                    </IconButton>
-                    <Link to="/dev">
-                        <IconButton style={{margin: 5, color: "white"}} component="span">
-                            <DeveloperBoardIcon/>
-                        </IconButton>
                     </Link>
-                </Link>
+                    <ProfileButton/>
+                    <DevButton />
                 </Toolbar>
             </AppBar>
             <Drawer
@@ -211,6 +211,11 @@ export default function MenuDrawer() {
                         icon={<AccountCircleIcon/>}
                     />
                     <ListItemLink
+                        to="/editArticles"
+                        primary="Artikel bearbeiten"
+                        icon={<EditIcon/>}
+                    />
+                    <ListItemLink
                         to="/Impressum"
                         primary="Impressum"
                         icon={<DescriptionIcon/>}
@@ -226,4 +231,152 @@ export default function MenuDrawer() {
             </main>
         </div>
     );
+}
+
+function ProfileButton() {
+    const history = useHistory();
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleMenu = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+    return (
+        <div>
+            {/*<Link to="/login">*/}
+            <IconButton style={{margin: 5, color: "white"}} component="span"
+                        aria-haspopup="true"
+                        onClick={event => {
+                            if (isUserLoggedIn())
+                                handleMenu(event)
+                            else
+                                history.push("/login")
+                        }}>
+                <AccountCircleIcon/>
+            </IconButton>
+            {/*</Link>*/}
+            <Menu
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                open={open}
+                onClose={handleClose}
+            >
+                <MenuItem disabled={history.location.pathname === "/profile"}
+                          onClick={event => {
+                              handleClose(event);
+                              history.push("/profile")
+                          }}>
+                    <Grid container spacing={2}>
+                        <Grid item>
+                            <AccountCircleIcon style={{display: "block"}}/>
+                        </Grid>
+                        <Grid item xs>
+                            Profil Anzeigen
+                        </Grid>
+                    </Grid>
+                </MenuItem>
+                <MenuItem onClick={event => {
+                    handleClose(event);
+                    logoutUser(() => {
+                        showToast("Abmeldung Erfolgreich", "success")
+                        history.push("/");
+                    }, () => {
+                        showToast('Abmelden Fehlgeschlagen', "error")
+                    });
+                }}>
+                    <Grid container spacing={2}>
+                        <Grid item>
+                            <ExitToApp style={{display: "block"}}/>
+                        </Grid>
+                        <Grid item xs>
+                            Ausloggen
+                        </Grid>
+                    </Grid>
+
+                </MenuItem>
+            </Menu>
+
+        </div>
+    )
+}
+
+function DevButton() {
+    const history = useHistory();
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleMenu = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+    return (
+        <div>
+            {/*<Link to="/login">*/}
+            <IconButton style={{margin: 5, color: "white"}} component="span"
+                        aria-haspopup="true"
+                        onClick={handleMenu}>
+                    <DeveloperBoardIcon/>
+            </IconButton>
+            {/*</Link>*/}
+            <Menu
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                open={open}
+                onClose={handleClose}
+            >
+                <MenuItem disabled={history.location.pathname === "/dev"}
+                          onClick={event => {
+                              handleClose(event);
+                              history.push("/dev")
+                          }}>
+                    <Grid container spacing={2}>
+                        <Grid item>
+                            <DeveloperBoardIcon style={{display: "block"}}/>
+                        </Grid>
+                        <Grid item xs>
+                            Admin-Panel
+                        </Grid>
+                    </Grid>
+                </MenuItem>
+                <MenuItem onClick={event => {
+                    handleClose(event);
+                    window.open("http://localhost:8080/swagger-ui/");
+                }}>
+                    <Grid container spacing={2}>
+                        <Grid item>
+                            <ListAltIcon style={{display: "block"}}/>
+                        </Grid>
+                        <Grid item xs>
+                            Swagger-UI
+                        </Grid>
+                    </Grid>
+
+                </MenuItem>
+            </Menu>
+
+        </div>
+    )
 }

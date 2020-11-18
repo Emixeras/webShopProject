@@ -3,7 +3,7 @@ import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
 import {loginUser} from "../services/UserApiUtil";
 import {
-    addDrawerCallback,
+    addDrawerCallback, getDrawerState,
     isDrawerVisible,
     isUserLoggedIn,
     removeDrawerCallback
@@ -31,7 +31,7 @@ class Login extends Component {
     passwordError = false;
     passwordState = {password: "", passwordRepeat: ""};
     emailError = false;
-    drawerState = isDrawerVisible();
+    drawerState = getDrawerState();
 
 
     drawerCallback = state => {
@@ -114,6 +114,7 @@ function LogInForm(props) {
                                 Anmelden
                             </Typography>
                             <TextField required
+                                       autoFocus
                                        fullWidth
                                        label="E-MailAdresse"
                                        variant="outlined"
