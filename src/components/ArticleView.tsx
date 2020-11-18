@@ -4,7 +4,10 @@ import MenuDrawer from "./MenuDrawer";
 import { addDrawerCallback, isDrawerVisible, removeDrawerCallback } from "../services/StorageUtil";
 import { padding, showToast } from "../Utilities/Utilities";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
-import { Article, loadSingleImage, LazyImage, base64ToDataUri } from "../Utilities/TsUtilities";
+import { Article, loadSingleImage, LazyImage, base64ToDataUri, ContextType, boolOr } from "../Utilities/TsUtilities";
+import EditIcon from '@material-ui/icons/Edit';
+import { useHistory, Link } from "react-router-dom";
+import { getSessionUser } from "../services/StorageUtil";
 
 interface IProps {
     // @ts-ignore
@@ -76,7 +79,7 @@ class ArticleView extends React.Component<IProps, IState> {
                                     {this.article.picture &&
                                         <Grid item md={4} sm={12}>
                                             <LazyImage
-                                                style={{width:250, height:250, backgroundColor:"lightgrey"}}
+                                                style={{ width: 250, height: 250, backgroundColor: "lightgrey" }}
                                                 rounded
                                                 alt={this.article.title}
                                                 getSrc={setImgSrc => {
@@ -90,7 +93,7 @@ class ArticleView extends React.Component<IProps, IState> {
 
                                         </Grid>}
                                     <Grid item md={8} sm={12}>
-                                        <Card style={{...padding(18), minHeight:250}}>
+                                        <Card style={{ ...padding(18), minHeight: 250 }}>
                                             <Grid container spacing={2}>
                                                 <Grid item md={8} sm={12}>
                                                     <Typography component="h1" variant="h4" align={"left"}>
@@ -130,13 +133,13 @@ class ArticleView extends React.Component<IProps, IState> {
                                         </Card>
                                     </Grid>
                                     <Grid item sm={12}>
-                                        <div style={{float:"right"}}>
-                                        <Button variant="contained" color="primary" endIcon={<ShoppingCartIcon />}
-                                            onClick={(event) => {
-                                                showToast("Artikel Erfolgreich hinzugefügt", "success");
-                                            }}>
-                                            {"Artikel in den Warenkorb hinzufügen"}
-                                        </Button>
+                                        <div style={{ float: "right" }}>
+                                            <Button variant="contained" color="primary" endIcon={<ShoppingCartIcon />}
+                                                onClick={(event) => {
+                                                    showToast("Artikel Erfolgreich hinzugefügt", "success");
+                                                }}>
+                                                {"Artikel in den Warenkorb hinzufügen"}
+                                            </Button>
                                         </div>
                                     </Grid>
                                     {this.article.description &&
@@ -147,6 +150,8 @@ class ArticleView extends React.Component<IProps, IState> {
                                                 </Typography>
                                             </Card>
                                         </Grid>}
+                                    <EditButton
+                                        context={this} />
                                 </Grid>
                             </Card>
                         </Grid>
@@ -155,9 +160,31 @@ class ArticleView extends React.Component<IProps, IState> {
             </div>
         )
     }
-    
+
     componentWillUnmount() {
         removeDrawerCallback(this.drawerCallback)
     }
 }
+
+function EditButton({ context }: ContextType<ArticleView>) {
+    const history = useHistory()
+    let sessionUser;
+    if ((sessionUser = getSessionUser()) && boolOr(sessionUser.role, "ADMIN", "EMPLOYEE")) {
+        return (
+            <Grid item sm={12}>
+                <div style={{ float: "right" }}>
+                    <Button variant="contained" color="primary" endIcon={<EditIcon />}
+                        onClick={event => {
+                            history.push("/editArticles", { article: context.article })
+                        }}>
+                        {"Artikel bearbeiten"}
+                    </Button>
+                </div>
+            </Grid>
+        )
+    } else {
+        return null;
+    }
+}
+
 export default ArticleView;
