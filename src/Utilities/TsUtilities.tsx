@@ -1,6 +1,7 @@
-import React, {useEffect, useState} from "react";
-import {CardMedia} from "@material-ui/core";
-import {Article} from "../components/EditArticles";
+import React, { useEffect, useState } from "react";
+import { CardMedia } from "@material-ui/core";
+import { number } from "prop-types";
+import { showToast } from "../Utilities/Utilities";
 
 export function boolOr<T>(input: T, ...ors: T[]): boolean {
     for (let or of ors) {
@@ -296,18 +297,17 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
     }
 
     shouldComponentUpdate(nextProps: Readonly<LazyImageProperties>, nextState: Readonly<LazyImageState>, nextContext: any): boolean {
-        if (this.shouldImageUpdate !== undefined)
-            {
-                let shouldUpdate: boolean;
-                if (this.shouldImageUpdate === null)
-                    shouldUpdate = this.payload !== nextProps.payload;
-                else
-                    shouldUpdate = this.shouldImageUpdate(this.payload, nextProps.payload);
-                if (shouldUpdate) {
-                    this.loadImage();
-                }
-                return false;
+        if (this.shouldImageUpdate !== undefined) {
+            let shouldUpdate: boolean;
+            if (this.shouldImageUpdate === null)
+                shouldUpdate = this.payload !== nextProps.payload;
+            else
+                shouldUpdate = this.shouldImageUpdate(this.payload, nextProps.payload);
+            if (shouldUpdate) {
+                this.loadImage();
             }
+            return false;
+        }
         else
             return true;
     }
@@ -371,25 +371,66 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
             default:
             case RETURN_MODE.IMG:
                 return <img className={this.className}
-                            style={{borderRadius: borderRadius, ...this.style}}
-                            src={this.imageSrc}
-                            ref={element => {
-                                if (element) this.imageRef = element
-                            }}
-                            alt={this.alt}
+                    style={{ borderRadius: borderRadius, ...this.style }}
+                    src={this.imageSrc}
+                    ref={element => {
+                        if (element) this.imageRef = element
+                    }}
+                    alt={this.alt}
                 />;
             case RETURN_MODE.CARD_MEDIA:
                 return <CardMedia className={this.className}
-                                  style={{borderRadius: borderRadius, ...this.style}}
-                                  image={this.imageSrc}
-                                  ref={element => {
-                                      if (element) this.imageRef = element
-                                  }}
-                                  title={this.alt}/>;
+                    style={{ borderRadius: borderRadius, ...this.style }}
+                    image={this.imageSrc}
+                    ref={element => {
+                        if (element) this.imageRef = element
+                    }}
+                    title={this.alt} />;
         }
 
     }
 }
+
+export interface Article {
+    id: number;
+    title: string;
+    description: string;
+    ean: number;
+    price: string;
+    artists: ArtistOrGenre;
+    genre: ArtistOrGenre;
+    picture?: { id: number, data: string };
+}
+
+
+export interface ArtistOrGenre {
+    id: number;
+    name: string;
+    file?: string;
+}
+
+export interface ImageResponseType {
+    article: Article;
+    file: string;
+}
+
+export function loadSingleImage(articleId: number, onFinish: (imageResponse?: ImageResponseType) => void, imageResolution?: number) {
+    fetch(new Request(`http://localhost:8080/article/range;start=${articleId};end=${articleId};quality=${imageResolution ? imageResolution : 250}`, { method: 'GET' }))
+        .then(response => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
+            }
+        })
+        .then((response: ImageResponseType[]) => onFinish(response[0]))
+        .catch(reason => {
+            showToast(reason.message, "error")
+        })
+}
+
+
+
 //  <------------------------- Image -------------------------
 
 
@@ -458,7 +499,7 @@ export function orElse<T>(input: T, orElse: T | (() => T)): T {
     }
 }
 
-export function ifExistsReturnOrElse<T,R>(input: T, returnFunction: (input:T) => R, orElse: R | (() => R)): R {
+export function ifExistsReturnOrElse<T, R>(input: T, returnFunction: (input: T) => R, orElse: R | (() => R)): R {
     if (input)
         return returnFunction(input);
     else {
