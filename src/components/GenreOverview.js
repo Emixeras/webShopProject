@@ -100,7 +100,7 @@ function GenreComponent(props) {
     return (
         <Grid item /*key={article}*/ xs={12} sm={6} md={4} lg={3}>
             <CardActionArea component={Link} to={(location) => {
-                location.pathname = "/article";
+                location.pathname = "/albums";
                 location.state = {genre: genre};
                 return location;
             }} >

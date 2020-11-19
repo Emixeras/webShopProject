@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import clsx from 'clsx';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
+import {Drawer} from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
@@ -23,13 +23,18 @@ import AlbumIcon from '@material-ui/icons/Album';
 import LibraryMusicIcon from '@material-ui/icons/LibraryMusic';
 import RadioIcon from '@material-ui/icons/Radio';
 import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
-import {isDrawerVisible, isUserLoggedIn, setDrawerVisible} from "../services/StorageUtil";
+import {
+    addMobileCallback,
+    isDrawerVisible,
+    isUserLoggedIn, removeMobileCallback,
+    setDrawerVisible
+} from "../services/StorageUtil";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import {ExitToApp} from "@material-ui/icons";
 import Grid from "@material-ui/core/Grid";
 import {logoutUser} from "../services/UserApiUtil";
-import {showToast} from "../Utilities/Utilities";
+import {isMobile, showToast} from "../Utilities/Utilities";
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import EditIcon from '@material-ui/icons/Edit';
 
@@ -103,7 +108,7 @@ function ListItemLink(props) {
     );
     return (
         <li>
-            <ListItem button component={renderLink}>
+            <ListItem button component={renderLink} style={document.location.pathname === to ? {background: "rgba(0,64,179,0.32)"} : undefined}>
                 {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
                 <ListItemText primary={primary}/>
             </ListItem>
@@ -112,10 +117,19 @@ function ListItemLink(props) {
 }
 
 
-export default function MenuDrawer() {
+export default function MenuDrawer(props) {
     const classes = useStyles();
     const theme = useTheme();
     const [open, setOpen] = React.useState(isDrawerVisible);
+    const [shouldShift, setShouldShift] = React.useState(() => !isMobile());
+
+    useEffect(() => {
+        let mobileCallback = isMobile => setShouldShift(!isMobile);
+        addMobileCallback(mobileCallback);
+        return () => {
+            removeMobileCallback(mobileCallback)
+        };
+    }, []);
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -138,32 +152,41 @@ export default function MenuDrawer() {
             >
                 <Toolbar
                 >
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={handleDrawerOpen}
-                        edge="start"
-                        style={{alignSelf: 'center'}}
-                        className={clsx(classes.menuButton, open && classes.hide)}
-                    >
-                        <MenuIcon/>
-                    </IconButton>
-                    <div style={{alignSelf: 'center', flex: 3}}>
-                        <img style={{alignSelf: 'center'}} height="50" src={logo} alt="fireSpot"/>
+                    <div>
+                        <IconButton
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={handleDrawerOpen}
+                            edge="start"
+                            style={{alignSelf: 'center'}}
+                            className={clsx(classes.menuButton, open && classes.hide)}>
+                            <MenuIcon/>
+                        </IconButton>
                     </div>
-                    <Link to="/">
-                        <IconButton style={{margin: 5, color: "white"}} component="span"
-                                    edge="start">
-                            <HomeIcon/>
-                        </IconButton>
-                    </Link>
-                    <Link to="/shoppingcart">
-                        <IconButton style={{margin: 5, color: "white"}} component="span">
-                            <ShoppingCartIcon/>
-                        </IconButton>
-                    </Link>
-                    <ProfileButton/>
-                    <DevButton />
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        flex: 3,
+                        marginLeft: 232 - (open ? 0 : 48)
+                    }}>
+                        <img style={{alignSelf: 'center'}} height="50" src={logo}
+                             alt="fireSpot"/>
+                    </div>
+                    {/*<div>*/}
+                        <Link to="/">
+                            <IconButton style={{margin: 5, color: "white"}} component="span"
+                                        edge="start">
+                                <HomeIcon/>
+                            </IconButton>
+                        </Link>
+                        <Link to="/shoppingcart">
+                            <IconButton style={{margin: 5, color: "white"}} component="span">
+                                <ShoppingCartIcon/>
+                            </IconButton>
+                        </Link>
+                        <ProfileButton/>
+                        <DevButton/>
+                    {/*</div>*/}
                 </Toolbar>
             </AppBar>
             <Drawer
@@ -224,10 +247,11 @@ export default function MenuDrawer() {
             </Drawer>
             <main
                 className={clsx(classes.content, {
-                    [classes.contentShift]: open,
+                    [classes.contentShift]: open && shouldShift,
                 })}
             >
                 <div className={classes.drawerHeader}/>
+                {props.children}
             </main>
         </div>
     );
@@ -330,7 +354,7 @@ function DevButton() {
             <IconButton style={{margin: 5, color: "white"}} component="span"
                         aria-haspopup="true"
                         onClick={handleMenu}>
-                    <DeveloperBoardIcon/>
+                <DeveloperBoardIcon/>
             </IconButton>
             {/*</Link>*/}
             <Menu

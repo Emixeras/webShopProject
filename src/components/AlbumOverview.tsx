@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -19,7 +19,6 @@ import {
 } from "../Utilities/TsUtilities";
 import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
-import {addDrawerCallback, getDrawerState, removeDrawerCallback} from "../services/StorageUtil";
 import {
     Button,
     FormControl,
@@ -35,6 +34,7 @@ import {DialogBuilder} from "../Utilities/DialogBuilder";
 import SettingsIcon from '@material-ui/icons/Settings';
 import SearchIcon from '@material-ui/icons/Search';
 import {Article} from "./EditArticles";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 interface IProps {
     // @ts-ignore
@@ -71,11 +71,6 @@ interface ImageResponseType {
 }
 
 export default class AlbumOverview extends React.Component<IProps, IState> {
-    drawerState = getDrawerState();
-    drawerCallback = (state: boolean) => {
-        this.drawerState = state;
-        this.forceUpdate()
-    };
     IMAGE_RESOLUTION: string = "IMAGE_RESOLUTION";
     imageResolution: number = +(localStorage.getItem(this.IMAGE_RESOLUTION) as string);
     UNLOAD_IMAGES: string = "UNLOAD_IMAGES";
@@ -83,6 +78,8 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     imageReloadArray: Array<() => void> = [];
     query: Pair<string, boolean> = Pair.make("", false);
     genreFilter?: GenrePayload;
+    maxVisible: number = 24;
+    hasMore: boolean = true;
 
     constructor(props: IProps, context: any) {
         super(props, context);
@@ -90,7 +87,6 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
             this.genreFilter = this.props.location.state.genre
         }
         this.loadArticles(this);
-        addDrawerCallback(this.drawerCallback)
     }
 
     render() {
@@ -98,17 +94,10 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
             return <NavigationComponent to={"/albums"}/>;
         }
         return (
-            <div>
-                <MenuDrawer/>
-                <div style={{marginInlineStart: (this.drawerState ? 240 : 0)}}>
-                    <Album context={this}/>
-                </div>
-            </div>
+            <MenuDrawer>
+                <Album context={this}/>
+            </MenuDrawer>
         )
-    }
-
-    componentWillUnmount() {
-        removeDrawerCallback(this.drawerCallback)
     }
 
     loadArticles(context: AlbumOverview) {
@@ -152,19 +141,6 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     }
 }
 
-function Copyright() {
-    return (
-        <Typography variant="body2" color="textSecondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" to="https://material-ui.com/">
-                Your Website
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
-
 const useStyles = makeStyles((theme) => ({
     icon: {
         marginRight: theme.spacing(2),
@@ -203,19 +179,20 @@ let articleArray: Array<Article> = [];
 function Album(props: ContextType<AlbumOverview>) {
     const classes = useStyles();
     let context = props.context;
+    let filteredArticleArray: Array<Article>;
+    context.maxVisible = 24;
+    context.hasMore = true;
 
-    if (articleArray.length === 0) {
-    }
-    buildDummyData();
-
-    let filteredArticleArray: Article[];
+    if (articleArray.length === 0)
+        buildDummyData();
 
     // @ts-ignore
     let queryText = context.query.first + ifExistsReturnOrElse(context.genreFilter, input => ifExistsReturnOrElse(context.query.first, input1 => " & ", "") + "g: " + input.genre.name.toLowerCase(), "");
-    if (queryText && articleArray[0].id !== -1) {
+    if (queryText && articleArray[0].id !== -2) {
         filteredArticleArray = articleArray.filter(article => filterArticle(queryText, article))
     } else
         filteredArticleArray = articleArray;
+
 
     return (
         <React.Fragment>
@@ -236,34 +213,7 @@ function Album(props: ContextType<AlbumOverview>) {
                             </div>
                             :
                             <div style={{display: 'flex', justifyContent: 'center'}}>
-                                <Card style={{height: "250px", width: "500px"}}>
-                                    <Grid container spacing={2} alignItems={"flex-end"} direction={"row"}>
-                                        <Grid item>
-                                            <LazyImage
-                                                getSrc={setImgSrc => {
-                                                    // @ts-ignore
-                                                    setImgSrc(base64ToDataUri(context.genreFilter.file));
-                                                }}
-                                                returnMode={RETURN_MODE.CARD_MEDIA}
-                                                style={{
-                                                    width: "250px",
-                                                    height: "250px",
-                                                    backgroundColor: '#00BCD4'
-                                                }}
-                                                shouldImageUpdate={oldPayload => false}
-                                            />
-                                        </Grid>
-                                        <Grid item style={{maxWidth: "250px"}}>
-                                            <Typography  component="h1" variant="h2"
-                                                        color="textPrimary"
-                                                        gutterBottom>
-                                                {context.genreFilter.genre.name}
-                                            </Typography>
-                                        </Grid>
-                                    </Grid>
-                                    <CardContent>
-                                    </CardContent>
-                                </Card>
+                                <FilterCard context={context}/>
                             </div>
                         }
                     </Container>
@@ -301,11 +251,10 @@ function Album(props: ContextType<AlbumOverview>) {
                     </Container>
                 </div>
                 <Container className={classes.cardGrid} maxWidth="lg">
-                    {filteredArticleArray.length > 0 ? <Grid container spacing={4}>
-                            {filteredArticleArray.map((article) => (
-                                <ArticleComponent context={context} article={article}/>
-                            ))}
-                        </Grid>
+                    {filteredArticleArray.length > 0 ?
+
+
+                        <GridList context={context} filteredArticleArray={filteredArticleArray}/>
                         :
                         <Typography style={{marginTop: 50}} variant="h6" align="center"
                                     gutterBottom>
@@ -314,23 +263,59 @@ function Album(props: ContextType<AlbumOverview>) {
                     }
                 </Container>
             </main>
-            {/* Footer */}
-            {/*<footer className={classes.footer}>*/}
-            {/*    <Typography variant="h6" align="center" gutterBottom>*/}
-            {/*        Footer*/}
-            {/*    </Typography>*/}
-            {/*    <Typography variant="subtitle1" align="center" color="textSecondary" component="p">*/}
-            {/*        Something here to give the footer a purpose!*/}
-            {/*    </Typography>*/}
-            {/*    <Copyright/>*/}
-            {/*</footer>*/}
-            {/* End footer */}
         </React.Fragment>
     );
 }
+let cardRef: any
+function FilterCard({context}: { context: AlbumOverview }) {
 
-function reloadImages(context: AlbumOverview) {
-    context.imageReloadArray.forEach(reload => reload())
+    // debugger
+    // useEffect(() => {
+    //     let listener = (ev: any) => {
+    //         debugger
+    //         if (cardRef) {
+    //             // @ts-ignore
+    //             console.log(`p: ${cardRef.parentElement.offsetWidth} | c: ${cardRef.clientWidth}`)
+    //         }
+    //     };
+    //     window.addEventListener('resize', listener);
+    //
+    //     return () => window.removeEventListener('resize', listener)
+    // }, []);
+
+    return (
+        <Card style={{minHeight: "250px"}} ref={instance => cardRef = instance}>
+            <Grid container alignItems={"flex-end"} direction={"row"}>
+                <Grid item>
+                    <LazyImage
+                        getSrc={setImgSrc => {
+                            // @ts-ignore
+                            setImgSrc(base64ToDataUri(context.genreFilter.file));
+                        }}
+                        style={{
+                            width: "250px",
+                            height: "250px",
+                            backgroundColor: '#00BCD4'
+                        }}
+                        shouldImageUpdate={oldPayload => false}
+                    />
+                </Grid>
+                <Grid item>
+                    <Typography component="h1" variant="h2"
+                                style={{minWidth: "250px", ...padding(16, 16, 0, 16)}}
+                                color="textPrimary"
+                    >
+                        {
+                            // @ts-ignore
+                            context.genreFilter.genre.name
+                        }
+                    </Typography>
+                </Grid>
+            </Grid>
+            {/*<CardContent>*/}
+            {/*</CardContent>*/}
+        </Card>
+    )
 }
 
 function UiSettings({context}: ContextType<AlbumOverview>) {
@@ -409,11 +394,75 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
     )
 }
 
+function GridList({context, filteredArticleArray}: { context: AlbumOverview, filteredArticleArray: Article[] }): JSX.Element {
+
+    // const [{hasMore, count}, setState] = useState(initialState);
+    // const [hasMore, setHasMore] = useState(true);
+    // const [count, setCount] = useState(24);
+    const [dummy, setDummy] = useState(0);
+    const step = 24;
+    let shortedFilteredArticleArray: Article[];
+
+    const fetchMoreData = () => {
+        if (articleArray[0].id === -2)
+            return;
+
+        if (shortedFilteredArticleArray.length >= filteredArticleArray.length) {
+            // setState(prevState => ({...prevState, hasMore: false}));
+            context.hasMore = false;
+            setDummy(dummy + 1);
+            return;
+        }
+
+        if (context.maxVisible + step >= filteredArticleArray.length - 1) {
+            // setState(({count: filteredArticleArray.length - 1, hasMore: false}));
+            // setState(filteredArticleArray.length - 1);
+            context.maxVisible = filteredArticleArray.length - 1;
+            context.hasMore = false;
+            setDummy(dummy + 1);
+        } else {
+            // setState(prevState => ({...prevState, count: count + step}));
+            // setState(count + step);
+            context.maxVisible += step;
+            setDummy(dummy + 1);
+        }
+    };
+
+    shortedFilteredArticleArray = filteredArticleArray.slice(0, context.maxVisible);
+
+    return (
+        <InfiniteScroll
+            style={{width: "100%"}}
+            dataLength={shortedFilteredArticleArray.length}
+            next={fetchMoreData}
+            hasMore={context.hasMore}
+            loader={<h4 style={{color: "rgba(0, 0, 0, 0.54)", marginTop: 15}}>Laden...</h4>}
+            endMessage={
+                <p style={{textAlign: "center", color: "rgba(0, 0, 0, 0.54)", marginTop: 75}}>
+                    <b>Keine weiteren Produkte ferfügbar</b>
+                </p>
+            }>
+            <Grid container spacing={4}
+                  style={{width: "100%"}}
+            >
+                {shortedFilteredArticleArray.map((article) => (
+                    <ArticleComponent context={context} article={article}/>
+                ))}
+            </Grid>
+        </InfiniteScroll>
+    )
+}
+
+function reloadImages(context: AlbumOverview) {
+    context.imageReloadArray.forEach(reload => reload())
+}
+
+
 function ArticleComponent(props: any) {
     const classes = useStyles();
     let article: Article = props.article;
     let context: AlbumOverview = props.context;
-    let isDummy: boolean = article.id === -1;
+    let isDummy: boolean = article.id === -2;
     if (isDummy) {
         return (
             <Grid item xs={12} sm={6} md={4} lg={3}>
@@ -522,7 +571,7 @@ function ArticleComponent(props: any) {
 function buildDummyData() {
     for (let i = 0; i < 12; i++) {
         articleArray.push({
-            id: -1,
+            id: -2,
             title: "⠀",
             description: "⠀",
             price: "",

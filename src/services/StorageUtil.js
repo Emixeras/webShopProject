@@ -56,12 +56,28 @@ export function callDrawerCallbacks() {
     drawerStateCallbackList.forEach(value => value(state))
 }
 
+// ---------------
+
+const mobileStateCallbackList = require("collections/list")();
+
+/**
+ * @param {function} mobileCallback Der hinzuzufügende Clallback
+ */
+export function addMobileCallback(mobileCallback) {
+    mobileStateCallbackList.push(mobileCallback)
+}
+
+export function removeMobileCallback(mobileCallback) {
+    mobileStateCallbackList.delete(mobileCallback)
+}
+
 function resizeListener() {
     let prevState = isMobile();
     window.addEventListener('resize', ev => {
         let newState = isMobile();
         if (newState !== prevState) {
             prevState = newState;
+            mobileStateCallbackList.forEach(callback => callback(newState));
             if (isDrawerVisible())
                 callDrawerCallbacks();
         }

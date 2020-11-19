@@ -79,7 +79,7 @@ export function margin(a, b, c, d) {
  * @param {ToastOptions} [customOptions] Ein Objekt mit überschriebenen Optionen
  * @returns {number} Gibt die Toast-ID zurück
  */
-export function showToast(text, type, customOptions) {
+export function showToast(text, type = "", customOptions) {
     let options = {
         position: "bottom-right",
         autoClose: 2500,

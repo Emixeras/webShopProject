@@ -73,17 +73,12 @@ interface ArtistOrGenre {
 
 export default class EditArticles extends React.Component<IProps, IState> {
     currentPicture: File | undefined = undefined;
-    setFileUploaDefaultdVisibility: (visibility: boolean) => void = visibility => {};
+    setFileUploaDefaultdVisibility: (visibility: boolean) => void = visibility => {
+    };
     IMAGE_RESOLUTION: string = "IMAGE_RESOLUTION";
-    drawerState: boolean = getDrawerState();
     articles: Array<Article> = [];
     artists: Array<ArtistOrGenre> = [];
     genres: Array<ArtistOrGenre> = [];
-
-    drawerCallback = (state: boolean) => {
-        this.drawerState = state;
-        this.forceUpdate()
-    };
 
     constructor(props: IProps, context: any) {
         super(props, context);
@@ -96,12 +91,11 @@ export default class EditArticles extends React.Component<IProps, IState> {
             artists: undefined,
             genre: undefined
         };
-        // @ts-ignore
+
         if (this.props.location.state) {
-            const { article } = this.props.location.state;
+            const {article} = this.props.location.state;
             this.state = article;
         }
-        addDrawerCallback(this.drawerCallback);
         this.loadArticles()
     }
 
@@ -164,12 +158,56 @@ export default class EditArticles extends React.Component<IProps, IState> {
         //     debugger
         //     this.imageReloadFile()
         // }
+
+        if ("")
+            return <MenuDrawer>
+                <Typography paragraph>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                    incididunt
+                    ut labore et dolore magna aliqua. Rhoncus dolor purus non enim praesent
+                    elementum
+                    facilisis leo vel. Risus at ultrices mi tempus imperdiet. Semper risus in
+                    hendrerit
+                    gravida rutrum quisque non tellus. Convallis convallis tellus id interdum velit
+                    laoreet id
+                    donec ultrices. Odio morbi quis commodo odio aenean sed adipiscing. Amet nisl
+                    suscipit
+                    adipiscing bibendum est ultricies integer quis. Cursus euismod quis viverra nibh
+                    cras.
+                    Metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Mauris
+                    commodo quis
+                    imperdiet massa tincidunt. Cras tincidunt lobortis feugiat vivamus at augue. At
+                    augue eget
+                    arcu dictum varius duis at consectetur lorem. Velit sed ullamcorper morbi
+                    tincidunt. Lorem
+                    donec massa sapien faucibus et molestie ac.
+                </Typography>
+                <Typography paragraph>
+                    Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper eget
+                    nulla
+                    facilisi etiam dignissim diam. Pulvinar elementum integer enim neque volutpat ac
+                    tincidunt. Ornare suspendisse sed nisi lacus sed viverra tellus. Purus sit amet
+                    volutpat
+                    consequat mauris. Elementum eu facilisis sed odio morbi. Euismod lacinia at quis
+                    risus sed
+                    vulputate odio. Morbi tincidunt ornare massa eget egestas purus viverra accumsan
+                    in. In
+                    hendrerit gravida rutrum quisque non tellus orci ac. Pellentesque nec nam
+                    aliquam sem et
+                    tortor. Habitant morbi tristique senectus et. Adipiscing elit duis tristique
+                    sollicitudin
+                    nibh sit. Ornare aenean euismod elementum nisi quis eleifend. Commodo viverra
+                    maecenas
+                    accumsan lacus vel facilisis. Nulla posuere sollicitudin aliquam ultrices
+                    sagittis orci a.
+                </Typography>
+            </MenuDrawer>
+
         return (
             <div>
-                <MenuDrawer/>
+                <MenuDrawer>
                 <div style={{
-                    marginTop: 8,
-                    marginInlineStart: (this.drawerState ? 240 : 0),
+                    marginTop: 5,
                     display: 'flex',
                     justifyContent: 'center'
                 }}>
@@ -177,6 +215,10 @@ export default class EditArticles extends React.Component<IProps, IState> {
                           style={{width: '85%', maxWidth: "800px"}}
                           spacing={3}>
                         <Grid item xs={12}>
+                            <Typography style={{
+                                color: "rgba(0, 0, 0, 0.54)",
+                                fontWeight: 500
+                            }}>Artikel</Typography>
                             <Combobox busy={this.articles.length === 0}
                                       suggest
                                       textField={(dataItem: Article | string) => typeof dataItem === 'string' ? dataItem :
@@ -189,30 +231,48 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                       }
                                       itemComponent={({item}) => {
                                           if ("true")
-                                              return(
+                                              return (
                                                   <table>
                                                       <tr>
-                                                          <td title={"ID"} style={{width: "60px", textAlign: "left"}}>
+                                                          <td title={"ID"} style={{
+                                                              width: "60px",
+                                                              textAlign: "left"
+                                                          }}>
                                                               <strong>i: </strong>
                                                               {item.id}
                                                           </td>
-                                                          <td title={"Titel"} style={{width: "210px", textAlign: "left"}}>
+                                                          <td title={"Titel"} style={{
+                                                              width: "210px",
+                                                              textAlign: "left"
+                                                          }}>
                                                               <strong>t: </strong>
                                                               {item.title}
                                                           </td>
-                                                          <td title={"Künstler"} style={{width: "123px", textAlign: "left"}}>
+                                                          <td title={"Künstler"} style={{
+                                                              width: "123px",
+                                                              textAlign: "left"
+                                                          }}>
                                                               <strong>a: </strong>
                                                               {item.artists.name}
                                                           </td>
-                                                          <td title={"Genre"} style={{width: "123px", textAlign: "left"}}>
+                                                          <td title={"Genre"} style={{
+                                                              width: "123px",
+                                                              textAlign: "left"
+                                                          }}>
                                                               <strong>g: </strong>
                                                               {item.genre.name}
                                                           </td>
-                                                          <td title={"Preis"} style={{width: "90px", textAlign: "left"}}>
+                                                          <td title={"Preis"} style={{
+                                                              width: "90px",
+                                                              textAlign: "left"
+                                                          }}>
                                                               <strong>p: </strong>
                                                               {item.price}
                                                           </td>
-                                                          <td title={"EAN"} style={{width: "100px", textAlign: "left"}}>
+                                                          <td title={"EAN"} style={{
+                                                              width: "100px",
+                                                              textAlign: "left"
+                                                          }}>
                                                               <strong>e: </strong>
                                                               {item.ean}
                                                           </td>
@@ -254,6 +314,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                           })
                                       }}
                                       data={this.articles}
+                                      defaultValue={this.state.id !== -1 ? this.state : undefined}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -285,7 +346,10 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                         />
                                     </Grid>
                                     <Grid item md={6} sm={12}>
-                                        <Typography style={{color: "rgba(0, 0, 0, 0.54)", fontWeight: 500}}>Künstler</Typography>
+                                        <Typography style={{
+                                            color: "rgba(0, 0, 0, 0.54)",
+                                            fontWeight: 500
+                                        }}>Künstler</Typography>
                                         <Grid container style={{alignItems: "center"}} spacing={1}>
                                             <Grid item xs={11}>
                                                 <Combobox busy={this.articles.length === 0}
@@ -305,7 +369,10 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                         </Grid>
                                     </Grid>
                                     <Grid item md={6} sm={12}>
-                                        <Typography style={{color: "rgba(0, 0, 0, 0.54)", fontWeight: 500}}>Genre</Typography>
+                                        <Typography style={{
+                                            color: "rgba(0, 0, 0, 0.54)",
+                                            fontWeight: 500
+                                        }}>Genre</Typography>
                                         <Combobox busy={this.articles.length === 0}
                                                   textField={"name"}
                                                   filter={"contains"}
@@ -324,8 +391,11 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                    label={"Beschreibung"}
                                                    variant={"outlined"}/>
                                     </Grid>
-                                    <Grid item md={8} sm={12} >
-                                        <Typography variant="h6">Album Cover</Typography>
+                                    <Grid item md={8} sm={12}>
+                                        <Typography style={{
+                                            color: "rgba(0, 0, 0, 0.54)",
+                                            fontWeight: 500
+                                        }}variant="h6">Album Cover</Typography>
                                         <div style={{width: 250, height: 250}}>
                                             <div style={{
                                                 width: 250,
@@ -405,6 +475,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                         </Grid>
                     </Grid>
                 </div>
+                </MenuDrawer>
             </div>
         )
     }
@@ -422,10 +493,6 @@ export default class EditArticles extends React.Component<IProps, IState> {
             .catch(reason => {
                 showToast(reason.message, "error")
             })
-    }
-
-    componentWillUnmount() {
-        removeDrawerCallback(this.drawerCallback)
     }
 }
 
