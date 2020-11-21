@@ -202,7 +202,7 @@ export default function MenuDrawer(props) {
                         </IconButton>
                     </div>
                     <div style={{
-                        maxWidth: 58 * (hasCurrentUserRoleLevel() ? 4 : 3) - (open ? 0 : 48), minWidth: 0,
+                        maxWidth: 58 * (hasCurrentUserRoleLevel("ADMIN") ? 4 : 3) - (open ? 0 : 48), minWidth: 0,
                         // backgroundColor: "green",
                         flexGrow: 100,
                         flexShrink: 100,
@@ -397,7 +397,7 @@ function DevButton() {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    if (hasCurrentUserRoleLevel())
+    if (hasCurrentUserRoleLevel("ADMIN"))
         return (
             <div>
                 {/*<Link to="/login">*/}

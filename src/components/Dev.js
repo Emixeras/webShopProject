@@ -26,7 +26,7 @@ class Dev extends React.Component {
 
     render() {
         return (
-            <RestrictedPage /*roleLevel={ROLES.ADMIN}*/>
+            <RestrictedPage roleLevel={ROLES.ADMIN}>
                 <MenuDrawer>
                     <div style={{
                         marginTop: 8,

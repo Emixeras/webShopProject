@@ -27,6 +27,8 @@ import {updateArticle} from "../services/ItemApiUtil";
 import context from "react-bootstrap/CardContext";
 import {makeStyles} from "@material-ui/core/styles";
 import zIndex from "@material-ui/core/styles/zIndex";
+import {createNewArtist} from "../services/ArtistApiUtil";
+import {useState} from "react";
 
 interface IProps {
     // @ts-ignore
@@ -444,14 +446,21 @@ export default class EditArticles extends React.Component<IProps, IState> {
     }
 }
 
+let setIsPictureNotSelected: (visibility: boolean) => void = visibility => {};
 function DialogComponent(arg: any) {
     const that: EditArticles = arg.context;
     const [open, setOpen] = React.useState(false);
+    // const [picture, setPicture] = useState<File>();
+
+
+    // debugger
 
     return (
         <div>
             <IconButton style={{maxHeight: 30, maxWidth: 30}}
-                        onClick={event => setOpen(true)}
+                        onClick={event => {
+                            return setOpen(true);
+                        }}
                         onMouseDown={(event) => {
                             event.preventDefault();
                         }}>
@@ -476,17 +485,81 @@ function DialogComponent(arg: any) {
                     }
 
                 })
+                .setContent(dialogBuilder => {
+                    return (
+                        <div style={{width: 250, height: 250}}>
+                            <div style={{
+                                width: 250,
+                                height: 250,
+                                zIndex: 1,
+                                position: "absolute"
+                            }}>
+                                <LazyImage
+                                    style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        zIndex: 5
+                                    }}
+                                    rounded
+                                    alt={"test"}
+                                    payload={that.currentPicture}
+                                    shouldImageUpdate={(oldPayload: File, newPayload: File) => {
+                                        return oldPayload !== newPayload
+                                    }}
+                                    // shouldImageUpdate={oldPayload => true}
+                                    getSrc={setImgSrc => {
+                                        if (that.currentPicture) {
+                                            setImgSrc(URL.createObjectURL(that.currentPicture));
+                                            setIsPictureNotSelected(false);
+                                        } else
+                                            setIsPictureNotSelected(true);
+
+                                    }}
+                                />
+                            </div>
+                            <div style={{
+                                width: 250,
+                                height: 250,
+                                zIndex: 2,
+                                position: "absolute",
+                            }}>
+                                <SimpleReactFileUpload
+                                    onFileSelected={(file: File) => {
+                                        // debugger
+                                        that.currentPicture = file;
+                                        that.forceUpdate()
+                                        // setPicture(file);
+                                    }}
+                                    setDefaultVisibility={((setVisibility: (visibility: boolean) => void) => setIsPictureNotSelected = setVisibility)}
+                                />
+                            </div>
+                        </div>
+                    )
+                })
                 .addButton("Abbrechen")
                 .addButton({
                     label: "Anlegen",
                     isActionButton: true,
                     onClick: dialogBuilder => {
+                        debugger
                         let netArtist = {
-                            id: that.artists.length + 1,
-                            name: dialogBuilder.getInputText().trim()
+                            // id: that.artists.length + 1,
+                            name: dialogBuilder.getInputText().trim(),
                         };
-                        that.artists.push(netArtist);
-                        that.setState({artists: netArtist});
+                        if (!that.currentPicture)
+                            return;
+                        createNewArtist(netArtist, null/*that.currentPicture*/, response => {
+                            console.log(response);
+                            showToast("Jay", "success");
+                            debugger
+                        }, error => {
+                            console.log(error);
+                            showToast("Nay", "error");
+                            debugger
+                        });
+
+                        // that.artists.push(netArtist);
+                        // that.setState({artists: netArtist});
                     }
                 })
                 .build()

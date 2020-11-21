@@ -6,7 +6,7 @@ import Typography from "@material-ui/core/Typography";
 
 
 class SimpleReactFileUpload extends React.Component {
-    onFileSelected;
+    ;
 
     constructor(props) {
         super(props);
@@ -14,8 +14,8 @@ class SimpleReactFileUpload extends React.Component {
             file: null,
             visible: false,
             defaultVisibility: true,
+            onFileSelected: this.props.onFileSelected,
         };
-        this.onFileSelected = this.props.onFileSelected;
         if (this.props.setDefaultVisibility) {
             this.props.setDefaultVisibility(visibility => this.setState({defaultVisibility: visibility}))
         }
@@ -33,9 +33,15 @@ class SimpleReactFileUpload extends React.Component {
         event.stopPropagation();
         event.preventDefault();
 
-        let file = event.dataTransfer.files[0];
+        let file;
+        if (event.target)
+            file = event.target.files[0];
+        else
+            file = event.dataTransfer.files[0];
         if (file) {
-            this.onFileSelected(file);
+            if (this.state.onFileSelected) {
+                this.state.onFileSelected(file);
+            }
             this.setState({
                 selectedFile: file,
                 loaded: 0,
