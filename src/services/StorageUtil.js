@@ -26,7 +26,6 @@ export const setDrawerVisible = (bool) =>{
     }else{
         localStorage.setItem('isDrawerVisible',undefined)
     }
-    callDrawerCallbacks()
 };
 
 export const isDrawerVisible = () =>{
@@ -37,27 +36,7 @@ export function getDrawerState() {
     return isDrawerVisible() && !isMobile();
 }
 
-//  ------------------------- Drawer-Callbacks ------------------------->
-const drawerStateCallbackList = require("collections/list")();
-
-/**
- * @param {function} drawerCallback Der hinzuzufügende Clallback
- */
-export function addDrawerCallback(drawerCallback) {
-    drawerStateCallbackList.push(drawerCallback)
-}
-
-export function removeDrawerCallback(drawerCallback) {
-    drawerStateCallbackList.delete(drawerCallback)
-}
-
-export function callDrawerCallbacks() {
-    let state = isDrawerVisible() && !isMobile();
-    drawerStateCallbackList.forEach(value => value(state))
-}
-
-// ---------------
-
+//  ------------------------- Resize-Callbacks ------------------------->
 const mobileStateCallbackList = require("collections/list")();
 
 /**
@@ -78,10 +57,8 @@ function resizeListener() {
         if (newState !== prevState) {
             prevState = newState;
             mobileStateCallbackList.forEach(callback => callback(newState));
-            if (isDrawerVisible())
-                callDrawerCallbacks();
         }
     });
 }
 resizeListener();
-//  <------------------------- Drawer-Callbacks -------------------------
+//  <------------------------- Resize-Callbacks -------------------------

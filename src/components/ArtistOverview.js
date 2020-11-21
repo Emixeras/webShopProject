@@ -4,11 +4,6 @@ import MenuDrawer from "./MenuDrawer";
 import banner1 from "../assets/1.png";
 import banner2 from "../assets/2.png";
 import banner3 from "../assets/3.png";
-import {
-    addDrawerCallback,
-    isDrawerVisible,
-    removeDrawerCallback,
-} from "../services/StorageUtil";
 import {makeStyles} from '@material-ui/core/styles';
 import {showToast} from "../Utilities/Utilities";
 import {
@@ -21,29 +16,23 @@ import CardActionArea from "@material-ui/core/CardActionArea";
 import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 import axios from "axios";
-import { Carousel } from 'react-responsive-carousel';
+import {Carousel} from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 class ArtistOverview extends Component {
 
-    drawerState = isDrawerVisible();
-    drawerCallback = state => {
-        this.drawerState = state;
-        this.forceUpdate()
-    };
-
     constructor(props, context) {
         super(props, context);
         this.loadGenre()
-        addDrawerCallback(this.drawerCallback)
     }
 
     render() {
 
-        return (<div>
-                <MenuDrawer/>
+        return (
+            <MenuDrawer>
                 <div style={{marginInlineStart: (this.drawerState ? 240 : 0)}}>
-                    <Carousel showArrows={false} showStatus={false} infiniteLoop={true} showThumbs={false} autoPlay={true}>
+                    <Carousel showArrows={false} showStatus={false} infiniteLoop={true}
+                              showThumbs={false} autoPlay={true}>
                         <div>
                             <img src={banner1}/>
                         </div>
@@ -56,15 +45,15 @@ class ArtistOverview extends Component {
                     </Carousel>
                     <Artist/>
                 </div>
-            </div>
+            </MenuDrawer>
         )
     }
 
-    loadGenre(){
+    loadGenre() {
         axios.get("http://localhost:8080/artist/range;start=1;end=50").then((response) => {
             showToast("artist fetch ok", "success");
             var artistresponse = response.data;
-            Object.keys(artistresponse).forEach(function(key) {
+            Object.keys(artistresponse).forEach(function (key) {
                 artistArray.push(artistresponse[key]);
             });
             this.forceUpdate()
@@ -73,13 +62,11 @@ class ArtistOverview extends Component {
                 showToast("artist fetch failed" + error, "error");
             })
     }
-
-    componentWillUnmount() {removeDrawerCallback(this.drawerCallback)}
 }
 
 let artistArray = [];
 
-function Artist(){
+function Artist() {
     const classes = useStyles();
     return (
         <React.Fragment>
@@ -106,6 +93,7 @@ function Artist(){
         </React.Fragment>
     );
 }
+
 function ArtistComponent(props) {
     const classes = useStyles();
     let artist = props.artist;
@@ -115,12 +103,12 @@ function ArtistComponent(props) {
             <CardActionArea component={Link} to={(location) => {
                 location.pathname = "/article";
                 return location;
-            }} >
+            }}>
                 <Card className={classes.card}>
                     <CardMedia
                         component='img'
                         className={classes.cardMedia}
-                        src= {"data:image/png;base64," + artist.file}
+                        src={"data:image/png;base64," + artist.file}
                         title={artist.artist.name}
                     />
                     <CardContent className={classes.cardContent}>

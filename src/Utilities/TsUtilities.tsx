@@ -1,7 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { CardMedia } from "@material-ui/core";
-import { number } from "prop-types";
-import { showToast } from "../Utilities/Utilities";
+import React, {useEffect, useState} from "react";
+import {Card, CardMedia, Link, Typography} from "@material-ui/core";
+import {number} from "prop-types";
+import {padding, showToast} from "../Utilities/Utilities";
+import {getSessionUser} from "../services/StorageUtil";
+import {useHistory} from "react-router-dom";
+import {logoutUser} from "../services/UserApiUtil";
+import MenuDrawer from "../components/MenuDrawer";
 
 export function boolOr<T>(input: T, ...ors: T[]): boolean {
     for (let or of ors) {
@@ -53,17 +57,36 @@ export interface ContextType<T> {
     context: T;
 }
 
+export interface Article {
+    id: number;
+    title: string;
+    description: string;
+    ean: number;
+    price: string;
+    artists: ArtistOrGenre;
+    genre: ArtistOrGenre;
+    picture?: { id: number, data: string };
+}
+
+export interface ArtistOrGenre {
+    id: number;
+    name: string;
+    file?: string;
+}
+
+export interface ImageResponseType {
+    article: Article;
+    file: string;
+}
+
+export enum ROLES {
+    USER, EMPLOYEE, ADMIN
+}
+
 //  <------------------------- Types -------------------------
 
 
 //  ------------------------- Image ------------------------->
-var signatures = {
-    JVBERi0: "application/pdf",
-    R0lGODdh: "image/gif",
-    R0lGODlh: "image/gif",
-    iVBORw0KGgo: "image/png"
-};
-
 export function base64ToDataUri(base64: string): string {
     var mime;
     if (base64.startsWith("iVBORw0KGgo"))
@@ -100,6 +123,21 @@ export function base64ToDataUri(base64: string): string {
     return `data:${mime};base64,${base64}`
 }
 
+export function loadSingleImage(articleId: number, onFinish: (imageResponse?: ImageResponseType) => void, imageResolution?: number) {
+    fetch(new Request(`http://localhost:8080/article/range;start=${articleId};end=${articleId};quality=${imageResolution ? imageResolution : 250}`, {method: 'GET'}))
+        .then(response => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
+            }
+        })
+        .then((response: ImageResponseType[]) => onFinish(response[0]))
+        .catch(reason => {
+            showToast(reason.message, "error")
+        })
+}
+
 // ---------------
 /* Credit: https://slashgear.github.io/creating-an-image-lazy-loading-component-with-react/*/
 
@@ -132,98 +170,6 @@ export enum RETURN_MODE {
 export enum LOAD_IMAGE_MODE {
     ON_VISIBLE, ALWAYS
 }
-
-// export const LazyImage = ({alt, getSrc, reload, style, className, returnMode, shouldImageUpdate}: LazyImageProperties): JSX.Element => {
-//     const [imageSrc, setImageSrc] = useState(placeHolder);
-//     const [imageRef, setImageRef] = useState<Element>();
-//
-//     if (reload)
-//         reload(() => getSrc(result => setImageSrc(result)));
-//
-//     // const onLoad = (event: any) => {
-//     //     event.target.classList.add('loaded')
-//     // };
-//     //
-//     // const onError = (event: any) => {
-//     //     event.target.classList.add('has-error')
-//     // };
-//
-//     if (shouldImageUpdate) {
-//         if (shouldImageUpdate(null, null))
-//             getSrc(result => setImageSrc(result))
-//     }
-//     useEffect(() => {
-//         if (shouldImageUpdate)
-//             return () => {};
-//         let observer: IntersectionObserver;
-//         let didCancel = false;
-//
-//         debugger
-//         if (imageRef && imageSrc === placeHolder) {
-//             if (IntersectionObserver) {
-//                 observer = new IntersectionObserver(
-//                     entries => {
-//                         entries.forEach(entry => {
-//                             if (alt === "Davis LLC")
-//                                 debugger
-//                             if (!didCancel && (entry.intersectionRatio > 0 || entry.isIntersecting)) {
-//                                 getSrc(result => {
-//                                     setImageSrc(result);
-//                                     if (alt !== "Davis LLC")
-//                                         observer.unobserve(imageRef);
-//                                     else
-//                                         debugger
-//                                 })
-//                             }
-//                         })
-//                     },
-//                     {
-//                         threshold: 0.01,
-//                         rootMargin: '75%',
-//                     }
-//                 );
-//                 observer.observe(imageRef)
-//             } else {
-//                 // Old browsers fallback
-//                 getSrc(result => {
-//                     setImageSrc(result);
-//                 })
-//             }
-//         }
-//         return () => {
-//             didCancel = true;
-//             // on component cleanup, we remove the listner
-//             if (observer && observer.unobserve && imageRef) {
-//                 if (alt === "Davis LLC")
-//                     debugger
-//                 observer.unobserve(imageRef)
-//             }
-//         }
-//     }, [imageSrc, imageRef]);
-//
-//     switch (returnMode) {
-//         default:
-//         case RETURN_MODE.IMG:
-//             return <img className={className}
-//                         style={style}
-//                         src={imageSrc}
-//                         ref={element => {
-//                             if (element) setImageRef(element)
-//                         }}
-//                         alt={alt}
-//             />;
-//         case RETURN_MODE.CARD_MEDIA:
-//             return <CardMedia className={className}
-//                               style={style}
-//                               image={imageSrc}
-//                               ref={element => {
-//                                   if (element) setImageRef(element)
-//                               }}
-//                               title={alt}/>;
-//     }
-// //    onLoad={onLoad}
-// //     onError={onError}
-// };
 
 export class LazyImage extends React.Component<LazyImageProperties, LazyImageState> {
     imageSrc: string = placeHolder;
@@ -307,8 +253,7 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
                 this.loadImage();
             }
             return false;
-        }
-        else
+        } else
             return true;
     }
 
@@ -371,65 +316,25 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
             default:
             case RETURN_MODE.IMG:
                 return <img className={this.className}
-                    style={{ borderRadius: borderRadius, ...this.style }}
-                    src={this.imageSrc}
-                    ref={element => {
-                        if (element) this.imageRef = element
-                    }}
-                    alt={this.alt}
+                            style={{borderRadius: borderRadius, ...this.style}}
+                            src={this.imageSrc}
+                            ref={element => {
+                                if (element) this.imageRef = element
+                            }}
+                            alt={this.alt}
                 />;
             case RETURN_MODE.CARD_MEDIA:
                 return <CardMedia className={this.className}
-                    style={{ borderRadius: borderRadius, ...this.style }}
-                    image={this.imageSrc}
-                    ref={element => {
-                        if (element) this.imageRef = element
-                    }}
-                    title={this.alt} />;
+                                  style={{borderRadius: borderRadius, ...this.style}}
+                                  image={this.imageSrc}
+                                  ref={element => {
+                                      if (element) this.imageRef = element
+                                  }}
+                                  title={this.alt}/>;
         }
 
     }
 }
-
-export interface Article {
-    id: number;
-    title: string;
-    description: string;
-    ean: number;
-    price: string;
-    artists: ArtistOrGenre;
-    genre: ArtistOrGenre;
-    picture?: { id: number, data: string };
-}
-
-
-export interface ArtistOrGenre {
-    id: number;
-    name: string;
-    file?: string;
-}
-
-export interface ImageResponseType {
-    article: Article;
-    file: string;
-}
-
-export function loadSingleImage(articleId: number, onFinish: (imageResponse?: ImageResponseType) => void, imageResolution?: number) {
-    fetch(new Request(`http://localhost:8080/article/range;start=${articleId};end=${articleId};quality=${imageResolution ? imageResolution : 250}`, { method: 'GET' }))
-        .then(response => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
-            }
-        })
-        .then((response: ImageResponseType[]) => onFinish(response[0]))
-        .catch(reason => {
-            showToast(reason.message, "error")
-        })
-}
-
-
 
 //  <------------------------- Image -------------------------
 
@@ -509,4 +414,123 @@ export function ifExistsReturnOrElse<T, R>(input: T, returnFunction: (input: T) 
             return orElse;
     }
 }
+
+// ---------------
+
+export function hasCurrentUserRoleLevel(level: string | number = "EMPLOYEE"): boolean {
+    let roleMap = {
+        USER: 0,
+        EMPLOYEE: 1,
+        ADMIN: 2,
+        "0": 0,
+        "1": 1,
+        "2": 2,
+    };
+
+    let user = getSessionUser();
+    // @ts-ignore
+    return user && roleMap[user.role] >= roleMap[level];
+}
+
 //  <------------------------- Logic -------------------------
+
+
+//  ------------------------- Components ------------------------->
+interface RestrictedPage_props {
+    children: JSX.Element;
+    roleLevel?: ROLES;
+    dontShowMenuDrawer?: boolean;
+    style?: React.CSSProperties;
+}
+
+interface RestrictedPage_state {}
+
+export class RestrictedPage extends React.Component<RestrictedPage_props, RestrictedPage_state> {
+    children: JSX.Element;
+    roleLevel?: ROLES;
+    dontShowMenuDrawer?: boolean;
+    hasPermission: boolean = false;
+    style?: React.CSSProperties;
+
+    constructor(props: RestrictedPage_props, context: any) {
+        super(props, context);
+
+        this.children = props.children;
+        this.roleLevel = props.roleLevel;
+        this.dontShowMenuDrawer = props.dontShowMenuDrawer;
+        this.style = props.style;
+
+        this.checkPermission();
+    }
+
+    checkPermission() {
+        this.hasPermission = hasCurrentUserRoleLevel(this.roleLevel)
+    }
+
+    shouldComponentUpdate(nextProps: Readonly<RestrictedPage_props>, nextState: Readonly<RestrictedPage_state>, nextContext: any): boolean {
+        this.children = nextProps.children;
+        this.roleLevel = nextProps.roleLevel;
+        this.dontShowMenuDrawer = nextProps.dontShowMenuDrawer;
+        this.style = nextProps.style;
+        return true;
+    }
+
+    render() {
+        if (this.hasPermission) {
+            return this.children;
+        } else {
+            if (this.dontShowMenuDrawer)
+                return this.renderMessage()
+            else
+                return (
+                    <MenuDrawer>
+                        {this.renderMessage()}
+                    </MenuDrawer>
+                )
+        }
+    }
+
+    renderMessage() {
+        return (
+            <div style={{display: 'flex', justifyContent: 'center', ...this.style}}>
+                <Card style={{
+                    marginTop: 75,
+                    width: '85%',
+                    maxWidth: "800px",
+                    textAlign: "center", ...padding(18)
+                }}>
+                    <Typography variant="h3" gutterBottom>
+                        Zugriff Verweigert
+                    </Typography>
+                    <Typography variant="h5" gutterBottom>
+                        Um auf die Seite '{document.location.pathname}' zugreifen zu können
+                        werden mindestens Berechtigungen vom Level
+                        '{this.roleLevel ? ROLES[this.roleLevel] : ROLES[ROLES.EMPLOYEE]}'
+                        benötigt.
+                    </Typography>
+                    <Typography variant="body1">
+                        Bitte melden Sie sich {<LogoutAndLoginLink text={"hier"}/>} an
+                    </Typography>
+                </Card>
+            </div>
+        )
+    }
+}
+
+function LogoutAndLoginLink({text}: { text: string }) {
+    const history = useHistory();
+    return (
+        <Link component="button"
+              variant="body2"
+              onClick={() => {
+                  logoutUser(() => {
+                      history.push("/login")
+                  }, () => {
+                      showToast('Abmelden Fehlgeschlagen', "error")
+                  });
+
+              }}>{text}</Link>
+    )
+}
+
+//  <------------------------- Components -------------------------

@@ -2,12 +2,6 @@ import React, {Component, useState} from 'react';
 import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
 import {loginUser} from "../services/UserApiUtil";
-import {
-    addDrawerCallback, getDrawerState,
-    isDrawerVisible,
-    isUserLoggedIn,
-    removeDrawerCallback
-} from "../services/StorageUtil";
 import {makeStyles} from '@material-ui/core/styles';
 import {isEmail, padding} from "../Utilities/Utilities";
 import {
@@ -25,19 +19,13 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import {useHistory} from "react-router-dom";
 import {Visibility, VisibilityOff} from "@material-ui/icons";
 import {NavigationComponent} from "../Utilities/Utilities.js"
+import {isUserLoggedIn} from "../services/StorageUtil";
 
 class Login extends Component {
     showPassword = false;
     passwordError = false;
     passwordState = {password: "", passwordRepeat: ""};
     emailError = false;
-    drawerState = getDrawerState();
-
-
-    drawerCallback = state => {
-        this.drawerState = state;
-        this.forceUpdate()
-    };
 
     constructor(props) {
         super(props);
@@ -45,7 +33,6 @@ class Login extends Component {
             email: '',
             password: '',
         };
-        addDrawerCallback(this.drawerCallback)
 
     }
 
@@ -56,8 +43,6 @@ class Login extends Component {
             return <NavigationComponent to={"/Profile"}/>;
         }
     }
-
-    componentWillUnmount() {removeDrawerCallback(this.drawerCallback)}
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -96,8 +81,7 @@ function LogInForm(props) {
         }
     };
     return (
-        <div>
-            <MenuDrawer/>
+        <MenuDrawer>
             <div style={{
                 marginTop: 8,
                 marginInlineStart: (that.drawerState ? 240 : 0),
@@ -179,14 +163,15 @@ function LogInForm(props) {
                         </div>
                     </Card>
 
-                    <Typography style={{marginTop: 50, marginBottom: 15}} variant="body2" color="textSecondary"
+                    <Typography style={{marginTop: 50, marginBottom: 15}} variant="body2"
+                                color="textSecondary"
                                 align="center">
                         {'Copyright © Studiotranics '}
                         {new Date().getFullYear()}
                     </Typography>
                 </div>
             </div>
-        </div>
+        </MenuDrawer>
     )
 }
 

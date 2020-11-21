@@ -1,11 +1,6 @@
 import React, {Component} from 'react';
 import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
-import {
-    addDrawerCallback,
-    isDrawerVisible,
-    removeDrawerCallback,
-} from "../services/StorageUtil";
 import {makeStyles} from '@material-ui/core/styles';
 import {showToast} from "../Utilities/Utilities";
 import {
@@ -22,36 +17,28 @@ import {base64ToDataUri} from "../Utilities/TsUtilities";
 
 class GenreOverview extends Component {
 
-    drawerState = isDrawerVisible();
-    drawerCallback = state => {
-        this.drawerState = state;
-        this.forceUpdate()
-    };
-
     constructor(props, context) {
         super(props, context);
         this.loadGenre()
-        addDrawerCallback(this.drawerCallback)
     }
 
     render() {
 
-        return (<div>
-                <MenuDrawer/>
+        return (
+            <MenuDrawer>
                 <div style={{marginInlineStart: (this.drawerState ? 240 : 0)}}>
                     <Genre/>
                 </div>
-            </div>
+            </MenuDrawer>
         )
     }
 
-    loadGenre(){
+    loadGenre() {
         axios.get("http://localhost:8080/genre").then((response) => {
             // showToast("genre fetch ok", "success");
             genreArray = [];
             var genreresponse = response.data;
-            console.log(genreresponse);
-            Object.keys(genreresponse).forEach(function(key) {
+            Object.keys(genreresponse).forEach(function (key) {
                 genreArray.push(genreresponse[key]);
             });
             this.forceUpdate()
@@ -60,13 +47,11 @@ class GenreOverview extends Component {
                 showToast("genre fetch failed" + error, "error");
             })
     }
-
-    componentWillUnmount() {removeDrawerCallback(this.drawerCallback)}
 }
 
 let genreArray = [];
 
-function Genre(){
+function Genre() {
     const classes = useStyles();
     return (
         <React.Fragment>
@@ -93,6 +78,7 @@ function Genre(){
         </React.Fragment>
     );
 }
+
 function GenreComponent(props) {
     const classes = useStyles();
     let genre = props.genre;
@@ -103,7 +89,7 @@ function GenreComponent(props) {
                 location.pathname = "/albums";
                 location.state = {genre: genre};
                 return location;
-            }} >
+            }}>
                 <Card className={classes.card}>
                     <CardMedia
                         component='img'

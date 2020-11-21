@@ -12,20 +12,14 @@ import {
 } from '@material-ui/core';
 import React, {Component} from 'react';
 import {Link} from "react-router-dom";
-import Profile from "./Profile";
 import MenuDrawer from "./MenuDrawer";
 import {registerUser} from "../services/UserApiUtil";
-import {
-    addDrawerCallback, getDrawerState,
-    isDrawerVisible,
-    isUserLoggedIn,
-    removeDrawerCallback
-} from "../services/StorageUtil";
 import {isEmail, padding, showToast} from "../Utilities/Utilities";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import {Visibility, VisibilityOff} from "@material-ui/icons";
 import {makeStyles} from "@material-ui/core/styles";
 import {useHistory} from "react-router-dom";
+import {isUserLoggedIn} from "../services/StorageUtil";
 
 class Register extends Component {
 
@@ -33,16 +27,8 @@ class Register extends Component {
     passwordError = false;
     passwordState = {password: "", passwordRepeat: ""};
     emailError = false;
-    drawerState = getDrawerState();
     user = {};
-    unchangedState;
     editMode = false;
-    currentEdiModeToastId = 0;
-
-    drawerCallback = state => {
-        this.drawerState = state;
-        this.forceUpdate()
-    };
 
     constructor(props) {
 
@@ -56,7 +42,6 @@ class Register extends Component {
             title: 'none',
             showPassword: false,
         }
-        addDrawerCallback(this.drawerCallback)
     }
 
     render() {
@@ -66,8 +51,6 @@ class Register extends Component {
             return (<NavigationComponent to={"/profile"}/>);
         }
     }
-
-    componentWillUnmount() {removeDrawerCallback(this.drawerCallback)}
 
     // ---------------
 
@@ -143,11 +126,9 @@ function RegisterForm(props) {
         }
     };
     return (
-        <div>
-            <MenuDrawer/>
+        <MenuDrawer>
             <div style={{
                 marginTop: 8,
-                marginInlineStart: (that.drawerState ? 240 : 0),
                 display: 'flex',
                 justifyContent: 'center'
             }}>
@@ -321,7 +302,8 @@ function RegisterForm(props) {
                     </Typography>
                 </div>
             </div>
-        </div>)
+        </MenuDrawer>
+    )
 }
 
 export default Register;

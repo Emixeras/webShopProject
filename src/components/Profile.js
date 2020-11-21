@@ -20,9 +20,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import {deleteUser, logoutUser, updateUser} from "../services/UserApiUtil";
 import {padding, showToast, shallowEqual, isEmail} from "../Utilities/Utilities";
 import {
-    addDrawerCallback, getDrawerState,
-    getSessionUser,
-    isDrawerVisible, isUserLoggedIn, removeDrawerCallback
+    getDrawerState,
+    getSessionUser, isUserLoggedIn
 } from "../services/StorageUtil";
 import {useHistory} from "react-router-dom";
 import Login from "./Login";
@@ -38,13 +37,7 @@ class Profile extends Component {
     unchangedState;
     editMode = false;
     currentEdiModeToastId = 0;
-    drawerState = getDrawerState();
     scrollHelper = Triple.make(this.editMode, 0, undefined);
-
-    drawerCallback = state => {
-        this.drawerState = state;
-        this.forceUpdate()
-    };
 
     constructor(props) {
         super(props);
@@ -67,280 +60,279 @@ class Profile extends Component {
             this.state = this.unchangedState = {...this.state, ...this.user};
             this.passwordState = {password: this.user.password, passwordRepeat: this.user.password};
         }
-        addDrawerCallback(this.drawerCallback)
     }
 
     render() {
         if (isUserLoggedIn()) {
-            return <div>
-                <MenuDrawer/>
-                <div style={{
-                    marginTop: 8,
-                    marginInlineStart: (this.drawerState ? 240 : 0),
-                    display: 'flex',
-                    justifyContent: 'center'
-                }}>
-                    <Grid container
-                          style={{width: '85%', maxWidth: "800px"}}
-                          spacing={3}>
-                        <Grid item xs={12}>
-                            <Card style={padding(18)}>
-                                <Grid
-                                    container
-                                    direction="column">
-                                    <Grid item fullWidth>
-                                        <div style={{
-                                            textAlign: "start",
-                                            fontSize: 22,
-                                            marginBottom: 3
-                                        }}>
-                                            Personen Daten
-                                        </div>
+            return (
+                <MenuDrawer>
+                    <div style={{
+                        marginTop: 8,
+                        display: 'flex',
+                        justifyContent: 'center'
+                    }}>
+                        <Grid container
+                              style={{width: '85%', maxWidth: "800px"}}
+                              spacing={3}>
+                            <Grid item xs={12}>
+                                <Card style={padding(18)}>
+                                    <Grid
+                                        container
+                                        direction="column">
+                                        <Grid item fullWidth>
+                                            <div style={{
+                                                textAlign: "start",
+                                                fontSize: 22,
+                                                marginBottom: 3
+                                            }}>
+                                                Personen Daten
+                                            </div>
+                                        </Grid>
+                                        <Grid item>
+                                            <TextField
+                                                select
+                                                margin={"normal"}
+                                                fullWidth
+                                                label="Anrede"
+                                                value={this.state.title}
+                                                helperText="Eine gewünschte Anrede auswählen"
+                                                variant="outlined"
+                                                disabled={!this.editMode}
+                                                onChange={this.handleChange}
+                                            >
+                                                {titles().map((option) => (
+                                                    <MenuItem key={option.value}
+                                                              value={option.value}>
+                                                        {option.label}
+                                                    </MenuItem>
+                                                ))}
+                                            </TextField>
+
+                                        </Grid>
+                                        <Grid item fullWidth>
+                                            <Grid
+                                                container
+                                                spacing={2}>
+                                                <Grid item md sm={12} xs={12}>
+                                                    <TextField required
+                                                               fullWidth
+                                                               label="Vorname"
+                                                               variant="outlined"
+                                                               onChange={event => this.changeStateItem("firstName", event)}
+                                                               value={this.state.firstName}
+                                                               disabled={!this.editMode}
+                                                               margin={"normal"}/>
+                                                </Grid>
+                                                <Grid item md sm={12} xs={12}>
+                                                    <TextField required
+                                                               fullWidth
+                                                               label="Nachname"
+                                                               variant="outlined"
+                                                               onChange={event => this.changeStateItem("lastName", event)}
+                                                               value={this.state.lastName}
+                                                               disabled={!this.editMode}
+                                                               margin={"normal"}/>
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
+                                        <Grid item
+                                              fullWidth>
+                                            <TextField required
+                                                       label="Geburtsdatum"
+                                                       type="date"
+                                                       variant="outlined"
+                                                       margin={"normal"}
+                                                       fullWidth
+                                                       value={this.state.birth}
+                                                       disabled={!this.editMode}
+                                                       onChange={event => this.changeStateItem("birth", event)}
+                                            />
+                                        </Grid>
                                     </Grid>
-                                    <Grid item>
-                                        <TextField
-                                            select
-                                            margin={"normal"}
-                                            fullWidth
-                                            label="Anrede"
-                                            value={this.state.title}
-                                            helperText="Eine gewünschte Anrede auswählen"
-                                            variant="outlined"
-                                            disabled={!this.editMode}
-                                            onChange={this.handleChange}
-                                        >
-                                            {titles().map((option) => (
-                                                <MenuItem key={option.value}
-                                                          value={option.value}>
-                                                    {option.label}
-                                                </MenuItem>
-                                            ))}
-                                        </TextField>
+                                </Card>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Card style={padding(18)}>
+                                    <Grid
+                                        container
+                                        direction="column">
+                                        <Grid item fullWidth>
+                                            <div style={{
+                                                textAlign: "start",
+                                                fontSize: 22,
+                                                marginBottom: 3
+                                            }}>
+                                                Account Daten
+                                            </div>
+                                        </Grid>
+                                        <Grid item>
+                                            <TextField required
+                                                       type="email" label="E-MailAdresse"
+                                                       variant="outlined" margin={"normal"}
+                                                       onChange={event => this.setState({email: event.target.value.trim()})}
+                                                       error={this.checkEmail()}
+                                                       value={this.state.email}
+                                                       disabled={!this.editMode}
+                                                       helperText={this.emailError ? "Bitte eine Korrekte E-MailAdresse eingeben" : ""}
+                                                       fullWidth/>
+                                        </Grid>
+                                        < Grid item>
+                                            <FormControl margin={"normal"}
+                                                         fullWidth
+                                                         variant="outlined">
+                                                <InputLabel required>Passwort</InputLabel>
+                                                <OutlinedInput
+                                                    type={this.showPassword ? 'text' : 'password'}
+                                                    value={this.passwordState.password}
+                                                    disabled={!this.editMode}
+                                                    onChange={this.handlePasswordChange("password")}
+                                                    endAdornment={
+                                                        <InputAdornment position="end">
+                                                            <IconButton
+                                                                onClick={() => {
+                                                                    this.showPassword = !this.showPassword;
+                                                                    this.forceUpdate()
+                                                                }}
+                                                                onMouseDown={(event) => {
+                                                                    event.preventDefault();
+                                                                }}
+                                                                edge="end">
+                                                                {this.showPassword ?
+                                                                    <VisibilityOff/> :
+                                                                    <Visibility/>}
+                                                            </IconButton>
+                                                        </InputAdornment>
+                                                    }
+                                                    labelWidth={78}
+                                                />
+                                            </FormControl>
+                                        </Grid>
+                                        {this.editMode && < Grid item>
+                                            <FormControl margin={"normal"}
+                                                         fullWidth
+                                                         variant="outlined">
+                                                <InputLabel required error={this.passwordError}>Passwort
+                                                    Wiederholen</InputLabel>
+                                                <OutlinedInput
+                                                    type={this.showPassword ? 'text' : 'password'}
+                                                    value={this.passwordState.passwordRepeat}
+                                                    error={this.passwordError}
+                                                    disabled={!this.editMode}
+                                                    onChange={this.handlePasswordChange("passwordRepeat")}
+                                                    endAdornment={
+                                                        <InputAdornment position="end">
+                                                            <IconButton
+                                                                onClick={() => {
+                                                                    this.showPassword = !this.showPassword;
+                                                                    this.forceUpdate()
+                                                                }}
+                                                                onMouseDown={(event) => {
+                                                                    event.preventDefault();
+                                                                }}
+                                                                edge="end">
+                                                                {this.showPassword ?
+                                                                    <VisibilityOff/> :
+                                                                    <Visibility/>}
+                                                            </IconButton>
+                                                        </InputAdornment>
+                                                    }
+                                                    labelWidth={175}
+                                                />
+                                                <FormHelperText
+                                                    error={this.passwordError}> {this.passwordError ? "Die Passwörter müssen übereinstimmen" : ""}</FormHelperText>
+                                            </FormControl>
+                                        </Grid>}
 
                                     </Grid>
-                                    <Grid item fullWidth>
-                                        <Grid
-                                            container
-                                            spacing={2}>
-                                            <Grid item md sm={12} xs={12}>
-                                                <TextField required
-                                                           fullWidth
-                                                           label="Vorname"
-                                                           variant="outlined"
-                                                           onChange={event => this.changeStateItem("firstName", event)}
-                                                           value={this.state.firstName}
-                                                           disabled={!this.editMode}
-                                                           margin={"normal"}/>
+                                </Card>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Card style={padding(18)}>
+                                    <Grid
+                                        container
+                                        direction="column">
+                                        <Grid item fullWidth>
+                                            <div style={{
+                                                textAlign: "start",
+                                                fontSize: 22,
+                                                marginBottom: 3
+                                            }}>
+                                                Adressen
+                                            </div>
+                                        </Grid>
+                                        <Grid item fullWidth>
+                                            <Grid
+                                                container
+                                                spacing={2}>
+                                                <Grid item md={10} sm={12} xs={12}>
+                                                    <TextField fullWidth
+                                                               label="Straße"
+                                                               variant="outlined"
+                                                               value={this.state.street}
+                                                               disabled={!this.editMode}
+                                                               onChange={event => this.setState({street: event.target.value.trim()})}
+                                                               margin={"normal"}/>
+                                                </Grid>
+                                                <Grid item md={2} sm={12} xs={12}>
+                                                    <TextField fullWidth
+                                                               label="Nr."
+                                                               variant="outlined"
+                                                               value={this.state.streetNumber}
+                                                               disabled={!this.editMode}
+                                                               onChange={event => this.setState({streetNumber: event.target.value.trim()})}
+                                                               margin={"normal"}/>
+                                                </Grid>
                                             </Grid>
-                                            <Grid item md sm={12} xs={12}>
-                                                <TextField required
-                                                           fullWidth
-                                                           label="Nachname"
-                                                           variant="outlined"
-                                                           onChange={event => this.changeStateItem("lastName", event)}
-                                                           value={this.state.lastName}
-                                                           disabled={!this.editMode}
-                                                           margin={"normal"}/>
+                                        </Grid>
+                                        <Grid item fullWidth>
+                                            <Grid
+                                                container
+                                                spacing={2}>
+                                                <Grid item md={3} sm={12} xs={12}>
+                                                    <TextField fullWidth
+                                                               label="PLZ"
+                                                               variant="outlined"
+                                                               value={this.state.postalCode}
+                                                               disabled={!this.editMode}
+                                                               onChange={event => this.setState({postalCode: event.target.value.trim()})}
+                                                               margin={"normal"}/>
+                                                </Grid>
+                                                <Grid item md={9} sm={12} xs={12}>
+                                                    <TextField fullWidth
+                                                               label="Ort"
+                                                               variant="outlined"
+                                                               value={this.state.town}
+                                                               disabled={!this.editMode}
+                                                               onChange={event => this.setState({town: event.target.value.trim()})}
+                                                               margin={"normal"}/>
+                                                </Grid>
                                             </Grid>
                                         </Grid>
                                     </Grid>
-                                    <Grid item
-                                          fullWidth>
-                                        <TextField required
-                                                   label="Geburtsdatum"
-                                                   type="date"
-                                                   variant="outlined"
-                                                   margin={"normal"}
-                                                   fullWidth
-                                                   value={this.state.birth}
-                                                   disabled={!this.editMode}
-                                                   onChange={event => this.changeStateItem("birth", event)}
-                                        />
-                                    </Grid>
-                                </Grid>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Card style={padding(18)}>
-                                <Grid
-                                    container
-                                    direction="column">
-                                    <Grid item fullWidth>
-                                        <div style={{
-                                            textAlign: "start",
-                                            fontSize: 22,
-                                            marginBottom: 3
-                                        }}>
-                                            Account Daten
-                                        </div>
-                                    </Grid>
+                                </Card>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Grid container ref={element => this.scrollHelper.third = element}
+                                      wrap={"wrap-reverse"}
+                                      direction="row"
+                                      justify="flex-end"
+                                      spacing={3}>
                                     <Grid item>
-                                        <TextField required
-                                                   type="email" label="E-MailAdresse"
-                                                   variant="outlined" margin={"normal"}
-                                                   onChange={event => this.setState({email: event.target.value.trim()})}
-                                                   error={this.checkEmail()}
-                                                   value={this.state.email}
-                                                   disabled={!this.editMode}
-                                                   helperText={this.emailError ? "Bitte eine Korrekte E-MailAdresse eingeben" : ""}
-                                                   fullWidth/>
+                                        <DeleteAccountButton/>
                                     </Grid>
-                                    < Grid item>
-                                        <FormControl margin={"normal"}
-                                                     fullWidth
-                                                     variant="outlined">
-                                            <InputLabel required>Passwort</InputLabel>
-                                            <OutlinedInput
-                                                type={this.showPassword ? 'text' : 'password'}
-                                                value={this.passwordState.password}
-                                                disabled={!this.editMode}
-                                                onChange={this.handlePasswordChange("password")}
-                                                endAdornment={
-                                                    <InputAdornment position="end">
-                                                        <IconButton
-                                                            onClick={() => {
-                                                                this.showPassword = !this.showPassword;
-                                                                this.forceUpdate()
-                                                            }}
-                                                            onMouseDown={(event) => {
-                                                                event.preventDefault();
-                                                            }}
-                                                            edge="end">
-                                                            {this.showPassword ?
-                                                                <VisibilityOff/> :
-                                                                <Visibility/>}
-                                                        </IconButton>
-                                                    </InputAdornment>
-                                                }
-                                                labelWidth={78}
-                                            />
-                                        </FormControl>
+                                    <Grid item xs>
+                                        <ModeButtons context={this}/>
                                     </Grid>
-                                    {this.editMode && < Grid item>
-                                        <FormControl margin={"normal"}
-                                                     fullWidth
-                                                     variant="outlined">
-                                            <InputLabel required error={this.passwordError}>Passwort
-                                                Wiederholen</InputLabel>
-                                            <OutlinedInput
-                                                type={this.showPassword ? 'text' : 'password'}
-                                                value={this.passwordState.passwordRepeat}
-                                                error={this.passwordError}
-                                                disabled={!this.editMode}
-                                                onChange={this.handlePasswordChange("passwordRepeat")}
-                                                endAdornment={
-                                                    <InputAdornment position="end">
-                                                        <IconButton
-                                                            onClick={() => {
-                                                                this.showPassword = !this.showPassword;
-                                                                this.forceUpdate()
-                                                            }}
-                                                            onMouseDown={(event) => {
-                                                                event.preventDefault();
-                                                            }}
-                                                            edge="end">
-                                                            {this.showPassword ?
-                                                                <VisibilityOff/> :
-                                                                <Visibility/>}
-                                                        </IconButton>
-                                                    </InputAdornment>
-                                                }
-                                                labelWidth={175}
-                                            />
-                                            <FormHelperText
-                                                error={this.passwordError}> {this.passwordError ? "Die Passwörter müssen übereinstimmen" : ""}</FormHelperText>
-                                        </FormControl>
-                                    </Grid>}
-
-                                </Grid>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Card style={padding(18)}>
-                                <Grid
-                                    container
-                                    direction="column">
-                                    <Grid item fullWidth>
-                                        <div style={{
-                                            textAlign: "start",
-                                            fontSize: 22,
-                                            marginBottom: 3
-                                        }}>
-                                            Adressen
-                                        </div>
-                                    </Grid>
-                                    <Grid item fullWidth>
-                                        <Grid
-                                            container
-                                            spacing={2}>
-                                            <Grid item md={10} sm={12} xs={12}>
-                                                <TextField fullWidth
-                                                           label="Straße"
-                                                           variant="outlined"
-                                                           value={this.state.street}
-                                                           disabled={!this.editMode}
-                                                           onChange={event => this.setState({street: event.target.value.trim()})}
-                                                           margin={"normal"}/>
-                                            </Grid>
-                                            <Grid item md={2} sm={12} xs={12}>
-                                                <TextField fullWidth
-                                                           label="Nr."
-                                                           variant="outlined"
-                                                           value={this.state.streetNumber}
-                                                           disabled={!this.editMode}
-                                                           onChange={event => this.setState({streetNumber: event.target.value.trim()})}
-                                                           margin={"normal"}/>
-                                            </Grid>
-                                        </Grid>
-                                    </Grid>
-                                    <Grid item fullWidth>
-                                        <Grid
-                                            container
-                                            spacing={2}>
-                                            <Grid item md={3} sm={12} xs={12}>
-                                                <TextField fullWidth
-                                                           label="PLZ"
-                                                           variant="outlined"
-                                                           value={this.state.postalCode}
-                                                           disabled={!this.editMode}
-                                                           onChange={event => this.setState({postalCode: event.target.value.trim()})}
-                                                           margin={"normal"}/>
-                                            </Grid>
-                                            <Grid item md={9} sm={12} xs={12}>
-                                                <TextField fullWidth
-                                                           label="Ort"
-                                                           variant="outlined"
-                                                           value={this.state.town}
-                                                           disabled={!this.editMode}
-                                                           onChange={event => this.setState({town: event.target.value.trim()})}
-                                                           margin={"normal"}/>
-                                            </Grid>
-                                        </Grid>
-                                    </Grid>
-                                </Grid>
-                            </Card>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Grid container ref={element => this.scrollHelper.third = element}
-                                  wrap={"wrap-reverse"}
-                                  direction="row"
-                                  justify="flex-end"
-                                  spacing={3}>
-                                <Grid item>
-                                    <DeleteAccountButton/>
-                                </Grid>
-                                <Grid item xs>
-                                    <ModeButtons context={this}/>
                                 </Grid>
                             </Grid>
+                            <Grid item>
+                                <div style={{marginBottom: 8}}/>
+                            </Grid>
+                            {/*<LogoutAccountButton context={this}/>*/}
                         </Grid>
-                        <Grid item>
-                            <div style={{marginBottom: 8}}/>
-                        </Grid>
-                        {/*<LogoutAccountButton context={this}/>*/}
-                    </Grid>
-                </div>
-            </div>;
+                    </div>
+                </MenuDrawer>
+            )
         } else {
             return <NavigationComponent to={"/login"}/>;
         }
@@ -352,10 +344,6 @@ class Profile extends Component {
             if (this.scrollHelper.third)
                 window.scrollBy(0, this.scrollHelper.third.getBoundingClientRect().top - this.scrollHelper.second)
         }
-    }
-
-    componentWillUnmount() {
-        removeDrawerCallback(this.drawerCallback)
     }
 
     // ---------------

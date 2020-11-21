@@ -9,11 +9,6 @@ import {
     IconButton, Typography,
 } from "@material-ui/core";
 import MenuDrawer from "./MenuDrawer";
-import {
-    addDrawerCallback,
-    getDrawerState,
-    removeDrawerCallback
-} from "../services/StorageUtil";
 import {padding, showToast} from "../Utilities/Utilities";
 import SimpleReactFileUpload from "./SimpleReactFileUpload";
 import {Combobox, DropdownList} from 'react-widgets'
@@ -24,7 +19,7 @@ import {
     base64ToDataUri,
     ContextType, filterArticle,
     LazyImage,
-    Pair,
+    Pair, RestrictedPage,
     Triple
 } from "../Utilities/TsUtilities";
 import {Save} from "@material-ui/icons";
@@ -154,329 +149,282 @@ export default class EditArticles extends React.Component<IProps, IState> {
     render() {
         const priceError: boolean = this.checkPrice(this.state.price);
         const eanError: boolean = !/^(-1|\d{8}|\d{13})$/.test(this.state.ean + "");
-        // if (this.imageReloadFile) {
-        //     debugger
-        //     this.imageReloadFile()
-        // }
-
-        if ("")
-            return <MenuDrawer>
-                <Typography paragraph>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                    incididunt
-                    ut labore et dolore magna aliqua. Rhoncus dolor purus non enim praesent
-                    elementum
-                    facilisis leo vel. Risus at ultrices mi tempus imperdiet. Semper risus in
-                    hendrerit
-                    gravida rutrum quisque non tellus. Convallis convallis tellus id interdum velit
-                    laoreet id
-                    donec ultrices. Odio morbi quis commodo odio aenean sed adipiscing. Amet nisl
-                    suscipit
-                    adipiscing bibendum est ultricies integer quis. Cursus euismod quis viverra nibh
-                    cras.
-                    Metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Mauris
-                    commodo quis
-                    imperdiet massa tincidunt. Cras tincidunt lobortis feugiat vivamus at augue. At
-                    augue eget
-                    arcu dictum varius duis at consectetur lorem. Velit sed ullamcorper morbi
-                    tincidunt. Lorem
-                    donec massa sapien faucibus et molestie ac.
-                </Typography>
-                <Typography paragraph>
-                    Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper eget
-                    nulla
-                    facilisi etiam dignissim diam. Pulvinar elementum integer enim neque volutpat ac
-                    tincidunt. Ornare suspendisse sed nisi lacus sed viverra tellus. Purus sit amet
-                    volutpat
-                    consequat mauris. Elementum eu facilisis sed odio morbi. Euismod lacinia at quis
-                    risus sed
-                    vulputate odio. Morbi tincidunt ornare massa eget egestas purus viverra accumsan
-                    in. In
-                    hendrerit gravida rutrum quisque non tellus orci ac. Pellentesque nec nam
-                    aliquam sem et
-                    tortor. Habitant morbi tristique senectus et. Adipiscing elit duis tristique
-                    sollicitudin
-                    nibh sit. Ornare aenean euismod elementum nisi quis eleifend. Commodo viverra
-                    maecenas
-                    accumsan lacus vel facilisis. Nulla posuere sollicitudin aliquam ultrices
-                    sagittis orci a.
-                </Typography>
-            </MenuDrawer>
 
         return (
-            <div>
+            <RestrictedPage>
                 <MenuDrawer>
-                <div style={{
-                    marginTop: 5,
-                    display: 'flex',
-                    justifyContent: 'center'
-                }}>
-                    <Grid container
-                          style={{width: '85%', maxWidth: "800px"}}
-                          spacing={3}>
-                        <Grid item xs={12}>
-                            <Typography style={{
-                                color: "rgba(0, 0, 0, 0.54)",
-                                fontWeight: 500
-                            }}>Artikel</Typography>
-                            <Combobox busy={this.articles.length === 0}
-                                      suggest
-                                      textField={(dataItem: Article | string) => typeof dataItem === 'string' ? dataItem :
-                                          'i: ' + dataItem.id +
-                                          ' | t: ' + dataItem.title +
-                                          ' | a: ' + dataItem.artists.name +
-                                          ' | g: ' + dataItem.genre.name +
-                                          ' | p: ' + dataItem.price +
-                                          ' | e: ' + dataItem.ean
-                                      }
-                                      itemComponent={({item}) => {
-                                          if ("true")
+                    <div style={{
+                        marginTop: 5,
+                        display: 'flex',
+                        justifyContent: 'center'
+                    }}>
+                        <Grid container
+                              style={{width: '85%', maxWidth: "800px"}}
+                              spacing={3}>
+                            <Grid item xs={12}>
+                                <Typography style={{
+                                    color: "rgba(0, 0, 0, 0.54)",
+                                    fontWeight: 500
+                                }}>Artikel</Typography>
+                                <Combobox busy={this.articles.length === 0}
+                                          suggest
+                                          textField={(dataItem: Article | string) => typeof dataItem === 'string' ? dataItem :
+                                              'i: ' + dataItem.id +
+                                              ' | t: ' + dataItem.title +
+                                              ' | a: ' + dataItem.artists.name +
+                                              ' | g: ' + dataItem.genre.name +
+                                              ' | p: ' + dataItem.price +
+                                              ' | e: ' + dataItem.ean
+                                          }
+                                          itemComponent={({item}) => {
+                                              if ("true")
+                                                  return (
+                                                      <table>
+                                                          <tr>
+                                                              <td title={"ID"} style={{
+                                                                  width: "60px",
+                                                                  textAlign: "left"
+                                                              }}>
+                                                                  <strong>i: </strong>
+                                                                  {item.id}
+                                                              </td>
+                                                              <td title={"Titel"} style={{
+                                                                  width: "210px",
+                                                                  textAlign: "left"
+                                                              }}>
+                                                                  <strong>t: </strong>
+                                                                  {item.title}
+                                                              </td>
+                                                              <td title={"Künstler"} style={{
+                                                                  width: "123px",
+                                                                  textAlign: "left"
+                                                              }}>
+                                                                  <strong>a: </strong>
+                                                                  {item.artists.name}
+                                                              </td>
+                                                              <td title={"Genre"} style={{
+                                                                  width: "123px",
+                                                                  textAlign: "left"
+                                                              }}>
+                                                                  <strong>g: </strong>
+                                                                  {item.genre.name}
+                                                              </td>
+                                                              <td title={"Preis"} style={{
+                                                                  width: "90px",
+                                                                  textAlign: "left"
+                                                              }}>
+                                                                  <strong>p: </strong>
+                                                                  {item.price}
+                                                              </td>
+                                                              <td title={"EAN"} style={{
+                                                                  width: "100px",
+                                                                  textAlign: "left"
+                                                              }}>
+                                                                  <strong>e: </strong>
+                                                                  {item.ean}
+                                                              </td>
+                                                          </tr>
+                                                      </table>
+                                                  )
                                               return (
-                                                  <table>
-                                                      <tr>
-                                                          <td title={"ID"} style={{
-                                                              width: "60px",
-                                                              textAlign: "left"
-                                                          }}>
-                                                              <strong>i: </strong>
-                                                              {item.id}
-                                                          </td>
-                                                          <td title={"Titel"} style={{
-                                                              width: "210px",
-                                                              textAlign: "left"
-                                                          }}>
-                                                              <strong>t: </strong>
-                                                              {item.title}
-                                                          </td>
-                                                          <td title={"Künstler"} style={{
-                                                              width: "123px",
-                                                              textAlign: "left"
-                                                          }}>
-                                                              <strong>a: </strong>
-                                                              {item.artists.name}
-                                                          </td>
-                                                          <td title={"Genre"} style={{
-                                                              width: "123px",
-                                                              textAlign: "left"
-                                                          }}>
-                                                              <strong>g: </strong>
-                                                              {item.genre.name}
-                                                          </td>
-                                                          <td title={"Preis"} style={{
-                                                              width: "90px",
-                                                              textAlign: "left"
-                                                          }}>
-                                                              <strong>p: </strong>
-                                                              {item.price}
-                                                          </td>
-                                                          <td title={"EAN"} style={{
-                                                              width: "100px",
-                                                              textAlign: "left"
-                                                          }}>
-                                                              <strong>e: </strong>
-                                                              {item.ean}
-                                                          </td>
-                                                      </tr>
-                                                  </table>
-                                              )
-                                          return (
-                                              <div>
-                                                  <strong>i: </strong>
-                                                  {item.id + " | "}
-                                                  <strong>t: </strong>
-                                                  {item.title + " | "}
-                                                  <strong>a: </strong>
-                                                  {item.artists.name + " | "}
-                                                  <strong>g: </strong>
-                                                  {item.genre.name + " | "}
-                                                  <strong>p: </strong>
-                                                  {item.price + " | "}
-                                                  <strong>e: </strong>
-                                                  {item.ean}
-                                              </div>
-                                          );
-                                      }}
-                                      filter={(dataItem: Article, searchItem: string): boolean => {
-                                          searchItem = searchItem.toLowerCase().replaceAll("|", "&");
+                                                  <div>
+                                                      <strong>i: </strong>
+                                                      {item.id + " | "}
+                                                      <strong>t: </strong>
+                                                      {item.title + " | "}
+                                                      <strong>a: </strong>
+                                                      {item.artists.name + " | "}
+                                                      <strong>g: </strong>
+                                                      {item.genre.name + " | "}
+                                                      <strong>p: </strong>
+                                                      {item.price + " | "}
+                                                      <strong>e: </strong>
+                                                      {item.ean}
+                                                  </div>
+                                              );
+                                          }}
+                                          filter={(dataItem: Article, searchItem: string): boolean => {
+                                              searchItem = searchItem.toLowerCase().replaceAll("|", "&");
 
-                                          return filterArticle(searchItem, dataItem);
-                                      }}
-                                      onSelect={(article: Article) => {
-                                          this.currentPicture = undefined;
-                                          this.setState({
-                                              id: article.id,
-                                              title: article.title,
-                                              price: article.price,
-                                              artists: article.artists,
-                                              genre: article.genre,
-                                              ean: article.ean,
-                                              description: article.description
-                                          })
-                                      }}
-                                      data={this.articles}
-                                      defaultValue={this.state.id !== -1 ? this.state : undefined}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Card style={padding(18)}>
-                                <Grid container spacing={2}>
-                                    <Grid item md={9} sm={12}>
-                                        <TextField fullWidth
-                                                   value={this.state.title}
-                                                   label={"Album Titel"}
-                                                   onChange={event => this.setState({title: event.target.value})}
-                                                   variant={"outlined"}/>
-                                    </Grid>
-                                    <Grid item md={3} sm={12}>
-                                        <TextField fullWidth
-                                                   variant="outlined"
-                                                   onChange={event => {
-                                                       let newPrice = event.target.value;
-                                                       if (newPrice.length === 0 || /^(\d+([.,]\d{0,2})?)$/.test(newPrice))
-                                                           this.setState({price: newPrice});
-                                                   }}
-                                                   error={priceError}
-                                                   helperText={priceError ? "Nicht Valide" : ""}
-                                                   label={"Preis"}
-                                                   value={this.state.price}
-                                                   InputProps={{
-                                                       endAdornment: <InputAdornment
-                                                           position="end">€</InputAdornment>,
-                                                   }}
-                                        />
-                                    </Grid>
-                                    <Grid item md={6} sm={12}>
-                                        <Typography style={{
-                                            color: "rgba(0, 0, 0, 0.54)",
-                                            fontWeight: 500
-                                        }}>Künstler</Typography>
-                                        <Grid container style={{alignItems: "center"}} spacing={1}>
-                                            <Grid item xs={11}>
-                                                <Combobox busy={this.articles.length === 0}
-                                                          name={"Künstler"}
-                                                          textField={"name"}
-                                                          filter={"contains"}
-                                                          placeholder={"Künstler eingeben"}
-                                                          onChange={value => this.setState({artists: value})}
-                                                          value={this.state.artists}
-                                                          data={this.artists}
-                                                />
-                                            </Grid>
-                                            <Grid item xs={1}>
-                                                <DialogComponent context={this}/>
-                                            </Grid>
-
+                                              return filterArticle(searchItem, dataItem);
+                                          }}
+                                          onSelect={(article: Article) => {
+                                              this.currentPicture = undefined;
+                                              this.setState({
+                                                  id: article.id,
+                                                  title: article.title,
+                                                  price: article.price,
+                                                  artists: article.artists,
+                                                  genre: article.genre,
+                                                  ean: article.ean,
+                                                  description: article.description
+                                              })
+                                          }}
+                                          data={this.articles}
+                                          defaultValue={this.state.id !== -1 ? this.state : undefined}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Card style={padding(18)}>
+                                    <Grid container spacing={2}>
+                                        <Grid item md={9} sm={12}>
+                                            <TextField fullWidth
+                                                       value={this.state.title}
+                                                       label={"Album Titel"}
+                                                       onChange={event => this.setState({title: event.target.value})}
+                                                       variant={"outlined"}/>
                                         </Grid>
-                                    </Grid>
-                                    <Grid item md={6} sm={12}>
-                                        <Typography style={{
-                                            color: "rgba(0, 0, 0, 0.54)",
-                                            fontWeight: 500
-                                        }}>Genre</Typography>
-                                        <Combobox busy={this.articles.length === 0}
-                                                  textField={"name"}
-                                                  filter={"contains"}
-                                                  placeholder={"Genre eingeben"}
-                                                  onChange={value => this.setState({genre: value})}
-                                                  value={this.state.genre}
-                                                  data={this.genres}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField fullWidth
-                                                   multiline
-                                                   style={{height: "100%"}}
-                                                   value={this.state.description ? this.state.description : ""}
-                                                   onChange={event => this.setState({description: event.target.value})}
-                                                   label={"Beschreibung"}
-                                                   variant={"outlined"}/>
-                                    </Grid>
-                                    <Grid item md={8} sm={12}>
-                                        <Typography style={{
-                                            color: "rgba(0, 0, 0, 0.54)",
-                                            fontWeight: 500
-                                        }}variant="h6">Album Cover</Typography>
-                                        <div style={{width: 250, height: 250}}>
-                                            <div style={{
-                                                width: 250,
-                                                height: 250,
-                                                zIndex: 1,
-                                                position: "absolute"
-                                            }}>
-                                                <LazyImage
-                                                    style={{
-                                                        width: "100%",
-                                                        height: "100%",
-                                                        zIndex: 5
-                                                    }}
-                                                    rounded
-                                                    alt={this.state.title}
-                                                    payload={Pair.make(this.state.id, this.currentPicture)}
-                                                    shouldImageUpdate={(oldPayload: Pair<number, File>, newPayload: Pair<number, File>) => {
-                                                        return oldPayload.first !== newPayload.first || oldPayload.second !== newPayload.second
-                                                    }}
-                                                    getSrc={setImgSrc => {
-                                                        if (this.currentPicture) {
-                                                            setImgSrc(URL.createObjectURL(this.currentPicture));
-                                                            this.setFileUploaDefaultdVisibility(false);
-                                                        } else if (this.state.id !== -1) {
-                                                            this.loadSingleImage(this.state.id, imageResponse => {
-                                                                if (imageResponse) {
-                                                                    setImgSrc(base64ToDataUri(imageResponse.file));
-                                                                    this.setFileUploaDefaultdVisibility(false);
-                                                                } else
-                                                                    this.setFileUploaDefaultdVisibility(true);
-                                                            });
-                                                        } else
-                                                            this.setFileUploaDefaultdVisibility(true);
+                                        <Grid item md={3} sm={12}>
+                                            <TextField fullWidth
+                                                       variant="outlined"
+                                                       onChange={event => {
+                                                           let newPrice = event.target.value;
+                                                           if (newPrice.length === 0 || /^(\d+([.,]\d{0,2})?)$/.test(newPrice))
+                                                               this.setState({price: newPrice});
+                                                       }}
+                                                       error={priceError}
+                                                       helperText={priceError ? "Nicht Valide" : ""}
+                                                       label={"Preis"}
+                                                       value={this.state.price}
+                                                       InputProps={{
+                                                           endAdornment: <InputAdornment
+                                                               position="end">€</InputAdornment>,
+                                                       }}
+                                            />
+                                        </Grid>
+                                        <Grid item md={6} sm={12}>
+                                            <Typography style={{
+                                                color: "rgba(0, 0, 0, 0.54)",
+                                                fontWeight: 500
+                                            }}>Künstler</Typography>
+                                            <Grid container style={{alignItems: "center"}}
+                                                  spacing={1}>
+                                                <Grid item xs={11}>
+                                                    <Combobox busy={this.articles.length === 0}
+                                                              name={"Künstler"}
+                                                              textField={"name"}
+                                                              filter={"contains"}
+                                                              placeholder={"Künstler eingeben"}
+                                                              onChange={value => this.setState({artists: value})}
+                                                              value={this.state.artists}
+                                                              data={this.artists}
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={1}>
+                                                    <DialogComponent context={this}/>
+                                                </Grid>
 
-                                                    }}
-                                                />
-                                            </div>
-                                            <div style={{
-                                                width: 250,
-                                                height: 250,
-                                                zIndex: 2,
-                                                position: "absolute",
-                                            }}>
-                                                <SimpleReactFileUpload
-                                                    onFileSelected={(file: File) => {
-                                                        this.currentPicture = file;
-                                                        this.forceUpdate();
-                                                    }}
-                                                    setDefaultVisibility={((setVisibility: (visibility: boolean) => void) => this.setFileUploaDefaultdVisibility = setVisibility)}
-                                                />
-                                            </div>
-                                        </div>
-                                    </Grid>
-                                    <Grid item md={4} sm={12}>
-                                        <TextField fullWidth
-                                                   value={this.state.ean === -1 ? "" : this.state.ean}
-                                                   onChange={event => {
-                                                       let newValue = event.target.value;
-                                                       if (/\d*/.test(newValue))
-                                                           this.setState({ean: newValue ? +newValue : -1});
-                                                   }}
-                                                   error={eanError}
-                                                   helperText={eanError ? "Keine valide EAN" : ""}
-                                                   label={"EAN"}
-                                                   variant={"outlined"}/>
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <Grid container justify="flex-end">
-                                            <Grid item>
-                                                <ActionButtons context={this}/>
                                             </Grid>
                                         </Grid>
-                                    </Grid>
+                                        <Grid item md={6} sm={12}>
+                                            <Typography style={{
+                                                color: "rgba(0, 0, 0, 0.54)",
+                                                fontWeight: 500
+                                            }}>Genre</Typography>
+                                            <Combobox busy={this.articles.length === 0}
+                                                      textField={"name"}
+                                                      filter={"contains"}
+                                                      placeholder={"Genre eingeben"}
+                                                      onChange={value => this.setState({genre: value})}
+                                                      value={this.state.genre}
+                                                      data={this.genres}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <TextField fullWidth
+                                                       multiline
+                                                       style={{height: "100%"}}
+                                                       value={this.state.description ? this.state.description : ""}
+                                                       onChange={event => this.setState({description: event.target.value})}
+                                                       label={"Beschreibung"}
+                                                       variant={"outlined"}/>
+                                        </Grid>
+                                        <Grid item md={8} sm={12}>
+                                            <Typography style={{
+                                                color: "rgba(0, 0, 0, 0.54)",
+                                                fontWeight: 500
+                                            }} variant="h6">Album Cover</Typography>
+                                            <div style={{width: 250, height: 250}}>
+                                                <div style={{
+                                                    width: 250,
+                                                    height: 250,
+                                                    zIndex: 1,
+                                                    position: "absolute"
+                                                }}>
+                                                    <LazyImage
+                                                        style={{
+                                                            width: "100%",
+                                                            height: "100%",
+                                                            zIndex: 5
+                                                        }}
+                                                        rounded
+                                                        alt={this.state.title}
+                                                        payload={Pair.make(this.state.id, this.currentPicture)}
+                                                        shouldImageUpdate={(oldPayload: Pair<number, File>, newPayload: Pair<number, File>) => {
+                                                            return oldPayload.first !== newPayload.first || oldPayload.second !== newPayload.second
+                                                        }}
+                                                        getSrc={setImgSrc => {
+                                                            if (this.currentPicture) {
+                                                                setImgSrc(URL.createObjectURL(this.currentPicture));
+                                                                this.setFileUploaDefaultdVisibility(false);
+                                                            } else if (this.state.id !== -1) {
+                                                                this.loadSingleImage(this.state.id, imageResponse => {
+                                                                    if (imageResponse) {
+                                                                        setImgSrc(base64ToDataUri(imageResponse.file));
+                                                                        this.setFileUploaDefaultdVisibility(false);
+                                                                    } else
+                                                                        this.setFileUploaDefaultdVisibility(true);
+                                                                });
+                                                            } else
+                                                                this.setFileUploaDefaultdVisibility(true);
 
-                                </Grid>
-                            </Card>
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div style={{
+                                                    width: 250,
+                                                    height: 250,
+                                                    zIndex: 2,
+                                                    position: "absolute",
+                                                }}>
+                                                    <SimpleReactFileUpload
+                                                        onFileSelected={(file: File) => {
+                                                            this.currentPicture = file;
+                                                            this.forceUpdate();
+                                                        }}
+                                                        setDefaultVisibility={((setVisibility: (visibility: boolean) => void) => this.setFileUploaDefaultdVisibility = setVisibility)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </Grid>
+                                        <Grid item md={4} sm={12}>
+                                            <TextField fullWidth
+                                                       value={this.state.ean === -1 ? "" : this.state.ean}
+                                                       onChange={event => {
+                                                           let newValue = event.target.value;
+                                                           if (/\d*/.test(newValue))
+                                                               this.setState({ean: newValue ? +newValue : -1});
+                                                       }}
+                                                       error={eanError}
+                                                       helperText={eanError ? "Keine valide EAN" : ""}
+                                                       label={"EAN"}
+                                                       variant={"outlined"}/>
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Grid container justify="flex-end">
+                                                <Grid item>
+                                                    <ActionButtons context={this}/>
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
+
+                                    </Grid>
+                                </Card>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </div>
+                    </div>
                 </MenuDrawer>
-            </div>
+            </RestrictedPage>
         )
     }
 

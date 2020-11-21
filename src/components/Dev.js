@@ -13,12 +13,7 @@ import {
 import MenuDrawer from "./MenuDrawer";
 import Box from "@material-ui/core/Box";
 import {Visibility, VisibilityOff} from "@material-ui/icons";
-import {
-    addDrawerCallback,
-    getDrawerState,
-    isDrawerVisible,
-    removeDrawerCallback
-} from "../services/StorageUtil";
+import {RestrictedPage, ROLES} from "../Utilities/TsUtilities";
 
 class Dev extends React.Component {
 
@@ -29,48 +24,30 @@ class Dev extends React.Component {
         "DELETE": "#f93e3e"
     };
 
-    drawerState = getDrawerState();
-
-    drawerCallback = state => {
-        this.drawerState = state;
-        this.forceUpdate()
-    };
-
-    constructor(props) {
-        super(props);
-        addDrawerCallback(this.drawerCallback)
-    }
-
-
     render() {
         return (
-            <div>
-                <MenuDrawer/>
-                <div style={{
-                    marginTop: 8,
-                    marginInlineStart: (this.drawerState ? 240 : 0),
-                    display: 'flex',
-                    justifyContent: 'center'
-                }}>
-                    <Grid container
-                          style={{width: '85%', maxWidth: "800px"}}
-                          spacing={5}>
-                        {this.generateComponents()}
-                    </Grid>
-                </div>
-            </div>
+            <RestrictedPage /*roleLevel={ROLES.ADMIN}*/>
+                <MenuDrawer>
+                    <div style={{
+                        marginTop: 8,
+                        display: 'flex',
+                        justifyContent: 'center'
+                    }}>
+                        <Grid container
+                              style={{width: '85%', maxWidth: "800px"}}
+                              spacing={5}>
+                            {this.generateComponents()}
+                        </Grid>
+                    </div>
+                </MenuDrawer>
+            </RestrictedPage>
         )
-    }
-
-    componentWillUnmount() {
-        removeDrawerCallback(this.drawerCallback)
     }
 
     // ---------------
 
     generateComponents() {
         return (
-
             this.allComponents.map(category => {
                 return (
                     <Grid item xs={12}>

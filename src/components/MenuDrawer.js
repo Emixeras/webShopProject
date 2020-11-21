@@ -37,6 +37,7 @@ import {logoutUser} from "../services/UserApiUtil";
 import {isMobile, showToast} from "../Utilities/Utilities";
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import EditIcon from '@material-ui/icons/Edit';
+import {hasCurrentUserRoleLevel, Pair} from "../Utilities/TsUtilities";
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -96,6 +97,36 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+
+//  ------------------------- Drawer-Callbacks ------------------------->
+const drawerStateCallbackList = require("collections/list")();
+
+/**
+ * @param {function} drawerCallback Der hinzuzufügende Clallback
+ * @param {'before' | 'after' | 'both' } [type] Wann wird der Callback aufgerufen
+ */
+export function addDrawerCallback(drawerCallback, type = 'after') {
+    drawerStateCallbackList.push(Pair.make(drawerCallback, type))
+}
+
+/**
+ * @param {function} drawerCallback Der selbe Clallback wie beim Hinzufügen
+ */
+
+export function removeDrawerCallback(drawerCallback) {
+    drawerStateCallbackList.delete(drawerCallback, (inList, toDelete) => inList.first === toDelete)
+}
+
+export function callDrawerCallbacks(value, type) {
+    drawerStateCallbackList.forEach(pair => {
+        if (type === 'both' || pair.second === type)
+            pair.first(value);
+    })
+}
+
+//  <------------------------- Drawer-Callbacks -------------------------
+
+
 function ListItemLink(props) {
     const {icon, primary, to} = props;
 
@@ -108,7 +139,8 @@ function ListItemLink(props) {
     );
     return (
         <li>
-            <ListItem button component={renderLink} style={document.location.pathname === to ? {background: "rgba(0,64,179,0.32)"} : undefined}>
+            <ListItem button component={renderLink}
+                      style={document.location.pathname === to ? {background: "rgba(0,64,179,0.32)"} : undefined}>
                 {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
                 <ListItemText primary={primary}/>
             </ListItem>
@@ -116,18 +148,25 @@ function ListItemLink(props) {
     );
 }
 
-
 export default function MenuDrawer(props) {
     const classes = useStyles();
     const theme = useTheme();
     const [open, setOpen] = React.useState(isDrawerVisible);
     const [shouldShift, setShouldShift] = React.useState(() => !isMobile());
+    const history = useHistory();
 
     useEffect(() => {
         let mobileCallback = isMobile => setShouldShift(!isMobile);
+        let transitionListener = () => callDrawerCallbacks(open, 'after');
+
         addMobileCallback(mobileCallback);
+
+        const main = document.getElementById('menuDrawer_main');
+        main.addEventListener('transitionend', transitionListener);
+
         return () => {
-            removeMobileCallback(mobileCallback)
+            removeMobileCallback(mobileCallback);
+            main.removeEventListener('transitionend', transitionListener)
         };
     }, []);
 
@@ -150,8 +189,7 @@ export default function MenuDrawer(props) {
                     [classes.appBarShift]: open,
                 })}
             >
-                <Toolbar
-                >
+                <Toolbar>
                     <div>
                         <IconButton
                             color="inherit"
@@ -164,28 +202,38 @@ export default function MenuDrawer(props) {
                         </IconButton>
                     </div>
                     <div style={{
+                        maxWidth: 58 * (hasCurrentUserRoleLevel() ? 4 : 3) - (open ? 0 : 48), minWidth: 0,
+                        // backgroundColor: "green",
+                        flexGrow: 100,
+                        flexShrink: 100,
+                        flexBasis: "auto",
+                        height: 15
+                    }}/>
+                    <div style={{
                         display: 'flex',
                         justifyContent: 'center',
-                        flex: 3,
-                        marginLeft: 232 - (open ? 0 : 48)
+                        flexGrow: 1,
+                        flexShrink: 1,
+                        flexBasis: "auto",
+                        // backgroundColor: "red",
                     }}>
-                        <img style={{alignSelf: 'center'}} height="50" src={logo}
+                        <img style={{alignSelf: 'center', cursor: "pointer"}} height="50" src={logo} onClick={event => history.push("/")}
                              alt="fireSpot"/>
                     </div>
                     {/*<div>*/}
-                        <Link to="/">
-                            <IconButton style={{margin: 5, color: "white"}} component="span"
-                                        edge="start">
-                                <HomeIcon/>
-                            </IconButton>
-                        </Link>
-                        <Link to="/shoppingcart">
-                            <IconButton style={{margin: 5, color: "white"}} component="span">
-                                <ShoppingCartIcon/>
-                            </IconButton>
-                        </Link>
-                        <ProfileButton/>
-                        <DevButton/>
+                    <Link to="/">
+                        <IconButton style={{margin: 5, color: "white"}} component="span"
+                                    edge="start">
+                            <HomeIcon/>
+                        </IconButton>
+                    </Link>
+                    <Link to="/shoppingcart">
+                        <IconButton style={{margin: 5, color: "white"}} component="span">
+                            <ShoppingCartIcon/>
+                        </IconButton>
+                    </Link>
+                    <ProfileButton/>
+                    <DevButton/>
                     {/*</div>*/}
                 </Toolbar>
             </AppBar>
@@ -233,11 +281,11 @@ export default function MenuDrawer(props) {
                         primary="Benutzer"
                         icon={<AccountCircleIcon/>}
                     />
-                    <ListItemLink
+                    {hasCurrentUserRoleLevel() && <ListItemLink
                         to="/editArticles"
                         primary="Artikel bearbeiten"
                         icon={<EditIcon/>}
-                    />
+                    />}
                     <ListItemLink
                         to="/Impressum"
                         primary="Impressum"
@@ -246,6 +294,7 @@ export default function MenuDrawer(props) {
                 </List>
             </Drawer>
             <main
+                id={"menuDrawer_main"}
                 className={clsx(classes.content, {
                     [classes.contentShift]: open && shouldShift,
                 })}
@@ -348,59 +397,62 @@ function DevButton() {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    return (
-        <div>
-            {/*<Link to="/login">*/}
-            <IconButton style={{margin: 5, color: "white"}} component="span"
-                        aria-haspopup="true"
-                        onClick={handleMenu}>
-                <DeveloperBoardIcon/>
-            </IconButton>
-            {/*</Link>*/}
-            <Menu
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
-                open={open}
-                onClose={handleClose}
-            >
-                <MenuItem disabled={history.location.pathname === "/dev"}
-                          onClick={event => {
-                              handleClose(event);
-                              history.push("/dev")
-                          }}>
-                    <Grid container spacing={2}>
-                        <Grid item>
-                            <DeveloperBoardIcon style={{display: "block"}}/>
+    if (hasCurrentUserRoleLevel())
+        return (
+            <div>
+                {/*<Link to="/login">*/}
+                <IconButton style={{margin: 5, color: "white"}} component="span"
+                            aria-haspopup="true"
+                            onClick={handleMenu}>
+                    <DeveloperBoardIcon/>
+                </IconButton>
+                {/*</Link>*/}
+                <Menu
+                    anchorEl={anchorEl}
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    open={open}
+                    onClose={handleClose}
+                >
+                    <MenuItem disabled={history.location.pathname === "/dev"}
+                              onClick={event => {
+                                  handleClose(event);
+                                  history.push("/dev")
+                              }}>
+                        <Grid container spacing={2}>
+                            <Grid item>
+                                <DeveloperBoardIcon style={{display: "block"}}/>
+                            </Grid>
+                            <Grid item xs>
+                                Admin-Panel
+                            </Grid>
                         </Grid>
-                        <Grid item xs>
-                            Admin-Panel
+                    </MenuItem>
+                    <MenuItem onClick={event => {
+                        handleClose(event);
+                        window.open("http://localhost:8080/swagger-ui/");
+                    }}>
+                        <Grid container spacing={2}>
+                            <Grid item>
+                                <ListAltIcon style={{display: "block"}}/>
+                            </Grid>
+                            <Grid item xs>
+                                Swagger-UI
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </MenuItem>
-                <MenuItem onClick={event => {
-                    handleClose(event);
-                    window.open("http://localhost:8080/swagger-ui/");
-                }}>
-                    <Grid container spacing={2}>
-                        <Grid item>
-                            <ListAltIcon style={{display: "block"}}/>
-                        </Grid>
-                        <Grid item xs>
-                            Swagger-UI
-                        </Grid>
-                    </Grid>
 
-                </MenuItem>
-            </Menu>
+                    </MenuItem>
+                </Menu>
 
-        </div>
-    )
+            </div>
+        )
+    else
+        return null
 }

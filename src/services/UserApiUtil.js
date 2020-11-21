@@ -124,7 +124,7 @@ export const deleteUser = (onSuccess, onFail) => {
 export const logoutUser = (onSuccess, onFail) => {
     try {
         console.log('user has been logged out');
-        localStorage.clear();
+        localStorage.removeItem("myUser");
         setUserLoggedIn(false);
         onSuccess();
     } catch (e) {

@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
-import Grid from '@material-ui/core/Grid';
+import Grid, {GridDirection} from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -22,11 +22,11 @@ import MenuDrawer from "./MenuDrawer";
 import {
     Button,
     FormControl,
-    FormControlLabel,
+    FormControlLabel, FormLabel,
     IconButton,
     InputAdornment,
     InputLabel,
-    OutlinedInput,
+    OutlinedInput, Paper, Radio, RadioGroup,
     Slider,
     Switch
 } from "@material-ui/core";
@@ -35,6 +35,8 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import SearchIcon from '@material-ui/icons/Search';
 import {Article} from "./EditArticles";
 import InfiniteScroll from "react-infinite-scroll-component";
+import {addDrawerCallback, removeDrawerCallback} from "./MenuDrawer";
+import ResizeObserver from 'resize-observer-polyfill';
 
 interface IProps {
     // @ts-ignore
@@ -212,9 +214,8 @@ function Album(props: ContextType<AlbumOverview>) {
                                 </Typography>
                             </div>
                             :
-                            <div style={{display: 'flex', justifyContent: 'center'}}>
-                                <FilterCard context={context}/>
-                            </div>
+                            /*<FilterCard context={context}/>*/
+                            <FilterCard context={context}/>
                         }
                     </Container>
                     <Container maxWidth={"md"} style={{marginTop: 40}}>
@@ -266,56 +267,103 @@ function Album(props: ContextType<AlbumOverview>) {
         </React.Fragment>
     );
 }
-let cardRef: any
-function FilterCard({context}: { context: AlbumOverview }) {
 
-    // debugger
-    // useEffect(() => {
-    //     let listener = (ev: any) => {
-    //         debugger
-    //         if (cardRef) {
-    //             // @ts-ignore
-    //             console.log(`p: ${cardRef.parentElement.offsetWidth} | c: ${cardRef.clientWidth}`)
-    //         }
-    //     };
-    //     window.addEventListener('resize', listener);
-    //
-    //     return () => window.removeEventListener('resize', listener)
-    // }, []);
+let setDummy: ((next: number) => void);
+let direction: GridDirection = "row";
+let dummy: number = 0;
+
+export function FilterCard({context}: ContextType<AlbumOverview>) {
+    setDummy = useState(0)[1];
+
+    function getNewDirection(): GridDirection {
+        // debugger
+        let filterCard_root = document.getElementById("filterCard_root");
+        let filterCard_text = document.getElementById("filterCard_text");
+        if (filterCard_root && filterCard_text) {
+            if (direction === "row" && filterCard_root.offsetHeight > 250) {
+                return "column";
+            } else if (direction === "column" && (filterCard_text.offsetWidth + 250) <= filterCard_root.offsetWidth) {
+                return "row";
+            }
+        }
+        return direction;
+    }
+
+    function testAndApply() {
+        let newDirection = getNewDirection();
+        if (direction !== newDirection) {
+            direction = newDirection;
+            setDummy(++dummy);
+        }
+    }
+
+    useEffect(() => {
+        direction = getNewDirection();
+        setDummy(++dummy);
+
+        let card = document.getElementById("filterCard_card");
+
+        if (card) {
+            new ResizeObserver((entries: any) => {
+                testAndApply();
+            }).observe(card);
+        }
+
+        let listener = (ev: any) => {
+            testAndApply();
+        };
+
+        let drawerCallback = (state: boolean) => {
+            testAndApply();
+        };
+
+        window.addEventListener('resize', listener);
+        addDrawerCallback(drawerCallback)
+
+        return () => {
+            window.removeEventListener('resize', listener);
+            removeDrawerCallback(drawerCallback)
+        }
+    }, []);
 
     return (
-        <Card style={{minHeight: "250px"}} ref={instance => cardRef = instance}>
-            <Grid container alignItems={"flex-end"} direction={"row"}>
-                <Grid item>
-                    <LazyImage
-                        getSrc={setImgSrc => {
-                            // @ts-ignore
-                            setImgSrc(base64ToDataUri(context.genreFilter.file));
-                        }}
-                        style={{
-                            width: "250px",
-                            height: "250px",
-                            backgroundColor: '#00BCD4'
-                        }}
-                        shouldImageUpdate={oldPayload => false}
-                    />
+        <div style={{display: 'flex', justifyContent: 'center'}} id={"filterCard_root"}>
+            <Card style={{minHeight: "250px"}} id={"filterCard_card"}>
+                <Grid container alignItems={direction === "row" ? "flex-end" : "flex-start"}
+                      direction={direction}>
+                    <Grid item>
+                        <LazyImage
+                            getSrc={setImgSrc => {
+                                // @ts-ignore
+                                setImgSrc(base64ToDataUri(context.genreFilter.file));
+                            }}
+                            style={{
+                                width: "250px",
+                                height: "250px",
+                                backgroundColor: '#00BCD4'
+                            }}
+                            shouldImageUpdate={oldPayload => false}
+                        />
+                    </Grid>
+                    <Grid item>
+                        <Typography component="h1" variant="h2" id={"filterCard_text"}
+                                    style={{
+                                        width: "250px",
+                                        display: "inline-table", ...padding(16, 16, 0, 16)
+                                    }}
+                                    color="textPrimary"
+                        >
+                            {
+                                // @ts-ignore
+                                context.genreFilter.genre.name
+                            }
+                        </Typography>
+                    </Grid>
                 </Grid>
-                <Grid item>
-                    <Typography component="h1" variant="h2"
-                                style={{minWidth: "250px", ...padding(16, 16, 0, 16)}}
-                                color="textPrimary"
-                    >
-                        {
-                            // @ts-ignore
-                            context.genreFilter.genre.name
-                        }
-                    </Typography>
-                </Grid>
-            </Grid>
-            {/*<CardContent>*/}
-            {/*</CardContent>*/}
-        </Card>
+            </Card>
+        </div>
     )
+        ;
 }
 
 function UiSettings({context}: ContextType<AlbumOverview>) {
@@ -456,7 +504,6 @@ function GridList({context, filteredArticleArray}: { context: AlbumOverview, fil
 function reloadImages(context: AlbumOverview) {
     context.imageReloadArray.forEach(reload => reload())
 }
-
 
 function ArticleComponent(props: any) {
     const classes = useStyles();
