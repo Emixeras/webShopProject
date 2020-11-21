@@ -123,7 +123,6 @@ export function callDrawerCallbacks(value, type) {
             pair.first(value);
     })
 }
-
 //  <------------------------- Drawer-Callbacks -------------------------
 
 
@@ -254,14 +253,14 @@ export default function MenuDrawer(props) {
                 <Divider/>
                 <List>
                     <ListItemLink
-                        to="/artists"
-                        primary="Künstler"
-                        icon={<LibraryMusicIcon/>}
-                    />
-                    <ListItemLink
                         to="/albums"
                         primary="Alben"
                         icon={<AlbumIcon/>}
+                    />
+                    <ListItemLink
+                        to="/artists"
+                        primary="Künstler"
+                        icon={<LibraryMusicIcon/>}
                     />
                     <ListItemLink
                         to="/genres"

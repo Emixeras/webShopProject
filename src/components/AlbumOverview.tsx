@@ -18,15 +18,15 @@ import {
     RETURN_MODE
 } from "../Utilities/TsUtilities";
 import {Link} from "react-router-dom";
-import MenuDrawer from "./MenuDrawer";
+import MenuDrawer, {addDrawerCallback, removeDrawerCallback} from "./MenuDrawer";
 import {
     Button,
     FormControl,
-    FormControlLabel, FormLabel,
+    FormControlLabel,
     IconButton,
     InputAdornment,
     InputLabel,
-    OutlinedInput, Paper, Radio, RadioGroup,
+    OutlinedInput,
     Slider,
     Switch
 } from "@material-ui/core";
@@ -35,7 +35,6 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import SearchIcon from '@material-ui/icons/Search';
 import {Article} from "./EditArticles";
 import InfiniteScroll from "react-infinite-scroll-component";
-import {addDrawerCallback, removeDrawerCallback} from "./MenuDrawer";
 import ResizeObserver from 'resize-observer-polyfill';
 
 interface IProps {
@@ -322,22 +321,21 @@ export function FilterCard({context}: ContextType<AlbumOverview>) {
                 <Grid container alignItems={direction === "row" ? "flex-end" : "flex-start"}
                       direction={direction}>
                     <Grid item>
-                        <div>
+                        {/*<div>*/}
                         <LazyImage
                             getSrc={setImgSrc => {
                                 // @ts-ignore
                                 setImgSrc(base64ToDataUri(context.filter.first.file));
                             }}
+                            returnMode={RETURN_MODE.CARD_MEDIA}
                             style={{
-                                // width: "250px",
-                                // height: "250px",
-                                paddingTop: '250px',
-                                paddingRight: '250px',
+                                width: "250px",
+                                height: "250px",
                                 backgroundColor: '#00BCD4'
                             }}
                             shouldImageUpdate={oldPayload => false}
                         />
-                        </div>
+                        {/*</div>*/}
                     </Grid>
                     <Grid item>
                         <Typography component="h1" variant="h2" id={"filterCard_text"}
