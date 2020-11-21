@@ -102,7 +102,8 @@ function ArtistComponent(props) {
         <Grid item /*key={article}*/ xs={12} sm={6} md={4} lg={3}>
             <CardActionArea component={Link} to={(location) => {
                 location.pathname = "/albums";
-                //location.state = {artist: artistResponse};
+                location.state = {filter: artistResponse,
+                                    type: 'a'};
                 return location;
             }}>
                 <Card className={classes.card}>
