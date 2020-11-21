@@ -13,11 +13,11 @@ import {
     Container,
 } from '@material-ui/core';
 import CardActionArea from "@material-ui/core/CardActionArea";
-import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 import axios from "axios";
 import {Carousel} from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
+import {base64ToDataUri, LazyImage, RETURN_MODE} from "../Utilities/TsUtilities";
 
 class ArtistOverview extends Component {
 
@@ -96,24 +96,29 @@ function Artist() {
 
 function ArtistComponent(props) {
     const classes = useStyles();
-    let artist = props.artist;
-//todo cardmedia quadratisch anzeigen
+    let artistResponse = props.artist;
+
     return (
         <Grid item /*key={article}*/ xs={12} sm={6} md={4} lg={3}>
             <CardActionArea component={Link} to={(location) => {
-                location.pathname = "/article";
+                location.pathname = "/albums";
+                //location.state = {artist: artistResponse};
                 return location;
             }}>
                 <Card className={classes.card}>
-                    <CardMedia
-                        component='img'
+                    <LazyImage
+                        returnMode={RETURN_MODE.CARD_MEDIA}
+                        alt={artistResponse.artist.name}
                         className={classes.cardMedia}
-                        src={"data:image/png;base64," + artist.file}
-                        title={artist.artist.name}
+                        // payload={artistResponse}
+                        getSrc={setImgSrc => {
+                            if (artistResponse.file)
+                                setImgSrc(base64ToDataUri(artistResponse.file));
+                        }}
                     />
                     <CardContent className={classes.cardContent}>
                         <Typography gutterBottom variant="h5" component="h2">
-                            {artist.artist.name}
+                            {artistResponse.artist.name}
                         </Typography>
                         <Typography>
                         </Typography>
