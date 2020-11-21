@@ -17,7 +17,7 @@ import CardContent from "@material-ui/core/CardContent";
 import axios from "axios";
 import {Carousel} from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import {base64ToDataUri, LazyImage, RETURN_MODE} from "../Utilities/TsUtilities";
+import {base64ToDataUri, LazyImage, renameObjectKey, RETURN_MODE} from "../Utilities/TsUtilities";
 
 class ArtistOverview extends Component {
 
@@ -102,8 +102,7 @@ function ArtistComponent(props) {
         <Grid item /*key={article}*/ xs={12} sm={6} md={4} lg={3}>
             <CardActionArea component={Link} to={(location) => {
                 location.pathname = "/albums";
-                location.state = {filter: artistResponse,
-                                    type: 'a'};
+                location.state = {filter: renameObjectKey(artistResponse, "artist", "artistOrGenre"), type: 'a'};
                 return location;
             }}>
                 <Card className={classes.card}>
@@ -151,7 +150,6 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
     },
     cardMedia: {
-        width: '100%',
         paddingTop: '100%',
         backgroundColor: '#00BCD4',
     },

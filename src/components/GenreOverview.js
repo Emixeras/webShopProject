@@ -13,7 +13,7 @@ import CardActionArea from "@material-ui/core/CardActionArea";
 import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 import axios from "axios";
-import {base64ToDataUri} from "../Utilities/TsUtilities";
+import {base64ToDataUri, renameObjectKey} from "../Utilities/TsUtilities";
 
 class GenreOverview extends Component {
 
@@ -87,8 +87,7 @@ function GenreComponent(props) {
         <Grid item /*key={article}*/ xs={12} sm={6} md={4} lg={3}>
             <CardActionArea component={Link} to={(location) => {
                 location.pathname = "/albums";
-                debugger
-                location.state = {filter: genre};
+                location.state = {filter: renameObjectKey(genre, "genre", "artistOrGenre"), type: 'g'};
                 return location;
             }}>
                 <Card className={classes.card}>

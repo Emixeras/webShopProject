@@ -534,3 +534,21 @@ function LogoutAndLoginLink({text}: { text: string }) {
 }
 
 //  <------------------------- Components -------------------------
+
+
+//  ------------------------- Convenience ------------------------->
+export function renameObjectKey(object: object, oldKey: string, newKey: string): object {
+    // @ts-ignore
+    object[newKey] = object[oldKey];
+    // @ts-ignore
+    // delete object[oldKey];
+    // if (oldKey !== newKey) {
+    //     Object.defineProperty(object, newKey,
+    //     // @ts-ignore
+    //         Object.getOwnPropertyDescriptor(object, oldKey));
+    //     // @ts-ignore
+    //     delete object[oldKey];
+    // }
+    return object
+}
+//  <------------------------- Convenience -------------------------

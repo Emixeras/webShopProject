@@ -68,14 +68,15 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     unloadImages: boolean = (localStorage.getItem(this.UNLOAD_IMAGES) as string) == 'true';
     imageReloadArray: Array<() => void> = [];
     query: Pair<string, boolean> = Pair.make("", false);
-    filter?: FilterPayload;
+    filter?: Pair<FilterPayload, string>;
     maxVisible: number = 24;
     hasMore: boolean = true;
 
     constructor(props: IProps, context: any) {
         super(props, context);
-        if (this.props.location.state) {
-            this.filter = this.props.location.state.filter
+        let state = this.props.location.state;
+        if (state) {
+            this.filter = Pair.make(state.filter, state.type)
         }
         this.loadArticles(this);
     }
@@ -178,7 +179,7 @@ function Album(props: ContextType<AlbumOverview>) {
         buildDummyData();
 
     // @ts-ignore
-    let queryText = context.query.first + ifExistsReturnOrElse(context.filter, input => ifExistsReturnOrElse(context.query.first, input1 => " & ", "") + "g: " + input.artistOrGenre.name.toLowerCase(), "");
+    let queryText = context.query.first + ifExistsReturnOrElse(context.filter, input => ifExistsReturnOrElse(context.query.first, input1 => " & ", "") + input.second + ": " + input.first.artistOrGenre.name.toLowerCase(), "");
     if (queryText && articleArray[0].id !== -2) {
         filteredArticleArray = articleArray.filter(article => filterArticle(queryText, article))
     } else
@@ -321,18 +322,22 @@ export function FilterCard({context}: ContextType<AlbumOverview>) {
                 <Grid container alignItems={direction === "row" ? "flex-end" : "flex-start"}
                       direction={direction}>
                     <Grid item>
+                        <div>
                         <LazyImage
                             getSrc={setImgSrc => {
                                 // @ts-ignore
-                                setImgSrc(base64ToDataUri(context.filter.file));
+                                setImgSrc(base64ToDataUri(context.filter.first.file));
                             }}
                             style={{
-                                width: "250px",
-                                height: "250px",
+                                // width: "250px",
+                                // height: "250px",
+                                paddingTop: '250px',
+                                paddingRight: '250px',
                                 backgroundColor: '#00BCD4'
                             }}
                             shouldImageUpdate={oldPayload => false}
                         />
+                        </div>
                     </Grid>
                     <Grid item>
                         <Typography component="h1" variant="h2" id={"filterCard_text"}
@@ -344,7 +349,7 @@ export function FilterCard({context}: ContextType<AlbumOverview>) {
                         >
                             {
                                 // @ts-ignore
-                                context.filter.artistOrGenre.name
+                                context.filter.first.artistOrGenre.name
                             }
                         </Typography>
                     </Grid>
