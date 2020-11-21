@@ -87,7 +87,8 @@ function GenreComponent(props) {
         <Grid item /*key={article}*/ xs={12} sm={6} md={4} lg={3}>
             <CardActionArea component={Link} to={(location) => {
                 location.pathname = "/albums";
-                location.state = {genre: genre};
+                debugger
+                location.state = {filter: genre};
                 return location;
             }}>
                 <Card className={classes.card}>

@@ -46,25 +46,14 @@ interface IProps {
 interface IState {
 }
 
-// interface Article {
-//     id: number;
-//     title: string;
-//     description: string;
-//     ean: number;
-//     price: string;
-//     artists: ArtistOrGenre;
-//     genre: ArtistOrGenre;
-//     picture?: { id: number, data: string };
-// }
-
 interface ArtistOrGenre {
     id: number;
     name: string;
 }
 
-interface GenrePayload {
+interface FilterPayload {
     file: string;
-    genre: ArtistOrGenre;
+    artistOrGenre: ArtistOrGenre;
 }
 
 interface ImageResponseType {
@@ -79,14 +68,14 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     unloadImages: boolean = (localStorage.getItem(this.UNLOAD_IMAGES) as string) == 'true';
     imageReloadArray: Array<() => void> = [];
     query: Pair<string, boolean> = Pair.make("", false);
-    genreFilter?: GenrePayload;
+    filter?: FilterPayload;
     maxVisible: number = 24;
     hasMore: boolean = true;
 
     constructor(props: IProps, context: any) {
         super(props, context);
         if (this.props.location.state) {
-            this.genreFilter = this.props.location.state.genre
+            this.filter = this.props.location.state.filter
         }
         this.loadArticles(this);
     }
@@ -189,7 +178,7 @@ function Album(props: ContextType<AlbumOverview>) {
         buildDummyData();
 
     // @ts-ignore
-    let queryText = context.query.first + ifExistsReturnOrElse(context.genreFilter, input => ifExistsReturnOrElse(context.query.first, input1 => " & ", "") + "g: " + input.genre.name.toLowerCase(), "");
+    let queryText = context.query.first + ifExistsReturnOrElse(context.filter, input => ifExistsReturnOrElse(context.query.first, input1 => " & ", "") + "g: " + input.artistOrGenre.name.toLowerCase(), "");
     if (queryText && articleArray[0].id !== -2) {
         filteredArticleArray = articleArray.filter(article => filterArticle(queryText, article))
     } else
@@ -201,7 +190,7 @@ function Album(props: ContextType<AlbumOverview>) {
             <main>
                 <div className={classes.heroContent}>
                     <Container maxWidth="sm">
-                        {!context.genreFilter ?
+                        {!context.filter ?
                             <div>
                                 <Typography component="h1" variant="h2" align="center"
                                             color="textPrimary"
@@ -335,7 +324,7 @@ export function FilterCard({context}: ContextType<AlbumOverview>) {
                         <LazyImage
                             getSrc={setImgSrc => {
                                 // @ts-ignore
-                                setImgSrc(base64ToDataUri(context.genreFilter.file));
+                                setImgSrc(base64ToDataUri(context.filter.file));
                             }}
                             style={{
                                 width: "250px",
@@ -355,7 +344,7 @@ export function FilterCard({context}: ContextType<AlbumOverview>) {
                         >
                             {
                                 // @ts-ignore
-                                context.genreFilter.genre.name
+                                context.filter.artistOrGenre.name
                             }
                         </Typography>
                     </Grid>
