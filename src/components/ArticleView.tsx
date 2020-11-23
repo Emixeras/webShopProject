@@ -85,7 +85,7 @@ class ArticleView extends React.Component<IProps, IState> {
                                             rounded
                                             alt={this.article.title}
                                             getSrc={setImgSrc => {
-                                                loadSingleImage(this.article.id, imageResponse => {
+                                                loadSingleImage("article", this.article.id, imageResponse => {
                                                     if (imageResponse) {
                                                         setImgSrc(base64ToDataUri(imageResponse.file))
                                                     }

@@ -17,7 +17,13 @@ import CardContent from "@material-ui/core/CardContent";
 import axios from "axios";
 import {Carousel} from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import {base64ToDataUri, LazyImage, renameObjectKey, RETURN_MODE} from "../Utilities/TsUtilities";
+import {
+    base64ToDataUri,
+    LazyImage,
+    loadSingleImage,
+    renameObjectKey,
+    RETURN_MODE
+} from "../Utilities/TsUtilities";
 
 class ArtistOverview extends Component {
 
@@ -50,21 +56,21 @@ class ArtistOverview extends Component {
     }
 
     loadGenre() {
-        axios.get("http://localhost:8080/artist/range;start=1;end=50").then((response) => {
-            showToast("artist fetch ok", "success");
-            var artistresponse = response.data;
-            Object.keys(artistresponse).forEach(function (key) {
-                artistArray.push(artistresponse[key]);
+        axios.get("http://localhost:8080/artist").then((response) => {
+            artistResponseArray = [];
+            var artistResponse = response.data;
+            Object.keys(artistResponse).forEach(key => {
+                artistResponseArray.push({file: "", artistOrGenre: artistResponse[key]});
             });
             this.forceUpdate()
         })
             .catch(function (error) {
-                showToast("artist fetch failed" + error, "error");
+                // showToast("artist fetch failed" + error, "error");
             })
     }
 }
 
-let artistArray = [];
+let artistResponseArray = [];
 
 function Artist() {
     const classes = useStyles();
@@ -73,8 +79,8 @@ function Artist() {
             <main>
                 <Container className={classes.cardGrid} maxWidth="lg">
                     <Grid container spacing={4}>
-                        {artistArray.map((artist) => (
-                            <ArtistComponent artist={artist}/>
+                        {artistResponseArray.map((artistResponse) => (
+                            <ArtistComponent artistResponse={artistResponse}/>
                         ))}
                     </Grid>
                 </Container>
@@ -94,31 +100,40 @@ function Artist() {
     );
 }
 
-function ArtistComponent(props) {
+function ArtistComponent({artistResponse}) {
     const classes = useStyles();
-    let artistResponse = props.artist;
+
+    // if (artistResponse.artistOrGenre.id === 1)
+    //     debugger
 
     return (
         <Grid item /*key={article}*/ xs={12} sm={6} md={4} lg={3}>
             <CardActionArea component={Link} to={(location) => {
                 location.pathname = "/albums";
-                location.state = {filter: renameObjectKey(artistResponse, "artist", "artistOrGenre"), type: 'a'};
+                location.state = {filter: artistResponse, type: 'a'};
                 return location;
             }}>
                 <Card className={classes.card}>
                     <LazyImage
                         returnMode={RETURN_MODE.CARD_MEDIA}
-                        alt={artistResponse.artist.name}
+                        alt={artistResponse.artistOrGenre.name}
                         className={classes.cardMedia}
                         // payload={artistResponse}
                         getSrc={setImgSrc => {
-                            if (artistResponse.file)
-                                setImgSrc(base64ToDataUri(artistResponse.file));
+                            loadSingleImage("artist", artistResponse.artistOrGenre.id, imageResponse => {
+                                // if (artistResponse.artistOrGenre.id === 1)
+                                //     debugger
+                                if (imageResponse) {
+                                    let file = imageResponse.file;
+                                    artistResponse.file = file;
+                                    setImgSrc(base64ToDataUri(file))
+                                }
+                            })
                         }}
                     />
                     <CardContent className={classes.cardContent}>
                         <Typography gutterBottom variant="h5" component="h2">
-                            {artistResponse.artist.name}
+                            {artistResponse.artistOrGenre.name}
                         </Typography>
                         <Typography>
                         </Typography>
@@ -151,7 +166,7 @@ const useStyles = makeStyles((theme) => ({
     },
     cardMedia: {
         paddingTop: '100%',
-        backgroundColor: '#00BCD4',
+        backgroundColor: 'lightgrey',
     },
     cardContent: {
         flexGrow: 1,

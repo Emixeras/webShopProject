@@ -546,8 +546,8 @@ function DialogComponent(arg: any) {
                             // id: that.artists.length + 1,
                             name: dialogBuilder.getInputText().trim(),
                         };
-                        if (!that.currentPicture)
-                            return;
+                        // if (!that.currentPicture)
+                        //     return;
                         createNewArtist(netArtist, null/*that.currentPicture*/, response => {
                             console.log(response);
                             showToast("Jay", "success");

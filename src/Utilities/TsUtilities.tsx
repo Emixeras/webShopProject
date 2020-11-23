@@ -123,8 +123,8 @@ export function base64ToDataUri(base64: string): string {
     return `data:${mime};base64,${base64}`
 }
 
-export function loadSingleImage(articleId: number, onFinish: (imageResponse?: ImageResponseType) => void, imageResolution?: number) {
-    fetch(new Request(`http://localhost:8080/article/range;start=${articleId};end=${articleId};quality=${imageResolution ? imageResolution : 250}`, {method: 'GET'}))
+export function loadSingleImage(type: "article" | "artist", articleId: number, onFinish: (imageResponse?: ImageResponseType) => void, imageResolution?: number) {
+    fetch(new Request(`http://localhost:8080/${type}/range;start=${articleId};end=${articleId};quality=${imageResolution ? imageResolution : 250}`, {method: 'GET'}))
         .then(response => {
             if (response.status === 200) {
                 return response.json();
