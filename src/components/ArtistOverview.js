@@ -30,6 +30,7 @@ class ArtistOverview extends Component {
     constructor(props, context) {
         super(props, context);
         this.loadGenre()
+        window.scrollTo(0,0);
     }
 
     render() {

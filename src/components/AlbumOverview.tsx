@@ -78,6 +78,7 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
             this.filter = Pair.make(state.filter, state.type)
         }
         this.loadArticles(this);
+        window.scrollTo(0,0);
     }
 
     render() {
@@ -331,7 +332,7 @@ export function FilterCard({context}: ContextType<AlbumOverview>) {
                             style={{
                                 width: "250px",
                                 height: "250px",
-                                backgroundColor: '#00BCD4'
+                                backgroundColor: (context.filter && context.filter.second === "g" ? '#00BCD4' : "lightgrey")
                             }}
                             shouldImageUpdate={oldPayload => false}
                         />

@@ -31,7 +31,6 @@ class Register extends Component {
     editMode = false;
 
     constructor(props) {
-
         super(props);
         this.state = {
             email: '',
@@ -41,7 +40,8 @@ class Register extends Component {
             birthdayDate: '1980-01-01',
             title: 'none',
             showPassword: false,
-        }
+        };
+        window.scrollTo(0,0);
     }
 
     render() {

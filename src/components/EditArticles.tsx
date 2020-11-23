@@ -93,7 +93,8 @@ export default class EditArticles extends React.Component<IProps, IState> {
             const {article} = this.props.location.state;
             this.state = article;
         }
-        this.loadArticles()
+        this.loadArticles();
+        window.scrollTo(0,0);
     }
 
     loadArticles() {

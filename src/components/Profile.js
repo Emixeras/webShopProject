@@ -54,12 +54,13 @@ class Profile extends Component {
             postalCode: '',
             town: ''
         };
-        this.user = getSessionUser();
-        if (this.user) {
+        // eslint-disable-next-line no-cond-assign
+        if (this.user = getSessionUser()) {
             this.user.birth = this.user.birth.split("T")[0];
             this.state = this.unchangedState = {...this.state, ...this.user};
             this.passwordState = {password: this.user.password, passwordRepeat: this.user.password};
         }
+        window.scrollTo(0,0);
     }
 
     render() {

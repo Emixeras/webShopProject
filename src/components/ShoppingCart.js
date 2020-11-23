@@ -10,6 +10,12 @@ import Grid from "@material-ui/core/Grid";
 import {padding} from "../Utilities/Utilities";
 
 class ShoppingCart extends React.Component {
+
+    constructor(props, context) {
+        super(props, context);
+        window.scrollTo(0,0);
+    }
+
     render() {
         return (
             <MenuDrawer>

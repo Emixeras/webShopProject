@@ -28,7 +28,6 @@ interface IProps {
 interface IState {
 }
 
-
 class ArticleView extends React.Component<IProps, IState> {
 
     article: Article;
@@ -58,6 +57,7 @@ class ArticleView extends React.Component<IProps, IState> {
                 description: "test Api - provides basic test Functions and example Data. test Api - provides basic test Functions and example Data. test Api - provides basic test Functions and example Data"
             }
         }
+        window.scrollTo(0,0);
     }
 
     render() {

@@ -24,6 +24,12 @@ class Dev extends React.Component {
         "DELETE": "#f93e3e"
     };
 
+
+    constructor(props, context) {
+        super(props, context);
+        window.scrollTo(0,0);
+    }
+
     render() {
         return (
             <RestrictedPage roleLevel={ROLES.ADMIN}>
