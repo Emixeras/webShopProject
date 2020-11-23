@@ -1,20 +1,24 @@
 import React from 'react'
-import {Grid, Card, TextField, Button, Typography, hexToRgb, IconButton} from "@material-ui/core";
+import {Button, Card, Grid, Typography} from "@material-ui/core";
 import MenuDrawer from "./MenuDrawer";
 import {padding, showToast} from "../Utilities/Utilities";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 import {
     Article,
-    loadSingleImage,
-    LazyImage,
     base64ToDataUri,
     ContextType,
-    boolOr,
-    hasCurrentUserRoleLevel
+    hasCurrentUserRoleLevel,
+    LazyImage,
+    loadSingleImage
 } from "../Utilities/TsUtilities";
 import EditIcon from '@material-ui/icons/Edit';
-import {useHistory, Link} from "react-router-dom";
-import {getSessionUser} from "../services/StorageUtil";
+import {useHistory} from "react-router-dom";
+import {
+    AAR_RETURN_TYPE,
+    addToShoppingCart,
+    getShoppingCartCount,
+    removeFromShoppingCart
+} from "../services/ShoppingCartUtil";
 
 interface IProps {
     // @ts-ignore
@@ -45,7 +49,7 @@ class ArticleView extends React.Component<IProps, IState> {
                     id: 1,
                     name: "Rock"
                 },
-                price: "16.20€",
+                price: "16.20",
                 ean: 12345678,
                 picture: {
                     id: 1,
@@ -133,7 +137,7 @@ class ArticleView extends React.Component<IProps, IState> {
                                                         <Grid item sm={12}>
                                                             <Typography component="h1" variant="h5"
                                                                         align={"left"}>
-                                                                {this.article.price}
+                                                                {this.article.price + " €"}
                                                             </Typography>
                                                         </Grid>
                                                     </Grid>
@@ -143,12 +147,18 @@ class ArticleView extends React.Component<IProps, IState> {
                                     </Grid>
                                     <Grid item sm={12}>
                                         <div style={{float: "right"}}>
+                                            <Button variant="contained" color="secondary"
+                                                    onClick={event => {
+                                                        let returnType = removeFromShoppingCart(this.article);
+                                                        showToast("Artikel Erfolgreich gelöscht " + getShoppingCartCount(this.article), returnType === AAR_RETURN_TYPE.DECREASED ?  "success" : returnType === AAR_RETURN_TYPE.REMOVED ? "info" : "error");
+                                                    }}>Löschen</Button>
                                             <Button variant="contained" color="primary"
                                                     endIcon={<ShoppingCartIcon/>}
                                                     onClick={(event) => {
-                                                        showToast("Artikel Erfolgreich hinzugefügt", "success");
+                                                        addToShoppingCart(this.article)
+                                                        showToast(`Artikel Erfolgreich hinzugefügt (${getShoppingCartCount(this.article)})`, "success");
                                                     }}>
-                                                {"Artikel in den Warenkorb hinzufügen"}
+                                                Artikel in den Warenkorb hinzufügen
                                             </Button>
                                         </div>
                                     </Grid>
