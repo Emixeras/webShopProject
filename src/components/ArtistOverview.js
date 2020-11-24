@@ -21,7 +21,6 @@ import {
     base64ToDataUri,
     LazyImage,
     loadSingleImage,
-    renameObjectKey,
     RETURN_MODE
 } from "../Utilities/TsUtilities";
 

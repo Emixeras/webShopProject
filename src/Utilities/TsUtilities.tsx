@@ -144,7 +144,7 @@ export function loadSingleImage(type: "article" | "artist", articleId: number, o
 const placeHolder = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="; //""; //'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII=';
 
 interface LazyImageProperties {
-    getSrc: (setImgSrc: ((result: string) => void)) => void;
+    getSrc: (setImgSrc: ((result: string) => void), payload: any) => void;
     alt?: string;
     reload?: (reload: () => void) => void
     style?: React.CSSProperties;
@@ -156,6 +156,7 @@ interface LazyImageProperties {
     payload?: any;
     imageRef?: any;
     rounded?: boolean | string | "circle" | "small" | "medium" | "large";
+    id?: string
 }
 
 interface LazyImageState {
@@ -174,7 +175,7 @@ export enum LOAD_IMAGE_MODE {
 export class LazyImage extends React.Component<LazyImageProperties, LazyImageState> {
     imageSrc: string = placeHolder;
     // @ts-ignore
-    getSrc: (onResult: ((result: string) => void)) => void;
+    getSrc: (onResult: ((result: string) => void), payload: any) => void;
     alt?: string;
     reload?: (reload: () => void) => void;
     style?: React.CSSProperties;
@@ -187,6 +188,7 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
     initialLoad: boolean = true;
     observer?: IntersectionObserver;
     rounded?: boolean | string | "circle" | "small" | "medium" | "large";
+    id?: string
 
     constructor(props: LazyImageProperties, context: any) {
         super(props, context);
@@ -240,6 +242,7 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
         this.alt = props.alt;
         this.loadImageMode = orElse(props.loadImageMode, LOAD_IMAGE_MODE.ON_VISIBLE);
         this.rounded = props.rounded;
+        this.id = props.id;
     }
 
     shouldComponentUpdate(nextProps: Readonly<LazyImageProperties>, nextState: Readonly<LazyImageState>, nextContext: any): boolean {
@@ -249,16 +252,15 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
                 shouldUpdate = this.payload !== nextProps.payload;
             else
                 shouldUpdate = this.shouldImageUpdate(this.payload, nextProps.payload);
+            this.updateVariables(nextProps);
             if (shouldUpdate) {
                 this.loadImage();
             }
             return false;
-        } else
+        } else {
+            this.updateVariables(nextProps);
             return true;
-    }
-
-    componentWillUpdate(nextProps: Readonly<LazyImageProperties>, nextState: Readonly<LazyImageState>, nextContext: any): void {
-        this.updateVariables(nextProps);
+        }
     }
 
     componentDidMount(): void {
@@ -279,7 +281,7 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
             if (onResult)
                 onResult(result);
             this.forceUpdate();
-        })
+        }, this.payload)
     }
 
     render() {
@@ -318,6 +320,7 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
                 return <img className={this.className}
                             style={{borderRadius: borderRadius, ...this.style}}
                             src={this.imageSrc}
+                            id={this.id}
                             ref={element => {
                                 if (element) this.imageRef = element
                             }}
@@ -327,6 +330,7 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
                 return <CardMedia className={this.className}
                                   style={{borderRadius: borderRadius, ...this.style}}
                                   image={this.imageSrc}
+                                  id={this.id}
                                   ref={element => {
                                       if (element) this.imageRef = element
                                   }}
@@ -414,6 +418,19 @@ export function ifExistsReturnOrElse<T, R>(input: T, returnFunction: (input: T) 
             return orElse;
     }
 }
+
+export function nameComparator (a: ArtistOrGenre, b: ArtistOrGenre) {
+    var nameA = a.name.toUpperCase();
+    var nameB = b.name.toUpperCase();
+    if (nameA < nameB) {
+        return -1;
+    }
+    if (nameA > nameB) {
+        return 1;
+    }
+    return 0;
+};
+
 
 // ---------------
 
@@ -533,6 +550,11 @@ function LogoutAndLoginLink({text}: { text: string }) {
     )
 }
 
+// export function DomDebugger({debugIf}: {debugIf?: () => boolean}): JSX.Element {
+//     if (!debugIf || debugIf())
+//         debugger
+//     return null;
+// }
 //  <------------------------- Components -------------------------
 
 
