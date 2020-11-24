@@ -28,7 +28,7 @@ class ArtistOverview extends Component {
 
     constructor(props, context) {
         super(props, context);
-        this.loadGenre()
+        this.loadArtists()
         window.scrollTo(0,0);
     }
 
@@ -55,7 +55,7 @@ class ArtistOverview extends Component {
         )
     }
 
-    loadGenre() {
+    loadArtists() {
         axios.get("http://localhost:8080/artist").then((response) => {
             artistResponseArray = [];
             var artistResponse = response.data;
@@ -120,6 +120,8 @@ function ArtistComponent({artistResponse}) {
                         className={classes.cardMedia}
                         // payload={artistResponse}
                         getSrc={setImgSrc => {
+                            // if (artistResponse.artistOrGenre.id === 51)
+                            //     debugger
                             loadSingleImage("artist", artistResponse.artistOrGenre.id, imageResponse => {
                                 // if (artistResponse.artistOrGenre.id === 1)
                                 //     debugger
@@ -127,6 +129,9 @@ function ArtistComponent({artistResponse}) {
                                     let file = imageResponse.file;
                                     artistResponse.file = file;
                                     setImgSrc(base64ToDataUri(file))
+                                    // if (artistResponse.artistOrGenre.id === 51)
+                                    //     debugger
+
                                 }
                             })
                         }}

@@ -18,7 +18,7 @@ import {
     DialogTitle, InputProps as StandardInputProps, PropTypes,
     TextField
 } from "@material-ui/core";
-import {boolOr, Pair, Triple} from "./TsUtilities";
+import {boolOr, Pair, Triple, ContextType} from "./TsUtilities";
 
 interface ButtonObject {
     label: string;
@@ -45,17 +45,21 @@ interface InputObject {
     hint?: string;
 }
 
+let persistentErrorState: Triple<string, boolean, string> = Triple.make("", false, "");
+let setPersistentErrorState: Dispatch<SetStateAction<Triple<string, boolean, string>>> = value => {};
+
+
 export class DialogBuilder {
-    private readonly open: boolean;
-    private _title: string = "";
-    private _text: string = "";
-    private _buttonList: LinkedList<ButtonObject> = new LinkedList();
-    private actionButton: any = undefined;
-    private handleClose: DialogOnClick = (dialogBuilder, event) => new DOMException("Handle Close nicht überschrieben");
-    private input: InputObject | undefined = undefined;
-    private dialogErrorState: Triple<string, boolean, string> = Triple.make("", false, "");
-    private setPersistentErrorState:Dispatch<SetStateAction<Triple<string, boolean, string>>> = value => {};
-    private content: ((dialogBuilder: DialogBuilder) => JSX.Element) | undefined = undefined;
+    readonly open: boolean;
+    _title: string = "";
+    _text: string = "";
+    _buttonList: LinkedList<ButtonObject> = new LinkedList();
+    actionButton: any = undefined;
+    handleClose: DialogOnClick = (dialogBuilder, event) => new DOMException("Handle Close nicht überschrieben");
+    input: InputObject | undefined = undefined;
+    content: ((dialogBuilder: DialogBuilder) => JSX.Element) | undefined = undefined;
+    // persistentErrorState: Triple<string, boolean, string>
+
 
     //  ------------------------- Constructor ------------------------->
     constructor(open: boolean, handleClose: DialogOnClick) {
@@ -106,7 +110,7 @@ export class DialogBuilder {
             handleClose(dialogBuilder, event);
             if (this.input) {
                 this.validate(this.input.initialValue ? this.input.initialValue : "");
-                this.setPersistentErrorState(this.dialogErrorState)
+                setPersistentErrorState(persistentErrorState)
             }
         };
         return this;
@@ -114,11 +118,15 @@ export class DialogBuilder {
 
     setInput(input: InputObject): DialogBuilder {
         this.input = input;
+        if (input.initialValue) {
+            persistentErrorState.third = input.initialValue;
+            setPersistentErrorState(persistentErrorState)
+        }
         return this;
     }
 
     getInputText() {
-        return this.dialogErrorState.third;
+        return persistentErrorState.third;
     }
 
     setContent(content: (dialogBuilder: DialogBuilder) => JSX.Element): DialogBuilder {
@@ -129,107 +137,21 @@ export class DialogBuilder {
 
 
     //  ------------------------- Build ------------------------->
-    // @ts-ignore
-    private buildInput(): TextField {
-        if (this.input === undefined)
-            return null;
-        const [persistentErrorState, setPersistentErrorState] = useState(() => {
-            if (this.input){
-                if (this.input.inputValidator) {
-                    this.validate(this.input.initialValue? this.input.initialValue : "")
-                }
-            }
-            return this.dialogErrorState;
-        });
-        this.setPersistentErrorState = setPersistentErrorState;
-        this.dialogErrorState = persistentErrorState;
-        return (
-            <TextField
-                autoFocus
-                margin="dense"
-                label={this.input.label}
-                fullWidth
-                onKeyPress={(event) => {
-                    if (event.key === 'Enter' && !persistentErrorState.second) {
-                        if (this.actionButton) {
-                            this.actionButton.click();
-                        }
-                    }
-                }}
-                error={!!this.dialogErrorState.first}
-                helperText={this.dialogErrorState.first}
-                onChange={this.input.inputValidator ? event => {
-                    this.validate(event.target.value)
-                    setPersistentErrorState(this.dialogErrorState)
-                } : undefined}
-                value={this.dialogErrorState.third}
-                placeholder={this.input.hint}
-            />
-        )
-    }
-
     validate(newValue: string) {
         // @ts-ignore
-        let result = this.input.inputValidator(newValue, this.dialogErrorState, this);
+        let result = this.input.inputValidator(newValue, persistentErrorState, this);
         if (typeof result === "string")
-            this.dialogErrorState = Triple.make(result, !!result, newValue);
+            persistentErrorState = Triple.make(result, !!result, newValue);
         else if (result instanceof Pair) {
-            this.dialogErrorState = Triple.make(result.first, result.second, newValue)
+            persistentErrorState = Triple.make(result.first, result.second, newValue)
         } else
-            this.dialogErrorState = result;
+            persistentErrorState = result;
     }
 
     // @ts-ignore
     build(): Dialog {
-        return (
-            <Dialog open={this.open} onClose={event => this.handleClose(this, event)}>
-                <DialogTitle id="form-dialog-title">{this.title}</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        {this.text}
-                    </DialogContentText>
-                    {this.buildInput()}
-                    {this.content ? this.content(this) : null}
-                </DialogContent>
-                <DialogActions>
-                    {this._buttonList.toArray().map(buttonObject => {
-                        let buttonColor: PropTypes.Color = (boolOr(buttonObject.color, 'inherit', 'primary', 'secondary', 'default') ? buttonObject.color : undefined) as PropTypes.Color;
-                        if (!buttonColor && buttonObject.isActionButton)
-                            buttonColor = "primary";
-                        return (
-                            <Button variant={buttonColor ? "contained" : undefined}
-                                    color={buttonColor} onClick={event => {
-                                if (buttonObject.onClick)
-                                    buttonObject.onClick(this, event)
-
-                                if (boolOr(buttonObject.dismissOnClick, undefined, true))
-                                    this.handleClose(this, event)
-                            }} id={buttonObject.id}
-                                    startIcon={buttonObject.iconAtStart && buttonObject.icon ? buttonObject.icon : undefined}
-                                    endIcon={!buttonObject.iconAtStart && buttonObject.icon ? buttonObject.icon : undefined}
-                                    style={{
-                                        backgroundColor: !buttonColor && buttonObject.color ? buttonObject.color : undefined,
-                                        color: buttonObject.textColor, ...buttonObject.style
-                                    }}
-                                    ref={element => {
-                                        if (buttonObject.isActionButton) {
-                                            this.actionButton = element;
-                                        }
-                                        if (buttonObject.getRef !== undefined) {
-                                            // @ts-ignore
-                                            buttonObject.getRef(element);
-                                        }
-                                    }}
-                                    disabled={buttonObject.isActionButton && this.dialogErrorState.second}>
-                                {buttonObject.label}
-                            </Button>
-                        )
-                    })}
-                </DialogActions>
-            </Dialog>
-        )
+        return <Builder context={this}/>
     }
-
     //  <------------------------- Build -------------------------
 
 
@@ -238,6 +160,96 @@ export class DialogBuilder {
         this.handleClose(this);
         return this;
     }
-
     //  <------------------------- Convenience -------------------------
+}
+
+function Builder({context}: ContextType<DialogBuilder>) {
+    let state = useState(() => {
+        if (context.input) {
+            if (context.input.inputValidator) {
+                context.validate(context.input.initialValue ? context.input.initialValue : "")
+            }
+        }
+        return persistentErrorState;
+    });
+    persistentErrorState = state[0];
+    setPersistentErrorState = state[1];
+    return (
+        <Dialog open={context.open} onClose={event => context.handleClose(context, event)}>
+            <DialogTitle id="form-dialog-title">{context.title}</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    {context.text}
+                </DialogContentText>
+                {buildInput(context)}
+                {context.content ? context.content(context) : null}
+            </DialogContent>
+            <DialogActions>
+                {context._buttonList.toArray().map(buttonObject => {
+                    let buttonColor: PropTypes.Color = (boolOr(buttonObject.color, 'inherit', 'primary', 'secondary', 'default') ? buttonObject.color : undefined) as PropTypes.Color;
+                    if (!buttonColor && buttonObject.isActionButton)
+                        buttonColor = "primary";
+                    return (
+                        <Button variant={buttonColor ? "contained" : undefined}
+                                color={buttonColor} onClick={event => {
+                            if (buttonObject.onClick)
+                                buttonObject.onClick(context, event)
+
+                            if (boolOr(buttonObject.dismissOnClick, undefined, true))
+                                context.handleClose(context, event)
+                        }} id={buttonObject.id}
+                                startIcon={buttonObject.iconAtStart && buttonObject.icon ? buttonObject.icon : undefined}
+                                endIcon={!buttonObject.iconAtStart && buttonObject.icon ? buttonObject.icon : undefined}
+                                style={{
+                                    backgroundColor: !buttonColor && buttonObject.color ? buttonObject.color : undefined,
+                                    color: buttonObject.textColor, ...buttonObject.style
+                                }}
+                                ref={element => {
+                                    if (buttonObject.isActionButton) {
+                                        context.actionButton = element;
+                                    }
+                                    if (buttonObject.getRef !== undefined) {
+                                        // @ts-ignore
+                                        buttonObject.getRef(element);
+                                    }
+                                }}
+                                disabled={buttonObject.isActionButton && persistentErrorState.second}>
+                            {buttonObject.label}
+                        </Button>
+                    )
+                })}
+            </DialogActions>
+        </Dialog>
+    )
+}
+
+function buildInput(context: DialogBuilder) {
+    if (context.input === undefined)
+        return null;
+    // setPersistentErrorState = setPersistentErrorState;
+    // persistentErrorState = persistentErrorState;
+
+    return (
+        <TextField
+            autoFocus
+            margin="dense"
+            label={context.input.label}
+            fullWidth
+            onKeyPress={(event) => {
+                if (event.key === 'Enter' && !persistentErrorState.second) {
+                    if (context.actionButton) {
+                        context.actionButton.click();
+                    }
+                }
+            }}
+            error={!!persistentErrorState.first}
+            helperText={persistentErrorState.first}
+            onChange={context.input.inputValidator ? event => {
+                context.validate(event.target.value);
+                setPersistentErrorState(persistentErrorState)
+            } : undefined}
+            value={persistentErrorState.third}
+            placeholder={context.input.hint}
+        />
+    )
 }

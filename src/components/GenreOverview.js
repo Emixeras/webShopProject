@@ -35,7 +35,7 @@ class GenreOverview extends Component {
     }
 
     loadGenre() {
-        axios.get("http://localhost:8080/genre").then((response) => {
+        axios.get("http://localhost:8080/genre;picture=true").then((response) => {
             // showToast("genre fetch ok", "success");
             genreArray = [];
             var genreresponse = response.data;

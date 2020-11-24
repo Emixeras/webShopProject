@@ -5,7 +5,7 @@ import {resolve} from "dns";
 
 const apiBaseUrlUpdateArtist = 'http://localhost:8080/artist/';
 
-export const createNewArtist = (metaDataPayload: object, pictureFile: File | null, onSuccess: (response: any) => void, onFail: (error: any) => void) => {
+export const createNewArtist = (metaDataPayload: object, pictureFile: File | null, onSuccess?: (response: any) => void, onFail?: (error: any) => void) => {
     var user = getSessionUser();
     if (!user) {
         showToast("Nicht angemeldet", "error");
@@ -43,7 +43,7 @@ export const createNewArtist = (metaDataPayload: object, pictureFile: File | nul
         });
 };
 
-export const updateArtist = (metaDataPayload: object, pictureFile: File | null , onSuccess: Function, onFail: Function) => {
+export const updateArtist = (metaDataPayload: object, pictureFile: File | null, onSuccess?: (response: any) => void, onFail?: (error: any) => void) => {
     var user = getSessionUser();
     if (!user) {
         showToast("Nicht angemeldet", "error");
@@ -81,3 +81,46 @@ export const updateArtist = (metaDataPayload: object, pictureFile: File | null ,
         });
 };
 
+export function deleteArtist(id: number, onSuccess?: (response: any) => void, onFail?: (error: any) => void) {
+    var user = getSessionUser();
+    if (!user) {
+        showToast("Nicht angemeldet", "error");
+        return
+    }
+
+    const config = {
+        auth: {
+            username: user.email,
+            password: user.password
+        },
+    };
+    axios.delete(apiBaseUrlUpdateArtist + id, config)
+        .then(function (response) {
+            console.log(response);
+            if(onSuccess)
+                onSuccess(response)
+        })
+        .catch(function (error) {
+            console.log(error);
+            if(onFail)
+                onFail(error);
+        });
+
+
+
+    // fetch(new Request(apiBaseUrlUpdateArtist + id, {method: 'DELETE'}))
+    //     .then(response => {
+    //         debugger
+    //         if (response.status === 200) {
+    //             if (onSuccess)
+    //                 onSuccess(response)
+    //         } else {
+    //             throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
+    //         }
+    //     })
+    //     .catch(reason => {
+    //         if (onFail)
+    //             onFail(reason)
+    //     })
+
+}

@@ -1,30 +1,37 @@
 import * as React from "react";
+import {useState} from "react";
 import {
-    Grid,
     Button,
     Card,
-    TextField,
+    Grid,
+    IconButton,
     InputAdornment,
-    IconButton, Typography,
+    TextField,
+    Typography,
 } from "@material-ui/core";
 import MenuDrawer from "./MenuDrawer";
-import {padding, showToast} from "../Utilities/Utilities";
+import {margin, padding, shallowEqual, showToast} from "../Utilities/Utilities";
 import SimpleReactFileUpload from "./SimpleReactFileUpload";
 import {Combobox} from 'react-widgets'
 import 'react-widgets/dist/css/react-widgets.css';
-import AddIcon from '@material-ui/icons/Add';
+import EditIcon from '@material-ui/icons/Edit';
 import ClearIcon from '@material-ui/icons/Clear';
+import DeleteIcon from '@material-ui/icons/Delete';
 import {DialogBuilder} from "../Utilities/DialogBuilder";
 import {
     base64ToDataUri,
-    ContextType, filterArticle,
-    LazyImage, nameComparator,
-    Pair, RestrictedPage,
+    ContextType,
+    filterArticle,
+    LazyImage,
+    loadSingleImage,
+    nameComparator,
+    Pair,
+    RestrictedPage,
+    RETURN_MODE
 } from "../Utilities/TsUtilities";
 import {Save} from "@material-ui/icons";
 import {updateArticle} from "../services/ItemApiUtil";
-import {createNewArtist} from "../services/ArtistApiUtil";
-import {useState} from "react";
+import {createNewArtist, deleteArtist, updateArtist} from "../services/ArtistApiUtil";
 
 interface IProps {
     // @ts-ignore
@@ -90,7 +97,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
         if (this.props.location.state)
             this.state = this.props.location.state.article;
         this.loadData();
-        window.scrollTo(0,0);
+        window.scrollTo(0, 0);
     }
 
     loadData() {
@@ -310,7 +317,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                   name={"test"}
                                         />
                                     </Grid>
-                                    {(this.state.id !== -1 || this.currentPicture) &&
+                                    {(!shallowEqual(initialState, this.state) || this.currentPicture) &&
                                     <Grid item>
                                         <IconButton style={{maxHeight: 38, maxWidth: 38}}
                                                     onClick={event => {
@@ -429,7 +436,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                                 setImgSrc(URL.createObjectURL(this.currentPicture));
                                                                 this.setFileUploadDefaultVisibility(false);
                                                             } else if (this.state.id !== -1) {
-                                                                this.loadSingleImage(this.state.id, imageResponse => {
+                                                                loadSingleImage("article", this.state.id, imageResponse => {
                                                                     if (imageResponse) {
                                                                         setImgSrc(base64ToDataUri(imageResponse.file));
                                                                         this.setFileUploadDefaultVisibility(false);
@@ -489,32 +496,30 @@ export default class EditArticles extends React.Component<IProps, IState> {
         )
     }
 
-    loadSingleImage(id: number, onFinish: (imageResponse?: ImageResponseType) => void) {
-        fetch(new Request(`http://localhost:8080/article/range;start=${id};end=${id};quality=${300}`, {method: 'GET'}))
-            .then(response => {
-                if (response.status === 200) {
-                    return response.json();
-                } else {
-                    throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
-                }
-            })
-            .then((response: ImageResponseType[]) => onFinish(response[0]))
-            .catch(reason => {
-                showToast(reason.message, "error")
-            })
-    }
+    // loadSingleImage(id: number, onFinish: (imageResponse?: ImageResponseType) => void) {
+    //     fetch(new Request(`http://localhost:8080/article/range;start=${id};end=${id};quality=${300}`, {method: 'GET'}))
+    //         .then(response => {
+    //             if (response.status === 200) {
+    //                 return response.json();
+    //             } else {
+    //                 throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
+    //             }
+    //         })
+    //         .then((response: ImageResponseType[]) => onFinish(response[0]))
+    //         .catch(reason => {
+    //             showToast(reason.message, "error")
+    //         })
+    // }
 }
 
 let setIsPictureNotSelected: (visibility: boolean) => void = visibility => {
 };
 
 function DialogComponent(arg: any) {
-    const that: EditArticles = arg.context;
+    const context: EditArticles = arg.context;
+    const artist: ArtistOrGenre | undefined = context.state.artists;
     const [open, setOpen] = React.useState(false);
     const [picture, setPicture] = useState<File>();
-
-
-    // debugger
 
     return (
         <div>
@@ -525,19 +530,23 @@ function DialogComponent(arg: any) {
                         onMouseDown={(event) => {
                             event.preventDefault();
                         }}>
-                {<AddIcon/>}
+                {<EditIcon/>}
             </IconButton>
 
             {new DialogBuilder(open, dialogBuilder => setOpen(false))
-                .setTitle("Künstler Anlegen")
-                .setText("Bitte den Namen des neuen Künstlers eingeben und auf 'Anlegen' klicken.")
+                .setTitle("Künstler " + (artist ? `Bearbeiten (${artist.name})` : "Anlegen"))
+                .setText(!artist ? "Bitte den Namen des neuen Künstlers eingeben und auf 'Anlegen' klicken." :
+                    "Die Daten des Künstlers bearbeiten und dann auf 'Speichern' klicken")
                 .setInput({
                     label: "Künstler Name",
+                    initialValue: artist ? artist.name : undefined,
                     inputValidator: text => {
-                        let newInput = text;
+                        let newInput = text.toLowerCase().trim();
+                        if (artist && artist.name.toLowerCase() === newInput)
+                            return Pair.make("" , false);
                         let result = "";
-                        for (let artist of that.artists) {
-                            if (artist.name.toLowerCase() === newInput.toLowerCase().trim()) {
+                        for (let artist of context.artists) {
+                            if (artist.name.toLowerCase() === newInput) {
                                 result = "Der Künstler existiert bereits";
                                 break
                             }
@@ -548,78 +557,119 @@ function DialogComponent(arg: any) {
                 })
                 .setContent(dialogBuilder => {
                     return (
-                        <div style={{width: 250, height: 250, marginTop: 15}}>
-                            <div style={{
-                                width: 250,
-                                height: 250,
-                                zIndex: 1,
-                                position: "absolute"
-                            }}>
-                                <LazyImage
-                                    style={{
-                                        width: "100%",
-                                        height: "100%",
-                                        zIndex: 5
-                                    }}
-                                    rounded
-                                    alt={"Ausgewähltes Künstler-Bild"}
-                                    payload={picture}
-                                    shouldImageUpdate={(oldPayload: File, newPayload: File) => {
-                                        return oldPayload !== newPayload
-                                    }}
-                                    // shouldImageUpdate={oldPayload => true}
-                                    getSrc={setImgSrc => {
-                                        if (picture) {
-                                            setImgSrc(URL.createObjectURL(picture));
-                                            setIsPictureNotSelected(false);
-                                        } else
-                                            setIsPictureNotSelected(true);
-
-                                    }}
-                                />
-                            </div>
-                            <div style={{
-                                width: 250,
-                                height: 250,
-                                zIndex: 2,
-                                position: "absolute",
-                            }}>
-                                <SimpleReactFileUpload
-                                    onFileSelected={(file: File) => {
-                                        // that.currentPicture = file;
-                                        // that.forceUpdate()
-                                        setPicture(file);
-                                    }}
-                                    setDefaultVisibility={((setVisibility: (visibility: boolean) => void) => setIsPictureNotSelected = setVisibility)}
-                                />
-                            </div>
-                        </div>
+                        <Grid container>
+                            <Grid item>
+                                <div style={{width: 250, height: 250, marginTop: 15}}>
+                                    <div style={{
+                                        width: 250,
+                                        height: 250,
+                                        zIndex: 1,
+                                        position: "absolute"
+                                    }}>
+                                        <LazyImage
+                                            style={{
+                                                width: "100%",
+                                                height: "100%",
+                                                zIndex: 5
+                                            }}
+                                            rounded
+                                            alt={"Ausgewähltes Künstler-Bild"}
+                                            payload={Pair.make(picture, artist)}
+                                            shouldImageUpdate={(oldPayload: Pair<File,ArtistOrGenre>, newPayload: Pair<File,ArtistOrGenre>) => {
+                                                return open && (oldPayload.first !== newPayload.first || !oldPayload.second || !newPayload.second ||  oldPayload.second.id !== newPayload.second.id)
+                                            }}
+                                            // shouldImageUpdate={oldPayload => true}
+                                            getSrc={setImgSrc => {
+                                                if (picture) {
+                                                    setImgSrc(URL.createObjectURL(picture));
+                                                    setIsPictureNotSelected(false);
+                                                } else if (artist) {
+                                                    loadSingleImage("artist", artist.id, imageResponse => {
+                                                        if (imageResponse && imageResponse.file) {
+                                                            setImgSrc(base64ToDataUri(imageResponse.file));
+                                                            setIsPictureNotSelected(false);
+                                                        } else
+                                                            setIsPictureNotSelected(false);
+                                                    });
+                                                } else
+                                                    setIsPictureNotSelected(true);
+                                            }}
+                                        />
+                                    </div>
+                                    <div style={{
+                                        width: 250,
+                                        height: 250,
+                                        zIndex: 2,
+                                        position: "absolute",
+                                    }}>
+                                        <SimpleReactFileUpload
+                                            onFileSelected={(file: File) => {
+                                                // context.currentPicture = file;
+                                                // context.forceUpdate()
+                                                setPicture(file);
+                                            }}
+                                            setDefaultVisibility={((setVisibility: (visibility: boolean) => void) => setIsPictureNotSelected = setVisibility)}
+                                        />
+                                    </div>
+                                </div>
+                            </Grid>
+                            {artist &&
+                            <Grid item>
+                                <Button style={margin(15,0,0,15)} variant={"contained"} color={"secondary"} endIcon={<DeleteIcon/>} onClick={event => {
+                                    deleteArtist(artist.id, response => {
+                                        showToast("Der Nutzer wurde gelöscht", "success");
+                                        dialogBuilder.dismiss();
+                                    }, error => {
+                                        showToast("Nay " + error.message, "error");
+                                    })
+                                }}>Löschen</Button>
+                            </Grid>}
+                        </Grid>
                     )
                 })
                 .addButton("Abbrechen")
                 .addButton({
-                    label: "Anlegen",
+                    label: artist ? "Speichern" : "Anlegen",
                     isActionButton: true,
                     onClick: dialogBuilder => {
-                        let netArtist = {
-                            // id: that.artists.length + 1,
-                            name: dialogBuilder.getInputText().trim(),
-                        };
-                        createNewArtist(netArtist, picture ? picture : null, response => {
-                            console.log(response);
-                            // showToast("Jay", "success");
-                            that.loadArtists(() => {
-                                that.forceUpdate();
-                                showToast("Der Künstler wurde angelegt", "success")
-                            })
-                        }, error => {
-                            console.log(error);
-                            showToast(error.message, "error");
-                            debugger
-                        });
+                        if (!artist) {
+                            let netArtist = {
+                                // id: context.artists.length + 1,
+                                name: dialogBuilder.getInputText().trim(),
+                            };
+                            createNewArtist(netArtist, picture ? picture : null, response => {
+                                // showToast("Jay", "success");
+                                context.loadArtists(() => {
+                                    context.forceUpdate();
+                                    showToast("Der Künstler wurde angelegt", "success")
+                                })
+                            }, error => {
+                                console.log(error);
+                                showToast(error.message, "error");
+                                debugger
+                            });
+                        } else {
+                            let newName = dialogBuilder.getInputText().trim()
+                            if (artist.name === newName && !picture)
+                                showToast("Keine Änderungen wurden vorgenommen", "info");
+                            else {
+                                debugger
+                                updateArtist({id: artist.id, name: newName}, picture ? picture : null, response => {
+                                    // showToast("Jay", "success");
+                                    context.loadArtists(() => {
+                                        context.forceUpdate();
+                                        showToast("Der Künstler wurde geändert", "success")
+                                    })
+                                }, error => {
+                                    console.log(error);
+                                    showToast(error.message, "error");
+                                    debugger
+                                })
+                            }
+                        }
 
-                        // that.artists.push(netArtist);
-                        // that.setState({artists: netArtist});
+                        // context.artists.push(netArtist);
+                        // context.setState({artists: netArtist});
                     }
                 })
                 .build()

@@ -88,6 +88,8 @@ export enum ROLES {
 
 //  ------------------------- Image ------------------------->
 export function base64ToDataUri(base64: string): string {
+    // if (!base64)
+    //     return "";
     var mime;
     if (base64.startsWith("iVBORw0KGgo"))
         mime = "image/png";
@@ -123,7 +125,10 @@ export function base64ToDataUri(base64: string): string {
     return `data:${mime};base64,${base64}`
 }
 
-export function loadSingleImage(type: "article" | "artist", articleId: number, onFinish: (imageResponse?: ImageResponseType) => void, imageResolution?: number) {
+interface ImageResponseFunction {
+    (imageResponse?: ImageResponseType): void
+}
+export function loadSingleImage(type: "article" | "artist", articleId: number, onFinish: (ImageResponseFunction | Function), imageResolution?: number) {
     fetch(new Request(`http://localhost:8080/${type}/range;start=${articleId};end=${articleId};quality=${imageResolution ? imageResolution : 250}`, {method: 'GET'}))
         .then(response => {
             if (response.status === 200) {
@@ -132,7 +137,13 @@ export function loadSingleImage(type: "article" | "artist", articleId: number, o
                 throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
             }
         })
-        .then((response: ImageResponseType[]) => onFinish(response[0]))
+        .then((response: ImageResponseType[]) => {
+            if (onFinish.name === "setImgSrc") {
+                // @ts-ignore
+                onFinish(base64ToDataUri(response[0].file))
+            } else
+                onFinish(response[0])
+        })
         .catch(reason => {
             showToast(reason.message, "error")
         })
@@ -214,8 +225,12 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
                     entries => {
                         entries.forEach(entry => {
                             if (!didCancel && (entry.intersectionRatio > 0 || entry.isIntersecting)) {
-                                // @ts-ignore
-                                this.loadImage(result => this.observer.unobserve(this.imageRef))
+                                const that = this;
+                                this.loadImage(function setImgSrc(result: string) {
+                                        // @ts-ignore
+                                        return that.observer.unobserve(that.imageRef);
+                                    }
+                                );
                             }
                         })
                     },
@@ -276,11 +291,12 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
     }
 
     private loadImage(onResult?: (result: string) => boolean | void) {
-        this.getSrc(result => {
-            this.imageSrc = result;
+        const that = this;
+        this.getSrc(function setImgSrc(result: string) {
+            that.imageSrc = result;
             if (onResult)
                 onResult(result);
-            this.forceUpdate();
+            that.forceUpdate();
         }, this.payload)
     }
 
@@ -316,6 +332,15 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
         }
         switch (this.returnMode) {
             default:
+            case RETURN_MODE.CARD_MEDIA:
+                return <CardMedia className={this.className}
+                                  style={{borderRadius: borderRadius, ...this.style}}
+                                  image={this.imageSrc}
+                                  id={this.id}
+                                  ref={element => {
+                                      if (element) this.imageRef = element
+                                  }}
+                                  title={this.alt}/>;
             case RETURN_MODE.IMG:
                 return <img className={this.className}
                             style={{borderRadius: borderRadius, ...this.style}}
@@ -326,15 +351,6 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
                             }}
                             alt={this.alt}
                 />;
-            case RETURN_MODE.CARD_MEDIA:
-                return <CardMedia className={this.className}
-                                  style={{borderRadius: borderRadius, ...this.style}}
-                                  image={this.imageSrc}
-                                  id={this.id}
-                                  ref={element => {
-                                      if (element) this.imageRef = element
-                                  }}
-                                  title={this.alt}/>;
         }
 
     }
