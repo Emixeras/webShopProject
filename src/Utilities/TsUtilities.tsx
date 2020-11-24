@@ -435,6 +435,21 @@ export function ifExistsReturnOrElse<T, R>(input: T, returnFunction: (input: T) 
     }
 }
 
+export function ifValueReturnOrElse<T, R>(input: T, value: T, returnFunction: ((input: T) => R) | undefined, orElse: R | (() => R), reverse?: boolean): R {
+    if ((reverse && input !== value) || (!reverse && input === value))
+        if (returnFunction)
+            return returnFunction(input);
+        else
+            // @ts-ignore
+            return input;
+    else {
+        if (typeof orElse === "function")
+            return (orElse as Function)();
+        else
+            return orElse;
+    }
+}
+
 export function artistOrGenre_comparator (a: ArtistOrGenre, b: ArtistOrGenre) {
     return name_comparator(a.name, b.name)
 }

@@ -12,7 +12,7 @@ import {
     base64ToDataUri,
     ContextType,
     filterArticle,
-    ifExistsReturnOrElse,
+    ifExistsReturnOrElse, ifValueReturnOrElse,
     LazyImage,
     Pair,
     RETURN_MODE
@@ -28,7 +28,7 @@ import {
     InputLabel,
     OutlinedInput,
     Slider,
-    Switch
+    Switch, TextField
 } from "@material-ui/core";
 import {DialogBuilder} from "../Utilities/DialogBuilder";
 import SettingsIcon from '@material-ui/icons/Settings';
@@ -63,12 +63,14 @@ interface ImageResponseType {
 export default class AlbumOverview extends React.Component<IProps, IState> {
     IMAGE_RESOLUTION: string = "IMAGE_RESOLUTION";
     imageResolution: number = +(localStorage.getItem(this.IMAGE_RESOLUTION) as string);
+    STEP_DISTANCE: string = "STEP_DISTANCE";
+    stepDistance: number = ifValueReturnOrElse(+(localStorage.getItem(this.STEP_DISTANCE) as string), 0, undefined, 48, true);
     UNLOAD_IMAGES: string = "UNLOAD_IMAGES";
     unloadImages: boolean = (localStorage.getItem(this.UNLOAD_IMAGES) as string) == 'true';
     imageReloadArray: Array<() => void> = [];
     query: Pair<string, boolean> = Pair.make("", false);
     filter?: Pair<FilterPayload, string>;
-    maxVisible: number = 24;
+    maxVisible: number = this.stepDistance;
     hasMore: boolean = true;
 
     constructor(props: IProps, context: any) {
@@ -172,7 +174,7 @@ function Album(props: ContextType<AlbumOverview>) {
     const classes = useStyles();
     let context = props.context;
     let filteredArticleArray: Array<Article>;
-    context.maxVisible = 24;
+    context.maxVisible = context.stepDistance;
     context.hasMore = true;
 
     if (articleArray.length === 0)
@@ -369,7 +371,7 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
             }} endIcon={<SettingsIcon/>}>Einstellungen</Button>
             {new DialogBuilder(open, dialogBuilder => setOpen(false))
                 .setTitle("UI Einstellungen")
-                .setText("Die Qualität der Vorschaubilder und das Bilder-Ladeverhalten können angepasst werden")
+                .setText("Die Qualität der Vorschaubilder und die Schrittweite der zu ladenen Bilder")
                 .setContent(dialogBuilder => {
                     return (
                         <div>
@@ -386,7 +388,7 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
                                     let value = +event.target.ariaValueNow;
                                     if (context.imageResolution !== value) {
                                         context.imageResolution = value;
-                                        localStorage.setItem("IMAGE_RESOLUTION", `${value}`);
+                                        localStorage.setItem(context.IMAGE_RESOLUTION, `${value}`);
                                         reloadImages(context);
                                     }
                                 }}
@@ -410,21 +412,62 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
                                 ]}
                                 valueLabelDisplay="on"
                             />
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={checked}
-                                        onChange={(event, checked) => {
-                                            context.unloadImages = checked;
-                                            setChecked(checked);
-                                            localStorage.setItem(context.UNLOAD_IMAGES, `${checked}`)
-                                        }}
-                                        name="checkedB"
-                                        color="primary"
-                                    />
-                                }
-                                label="Bilder automatisch entladen"
+                            <Slider
+                                style={{width: "95%", ...margin(30, 15, 0)}}
+                                defaultValue={context.stepDistance}
+                                getAriaValueText={value => `${value} Elemente`}
+                                aria-labelledby="discrete-slider-small-steps"
+                                step={12}
+                                min={12}
+                                max={96}
+                                onMouseUp={event => {
+                                    // @ts-ignore
+                                    let value = +event.target.ariaValueNow;
+                                    if (context.stepDistance !== value) {
+                                        context.stepDistance = value;
+                                        localStorage.setItem(context.STEP_DISTANCE, `${value}`);
+                                        reloadImages(context);
+                                    }
+                                }}
+                                marks={[
+                                    {
+                                        value: 12,
+                                        label: 'Min',
+                                    },
+                                    {
+                                        value: 24,
+                                        label: 'Klein',
+                                    },
+                                    {
+                                        value: 48,
+                                        label: 'Mittel',
+                                    },
+                                    {
+                                        value: 72,
+                                        label: 'Groß',
+                                    },
+                                    {
+                                        value: 96,
+                                        label: 'Max',
+                                    },
+                                ]}
+                                valueLabelDisplay="on"
                             />
+                            {/*<FormControlLabel*/}
+                            {/*    control={*/}
+                            {/*        <Switch*/}
+                            {/*            checked={checked}*/}
+                            {/*            onChange={(event, checked) => {*/}
+                            {/*                context.unloadImages = checked;*/}
+                            {/*                setChecked(checked);*/}
+                            {/*                localStorage.setItem(context.UNLOAD_IMAGES, `${checked}`)*/}
+                            {/*            }}*/}
+                            {/*            name="checkedB"*/}
+                            {/*            color="primary"*/}
+                            {/*        />*/}
+                            {/*    }*/}
+                            {/*    label="Bilder automatisch entladen"*/}
+                            {/*/>*/}
                         </div>
                     )
                 })
@@ -441,7 +484,7 @@ function GridList({context, filteredArticleArray}: { context: AlbumOverview, fil
     // const [hasMore, setHasMore] = useState(true);
     // const [count, setCount] = useState(24);
     const [dummy, setDummy] = useState(0);
-    const step = 24;
+    const step = context.stepDistance;
     let shortedFilteredArticleArray: Article[];
 
     const fetchMoreData = () => {
