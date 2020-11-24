@@ -24,7 +24,7 @@ import {
     filterArticle,
     LazyImage,
     loadSingleImage,
-    nameComparator,
+    artistOrGenre_comparator,
     Pair,
     RestrictedPage,
     RETURN_MODE
@@ -101,7 +101,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
     }
 
     loadData() {
-        let pendingRequests = 2;
+        let pendingRequests = 3;
         fetch(new Request("http://localhost:8080/article", {method: 'GET'}))
             .then(response => {
                 if (response.status === 200) {
@@ -115,13 +115,6 @@ export default class EditArticles extends React.Component<IProps, IState> {
 
                 this.articles = response;
 
-                var flags = [], l = response.length, i;
-                for (i = 0; i < l; i++) {
-                    if (flags[response[i].genre.id]) continue;
-                    flags[response[i].genre.id] = true;
-                    this.genres.push(response[i].genre);
-                }
-                this.genres.sort(nameComparator)
 
                 if (--pendingRequests === 0)
                     this.forceUpdate()
@@ -135,35 +128,30 @@ export default class EditArticles extends React.Component<IProps, IState> {
                 this.forceUpdate()
         })
 
-        // fetch(new Request("http://localhost:8080/genre", {method: 'GET'}))
-        //     .then(response => {
-        //         if (response.status === 200) {
-        //             return response.json();
-        //         } else {
-        //             throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
-        //         }
-        //     })
-        //     .then((response: Array<ArtistOrGenre>) => {
-        //         this.artists = response;
-        //         let nameComparetor = (a: ArtistOrGenre, b: ArtistOrGenre) => {
-        //             var nameA = a.name.toUpperCase();
-        //             var nameB = b.name.toUpperCase();
-        //             if (nameA < nameB) {
-        //                 return -1;
-        //             }
-        //             if (nameA > nameB) {
-        //                 return 1;
-        //             }
-        //             return 0;
-        //         };
-        //         this.artists.sort(nameComparetor)
-        //
-        //         if (--pendingRequests === 0)
-        //             this.forceUpdate()
-        //     })
-        //     .catch(reason => {
-        //         showToast(reason.message, "error")
-        //     })
+        fetch(new Request("http://localhost:8080/genre", {method: 'GET'}))
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
+                }
+            })
+            .then((response: object) => {
+
+                this.genres = [];
+                Object.keys(response).forEach((key) => {
+                    // @ts-ignore
+                    this.genres.push(response[key].genre);
+                });
+
+                this.genres.sort(artistOrGenre_comparator)
+
+                if (--pendingRequests === 0)
+                    this.forceUpdate()
+            })
+            .catch(reason => {
+                showToast(reason.message, "error")
+            })
     }
 
     loadArtists(onLoaded: () => void) {
@@ -177,7 +165,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
             })
             .then((response: Array<ArtistOrGenre>) => {
                 this.artists = response;
-                this.artists.sort(nameComparator)
+                this.artists.sort(artistOrGenre_comparator)
 
                 onLoaded();
             })
@@ -533,7 +521,10 @@ function DialogComponent(arg: any) {
                 {<EditIcon/>}
             </IconButton>
 
-            {new DialogBuilder(open, dialogBuilder => setOpen(false))
+            {new DialogBuilder(open, dialogBuilder => {
+                setPicture(undefined)
+                setOpen(false);
+            })
                 .setTitle("Künstler " + (artist ? `Bearbeiten (${artist.name})` : "Anlegen"))
                 .setText(!artist ? "Bitte den Namen des neuen Künstlers eingeben und auf 'Anlegen' klicken." :
                     "Die Daten des Künstlers bearbeiten und dann auf 'Speichern' klicken")
@@ -576,7 +567,7 @@ function DialogComponent(arg: any) {
                                             alt={"Ausgewähltes Künstler-Bild"}
                                             payload={Pair.make(picture, artist)}
                                             shouldImageUpdate={(oldPayload: Pair<File,ArtistOrGenre>, newPayload: Pair<File,ArtistOrGenre>) => {
-                                                return open && (oldPayload.first !== newPayload.first || !oldPayload.second || !newPayload.second ||  oldPayload.second.id !== newPayload.second.id)
+                                                return open && (oldPayload.first !== newPayload.first ||  !shallowEqual(oldPayload.second, newPayload.second))
                                             }}
                                             // shouldImageUpdate={oldPayload => true}
                                             getSrc={setImgSrc => {
@@ -617,8 +608,11 @@ function DialogComponent(arg: any) {
                             <Grid item>
                                 <Button style={margin(15,0,0,15)} variant={"contained"} color={"secondary"} endIcon={<DeleteIcon/>} onClick={event => {
                                     deleteArtist(artist.id, response => {
-                                        showToast("Der Nutzer wurde gelöscht", "success");
-                                        dialogBuilder.dismiss();
+                                        context.loadArtists(() => {
+                                            showToast("Der Nutzer wurde gelöscht", "success");
+                                            dialogBuilder.dismiss();
+                                            context.forceUpdate();
+                                        })
                                     }, error => {
                                         showToast("Nay " + error.message, "error");
                                     })

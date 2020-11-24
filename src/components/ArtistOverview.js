@@ -18,9 +18,10 @@ import axios from "axios";
 import {Carousel} from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import {
+    artistOrGenre_comparator,
     base64ToDataUri,
     LazyImage,
-    loadSingleImage,
+    loadSingleImage, name_comparator,
     RETURN_MODE
 } from "../Utilities/TsUtilities";
 
@@ -62,6 +63,7 @@ class ArtistOverview extends Component {
             Object.keys(artistResponse).forEach(key => {
                 artistResponseArray.push({file: "", artistOrGenre: artistResponse[key]});
             });
+            artistResponseArray.sort((a, b) => name_comparator(a.artistOrGenre.name, b.artistOrGenre.name))
             this.forceUpdate()
         })
             .catch(function (error) {
@@ -120,10 +122,12 @@ function ArtistComponent({artistResponse}) {
                         className={classes.cardMedia}
                         // payload={artistResponse}
                         getSrc={setImgSrc => {
-                            // if (artistResponse.artistOrGenre.id === 51)
+                            // if (artistResponse.artistOrGenre.name === "Green Artist")
+                            //     debugger
+                            // if (artistResponse.artistOrGenre.id === 54)
                             //     debugger
                             loadSingleImage("artist", artistResponse.artistOrGenre.id, imageResponse => {
-                                // if (artistResponse.artistOrGenre.id === 1)
+                                // if (artistResponse.artistOrGenre.id === 54)
                                 //     debugger
                                 if (imageResponse) {
                                     let file = imageResponse.file;

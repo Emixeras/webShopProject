@@ -435,18 +435,22 @@ export function ifExistsReturnOrElse<T, R>(input: T, returnFunction: (input: T) 
     }
 }
 
-export function nameComparator (a: ArtistOrGenre, b: ArtistOrGenre) {
-    var nameA = a.name.toUpperCase();
-    var nameB = b.name.toUpperCase();
-    if (nameA < nameB) {
+export function artistOrGenre_comparator (a: ArtistOrGenre, b: ArtistOrGenre) {
+    return name_comparator(a.name, b.name)
+}
+
+export function name_comparator(a: string, b: string) {
+    a = a.toUpperCase();
+    b = b.toUpperCase();
+
+    if (a < b) {
         return -1;
     }
-    if (nameA > nameB) {
+    if (a > b) {
         return 1;
     }
     return 0;
-};
-
+}
 
 // ---------------
 
