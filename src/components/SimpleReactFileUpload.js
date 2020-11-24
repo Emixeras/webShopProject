@@ -6,7 +6,8 @@ import Typography from "@material-ui/core/Typography";
 
 
 class SimpleReactFileUpload extends React.Component {
-    ;
+
+    inputRef;
 
     constructor(props) {
         super(props);
@@ -20,21 +21,15 @@ class SimpleReactFileUpload extends React.Component {
             this.props.setDefaultVisibility(visibility => this.setState({defaultVisibility: visibility}))
         }
         this.onClickHandler = this.onClickHandler.bind(this);
-        this.onDrop = this.onDrop.bind(this)
+        // this.onDrop = this.onDrop.bind(this)
     }
-
-    onFormSubmit(e) {
-        e.preventDefault(); // Stop form submit
-        this.onClickHandler();
-    }
-
 
     onDrop = event => {
         event.stopPropagation();
         event.preventDefault();
 
         let file;
-        if (event.target)
+        if (event.target && event.target.files)
             file = event.target.files[0];
         else
             file = event.dataTransfer.files[0];
@@ -97,26 +92,35 @@ class SimpleReactFileUpload extends React.Component {
                             onDragLeave={preventDefault}
                             onDragOver={preventDefault}
                             onDrop={this.onDrop}
-                            onClick={event => document.getElementById("upload-photo-button").click()}>
+                            onClick={event => this.inputRef ? this.inputRef.click() : null}>
                         Öffnen
                     </Button>
-                    <input style={{opacity: 0, position: "absolute", zIndex: -1, height: "100%", width: "100%"}}
-                           type="file" name="photo" id="upload-photo-button"
-                           onChange={this.onDrop}/>
-                    <Typography style={{
-                        width: "100%",
-                        opacity: 1,
-                        position: "absolute",
-                        zIndex: 1,
-                        textAlign: "center",
-                        color: "white",
-                        fontWeight: 600,
-                        marginTop: "170px"
-                    }}
-                                onDragEnter={preventDefault}
-                                onDragLeave={preventDefault}
-                                onDragOver={preventDefault}
-                                onDrop={this.onDrop}
+                    <input
+                        style={{
+                            opacity: 0,
+                            position: "absolute",
+                            zIndex: -1,
+                            height: "100%",
+                            width: "100%"
+                        }}
+                        ref={instance => this.inputRef = instance}
+                        type="file" name="photo" id="upload-photo-button"
+                        onChange={this.onDrop}/>
+                    <Typography
+                        style={{
+                            width: "100%",
+                            opacity: 1,
+                            position: "absolute",
+                            zIndex: 1,
+                            textAlign: "center",
+                            color: "white",
+                            fontWeight: 600,
+                            marginTop: "170px"
+                        }}
+                        onDragEnter={preventDefault}
+                        onDragLeave={preventDefault}
+                        onDragOver={preventDefault}
+                        onDrop={this.onDrop}
                     >
                         oder hierher ziehen
                     </Typography>

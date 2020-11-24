@@ -1,6 +1,5 @@
 import * as React from "react";
 import {
-    Box,
     Grid,
     Button,
     Card,
@@ -11,22 +10,19 @@ import {
 import MenuDrawer from "./MenuDrawer";
 import {padding, showToast} from "../Utilities/Utilities";
 import SimpleReactFileUpload from "./SimpleReactFileUpload";
-import {Combobox, DropdownList} from 'react-widgets'
+import {Combobox} from 'react-widgets'
 import 'react-widgets/dist/css/react-widgets.css';
 import AddIcon from '@material-ui/icons/Add';
+import ClearIcon from '@material-ui/icons/Clear';
 import {DialogBuilder} from "../Utilities/DialogBuilder";
 import {
     base64ToDataUri,
     ContextType, filterArticle,
-    LazyImage,
+    LazyImage, nameComparator,
     Pair, RestrictedPage,
-    Triple
 } from "../Utilities/TsUtilities";
 import {Save} from "@material-ui/icons";
 import {updateArticle} from "../services/ItemApiUtil";
-import context from "react-bootstrap/CardContext";
-import {makeStyles} from "@material-ui/core/styles";
-import zIndex from "@material-ui/core/styles/zIndex";
 import {createNewArtist} from "../services/ArtistApiUtil";
 import {useState} from "react";
 
@@ -61,42 +57,43 @@ export interface Article {
     picture?: { id: number, data: string };
 }
 
-
 interface ArtistOrGenre {
     id: number;
     name: string;
     file?: string;
 }
 
+const initialState = {
+    id: -1,
+    title: "",
+    price: "",
+    ean: -1,
+    description: "",
+    artists: undefined,
+    genre: undefined
+};
+
 export default class EditArticles extends React.Component<IProps, IState> {
     currentPicture: File | undefined = undefined;
-    setFileUploaDefaultdVisibility: (visibility: boolean) => void = visibility => {
+    setFileUploadDefaultVisibility: (visibility: boolean) => void = visibility => {
     };
     IMAGE_RESOLUTION: string = "IMAGE_RESOLUTION";
     articles: Array<Article> = [];
     artists: Array<ArtistOrGenre> = [];
     genres: Array<ArtistOrGenre> = [];
+    selectArticle_input: string = "";
 
     constructor(props: IProps, context: any) {
         super(props, context);
-        this.state = {
-            id: -1,
-            title: "",
-            price: "",
-            ean: -1,
-            description: "",
-            artists: undefined,
-            genre: undefined
-        };
+        this.state = initialState;
 
-        if (this.props.location.state) {
-            const {article} = this.props.location.state;
-            this.state = article;
-        }
-        this.loadArticles()
+        if (this.props.location.state)
+            this.state = this.props.location.state.article;
+        this.loadData()
     }
 
-    loadArticles() {
+    loadData() {
+        let pendingRequests = 2;
         fetch(new Request("http://localhost:8080/article", {method: 'GET'}))
             .then(response => {
                 if (response.status === 200) {
@@ -109,26 +106,6 @@ export default class EditArticles extends React.Component<IProps, IState> {
                 response.sort((a, b) => a.id - b.id);
 
                 this.articles = response;
-                this.forceUpdate()
-
-                var flags = [], l = response.length, i;
-                for (i = 0; i < l; i++) {
-                    if (flags[response[i].artists.id]) continue;
-                    flags[response[i].artists.id] = true;
-                    this.artists.push(response[i].artists);
-                }
-                let nameComparetor = (a: ArtistOrGenre, b: ArtistOrGenre) => {
-                    var nameA = a.name.toUpperCase();
-                    var nameB = b.name.toUpperCase();
-                    if (nameA < nameB) {
-                        return -1;
-                    }
-                    if (nameA > nameB) {
-                        return 1;
-                    }
-                    return 0;
-                };
-                this.artists.sort(nameComparetor)
 
                 var flags = [], l = response.length, i;
                 for (i = 0; i < l; i++) {
@@ -136,14 +113,69 @@ export default class EditArticles extends React.Component<IProps, IState> {
                     flags[response[i].genre.id] = true;
                     this.genres.push(response[i].genre);
                 }
-                this.genres.sort(nameComparetor)
+                this.genres.sort(nameComparator)
 
+                if (--pendingRequests === 0)
+                    this.forceUpdate()
+            })
+            .catch(reason => {
+                showToast(reason.message, "error")
+            });
 
+        this.loadArtists(() => {
+            if (--pendingRequests === 0)
+                this.forceUpdate()
+        })
+
+        // fetch(new Request("http://localhost:8080/genre", {method: 'GET'}))
+        //     .then(response => {
+        //         if (response.status === 200) {
+        //             return response.json();
+        //         } else {
+        //             throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
+        //         }
+        //     })
+        //     .then((response: Array<ArtistOrGenre>) => {
+        //         this.artists = response;
+        //         let nameComparetor = (a: ArtistOrGenre, b: ArtistOrGenre) => {
+        //             var nameA = a.name.toUpperCase();
+        //             var nameB = b.name.toUpperCase();
+        //             if (nameA < nameB) {
+        //                 return -1;
+        //             }
+        //             if (nameA > nameB) {
+        //                 return 1;
+        //             }
+        //             return 0;
+        //         };
+        //         this.artists.sort(nameComparetor)
+        //
+        //         if (--pendingRequests === 0)
+        //             this.forceUpdate()
+        //     })
+        //     .catch(reason => {
+        //         showToast(reason.message, "error")
+        //     })
+    }
+
+    loadArtists(onLoaded: () => void) {
+        fetch(new Request("http://localhost:8080/artist", {method: 'GET'}))
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
+                }
+            })
+            .then((response: Array<ArtistOrGenre>) => {
+                this.artists = response;
+                this.artists.sort(nameComparator)
+
+                onLoaded();
             })
             .catch(reason => {
                 showToast(reason.message, "error")
             })
-
     }
 
     checkPrice = (price: string) => price.length > 0 && !/^(\d+([.,]\d{1,2})?)$/.test(price);
@@ -168,103 +200,127 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                     color: "rgba(0, 0, 0, 0.54)",
                                     fontWeight: 500
                                 }}>Artikel</Typography>
-                                <Combobox busy={this.articles.length === 0}
-                                          suggest
-                                          textField={(dataItem: Article | string) => typeof dataItem === 'string' ? dataItem :
-                                              'i: ' + dataItem.id +
-                                              ' | t: ' + dataItem.title +
-                                              ' | a: ' + dataItem.artists.name +
-                                              ' | g: ' + dataItem.genre.name +
-                                              ' | p: ' + dataItem.price +
-                                              ' | e: ' + dataItem.ean
-                                          }
-                                          itemComponent={({item}) => {
-                                              if ("true")
-                                                  return (
-                                                      <table>
-                                                          <tr>
-                                                              <td title={"ID"} style={{
-                                                                  width: "60px",
-                                                                  textAlign: "left"
-                                                              }}>
-                                                                  <strong>i: </strong>
-                                                                  {item.id}
-                                                              </td>
-                                                              <td title={"Titel"} style={{
-                                                                  width: "210px",
-                                                                  textAlign: "left"
-                                                              }}>
-                                                                  <strong>t: </strong>
-                                                                  {item.title}
-                                                              </td>
-                                                              <td title={"Künstler"} style={{
-                                                                  width: "123px",
-                                                                  textAlign: "left"
-                                                              }}>
-                                                                  <strong>a: </strong>
-                                                                  {item.artists.name}
-                                                              </td>
-                                                              <td title={"Genre"} style={{
-                                                                  width: "123px",
-                                                                  textAlign: "left"
-                                                              }}>
-                                                                  <strong>g: </strong>
-                                                                  {item.genre.name}
-                                                              </td>
-                                                              <td title={"Preis"} style={{
-                                                                  width: "90px",
-                                                                  textAlign: "left"
-                                                              }}>
-                                                                  <strong>p: </strong>
-                                                                  {item.price}
-                                                              </td>
-                                                              <td title={"EAN"} style={{
-                                                                  width: "100px",
-                                                                  textAlign: "left"
-                                                              }}>
-                                                                  <strong>e: </strong>
-                                                                  {item.ean}
-                                                              </td>
-                                                          </tr>
-                                                      </table>
-                                                  )
-                                              return (
-                                                  <div>
-                                                      <strong>i: </strong>
-                                                      {item.id + " | "}
-                                                      <strong>t: </strong>
-                                                      {item.title + " | "}
-                                                      <strong>a: </strong>
-                                                      {item.artists.name + " | "}
-                                                      <strong>g: </strong>
-                                                      {item.genre.name + " | "}
-                                                      <strong>p: </strong>
-                                                      {item.price + " | "}
-                                                      <strong>e: </strong>
-                                                      {item.ean}
-                                                  </div>
-                                              );
-                                          }}
-                                          filter={(dataItem: Article, searchItem: string): boolean => {
-                                              searchItem = searchItem.toLowerCase().replaceAll("|", "&");
+                                <Grid container>
+                                    <Grid item xs>
+                                        <Combobox busy={this.articles.length === 0}
+                                                  suggest
+                                                  id={"editArticles_selectArticle"}
+                                                  textField={(dataItem: Article | string) => typeof dataItem === 'string' ? dataItem :
+                                                      'i: ' + dataItem.id +
+                                                      ' | t: ' + dataItem.title +
+                                                      ' | a: ' + dataItem.artists.name +
+                                                      ' | g: ' + dataItem.genre.name +
+                                                      ' | p: ' + dataItem.price +
+                                                      ' | e: ' + dataItem.ean
+                                                  }
+                                                  itemComponent={({item}) => {
+                                                      if ("true")
+                                                          return (
+                                                              <table>
+                                                                  <tr>
+                                                                      <td title={"ID"} style={{
+                                                                          width: "60px",
+                                                                          textAlign: "left"
+                                                                      }}>
+                                                                          <strong>i: </strong>
+                                                                          {item.id}
+                                                                      </td>
+                                                                      <td title={"Titel"} style={{
+                                                                          width: "210px",
+                                                                          textAlign: "left"
+                                                                      }}>
+                                                                          <strong>t: </strong>
+                                                                          {item.title}
+                                                                      </td>
+                                                                      <td title={"Künstler"}
+                                                                          style={{
+                                                                              width: "123px",
+                                                                              textAlign: "left"
+                                                                          }}>
+                                                                          <strong>a: </strong>
+                                                                          {item.artists.name}
+                                                                      </td>
+                                                                      <td title={"Genre"} style={{
+                                                                          width: "123px",
+                                                                          textAlign: "left"
+                                                                      }}>
+                                                                          <strong>g: </strong>
+                                                                          {item.genre.name}
+                                                                      </td>
+                                                                      <td title={"Preis"} style={{
+                                                                          width: "90px",
+                                                                          textAlign: "left"
+                                                                      }}>
+                                                                          <strong>p: </strong>
+                                                                          {item.price}
+                                                                      </td>
+                                                                      <td title={"EAN"} style={{
+                                                                          width: "100px",
+                                                                          textAlign: "left"
+                                                                      }}>
+                                                                          <strong>e: </strong>
+                                                                          {item.ean}
+                                                                      </td>
+                                                                  </tr>
+                                                              </table>
+                                                          );
+                                                      return (
+                                                          <div>
+                                                              <strong>i: </strong>
+                                                              {item.id + " | "}
+                                                              <strong>t: </strong>
+                                                              {item.title + " | "}
+                                                              <strong>a: </strong>
+                                                              {item.artists.name + " | "}
+                                                              <strong>g: </strong>
+                                                              {item.genre.name + " | "}
+                                                              <strong>p: </strong>
+                                                              {item.price + " | "}
+                                                              <strong>e: </strong>
+                                                              {item.ean}
+                                                          </div>
+                                                      );
+                                                  }}
+                                                  filter={(dataItem: Article, searchItem: string): boolean => {
+                                                      searchItem = searchItem.toLowerCase().replaceAll("|", "&");
 
-                                              return filterArticle(searchItem, dataItem);
-                                          }}
-                                          onSelect={(article: Article) => {
-                                              this.currentPicture = undefined;
-                                              this.setState({
-                                                  id: article.id,
-                                                  title: article.title,
-                                                  price: article.price,
-                                                  artists: article.artists,
-                                                  genre: article.genre,
-                                                  ean: article.ean,
-                                                  description: article.description
-                                              })
-                                          }}
-                                          data={this.articles}
-                                          defaultValue={this.state.id !== -1 ? this.state : undefined}
-                                />
+                                                      return filterArticle(searchItem, dataItem);
+                                                  }}
+                                                  onSelect={(article: Article) => {
+                                                      this.currentPicture = undefined;
+                                                      this.setState({
+                                                          id: article.id,
+                                                          title: article.title,
+                                                          price: article.price,
+                                                          artists: article.artists,
+                                                          genre: article.genre,
+                                                          ean: article.ean,
+                                                          description: article.description
+                                                      })
+                                                  }}
+                                                  onChange={value => {
+                                                      if (typeof value === "string") {
+                                                          this.selectArticle_input = value;
+                                                          this.forceUpdate()
+                                                      }
+                                                  }}
+                                                  data={this.articles}
+                                                  value={this.state.id !== -1 ? this.state : this.selectArticle_input ? this.selectArticle_input : undefined}
+                                                  name={"test"}
+                                        />
+                                    </Grid>
+                                    {(this.state.id !== -1 || this.currentPicture) &&
+                                    <Grid item>
+                                        <IconButton style={{maxHeight: 38, maxWidth: 38}}
+                                                    onClick={event => {
+                                                        this.selectArticle_input = "";
+                                                        this.currentPicture = undefined;
+                                                        this.setState(initialState);
+                                                    }}>
+                                            {<ClearIcon/>}
+                                        </IconButton>
+                                    </Grid>}
+                                </Grid>
                             </Grid>
                             <Grid item xs={12}>
                                 <Card style={padding(18)}>
@@ -307,7 +363,9 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                               textField={"name"}
                                                               filter={"contains"}
                                                               placeholder={"Künstler eingeben"}
-                                                              onChange={value => this.setState({artists: value})}
+                                                              onChange={value => {
+                                                                  return this.setState({artists: value});
+                                                              }}
                                                               value={this.state.artists}
                                                               data={this.artists}
                                                     />
@@ -368,17 +426,17 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                         getSrc={setImgSrc => {
                                                             if (this.currentPicture) {
                                                                 setImgSrc(URL.createObjectURL(this.currentPicture));
-                                                                this.setFileUploaDefaultdVisibility(false);
+                                                                this.setFileUploadDefaultVisibility(false);
                                                             } else if (this.state.id !== -1) {
                                                                 this.loadSingleImage(this.state.id, imageResponse => {
                                                                     if (imageResponse) {
                                                                         setImgSrc(base64ToDataUri(imageResponse.file));
-                                                                        this.setFileUploaDefaultdVisibility(false);
+                                                                        this.setFileUploadDefaultVisibility(false);
                                                                     } else
-                                                                        this.setFileUploaDefaultdVisibility(true);
+                                                                        this.setFileUploadDefaultVisibility(true);
                                                                 });
                                                             } else
-                                                                this.setFileUploaDefaultdVisibility(true);
+                                                                this.setFileUploadDefaultVisibility(true);
 
                                                         }}
                                                     />
@@ -394,7 +452,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                             this.currentPicture = file;
                                                             this.forceUpdate();
                                                         }}
-                                                        setDefaultVisibility={((setVisibility: (visibility: boolean) => void) => this.setFileUploaDefaultdVisibility = setVisibility)}
+                                                        setDefaultVisibility={((setVisibility: (visibility: boolean) => void) => this.setFileUploadDefaultVisibility = setVisibility)}
                                                     />
                                                 </div>
                                             </div>
@@ -446,11 +504,13 @@ export default class EditArticles extends React.Component<IProps, IState> {
     }
 }
 
-let setIsPictureNotSelected: (visibility: boolean) => void = visibility => {};
+let setIsPictureNotSelected: (visibility: boolean) => void = visibility => {
+};
+
 function DialogComponent(arg: any) {
     const that: EditArticles = arg.context;
     const [open, setOpen] = React.useState(false);
-    // const [picture, setPicture] = useState<File>();
+    const [picture, setPicture] = useState<File>();
 
 
     // debugger
@@ -487,7 +547,7 @@ function DialogComponent(arg: any) {
                 })
                 .setContent(dialogBuilder => {
                     return (
-                        <div style={{width: 250, height: 250}}>
+                        <div style={{width: 250, height: 250, marginTop: 15}}>
                             <div style={{
                                 width: 250,
                                 height: 250,
@@ -501,15 +561,15 @@ function DialogComponent(arg: any) {
                                         zIndex: 5
                                     }}
                                     rounded
-                                    alt={"test"}
-                                    payload={that.currentPicture}
+                                    alt={"Ausgewähltes Künstler-Bild"}
+                                    payload={picture}
                                     shouldImageUpdate={(oldPayload: File, newPayload: File) => {
                                         return oldPayload !== newPayload
                                     }}
                                     // shouldImageUpdate={oldPayload => true}
                                     getSrc={setImgSrc => {
-                                        if (that.currentPicture) {
-                                            setImgSrc(URL.createObjectURL(that.currentPicture));
+                                        if (picture) {
+                                            setImgSrc(URL.createObjectURL(picture));
                                             setIsPictureNotSelected(false);
                                         } else
                                             setIsPictureNotSelected(true);
@@ -525,10 +585,9 @@ function DialogComponent(arg: any) {
                             }}>
                                 <SimpleReactFileUpload
                                     onFileSelected={(file: File) => {
-                                        // debugger
-                                        that.currentPicture = file;
-                                        that.forceUpdate()
-                                        // setPicture(file);
+                                        // that.currentPicture = file;
+                                        // that.forceUpdate()
+                                        setPicture(file);
                                     }}
                                     setDefaultVisibility={((setVisibility: (visibility: boolean) => void) => setIsPictureNotSelected = setVisibility)}
                                 />
@@ -541,20 +600,20 @@ function DialogComponent(arg: any) {
                     label: "Anlegen",
                     isActionButton: true,
                     onClick: dialogBuilder => {
-                        debugger
                         let netArtist = {
                             // id: that.artists.length + 1,
                             name: dialogBuilder.getInputText().trim(),
                         };
-                        // if (!that.currentPicture)
-                        //     return;
-                        createNewArtist(netArtist, null/*that.currentPicture*/, response => {
+                        createNewArtist(netArtist, picture ? picture : null, response => {
                             console.log(response);
-                            showToast("Jay", "success");
-                            debugger
+                            // showToast("Jay", "success");
+                            that.loadArtists(() => {
+                                that.forceUpdate();
+                                showToast("Der Künstler wurde angelegt", "success")
+                            })
                         }, error => {
                             console.log(error);
-                            showToast("Nay", "error");
+                            showToast(error.message, "error");
                             debugger
                         });
 
