@@ -16,7 +16,7 @@ import {useHistory} from "react-router-dom";
 import Typography from "@material-ui/core/Typography";
 
 
-class OrderSummary extends Component {
+class OrderComplete extends Component {
 
     user = {};
 
@@ -33,7 +33,6 @@ class OrderSummary extends Component {
         if (isUserLoggedIn()) {
             return (
                 <MenuDrawer>
-                    <HorizontalLabelPositionBelowStepper index={2}/>
                     <div style={{
                         marginTop: 8,
                         display: 'flex',
@@ -53,31 +52,14 @@ class OrderSummary extends Component {
                                                 fontSize: 22,
                                                 marginBottom: 3
                                             }}>
-                                                Anschrift
+                                                Vielen Dank für ihre Bestellung!
                                             </div>
                                         </Grid>
                                         <Grid item>
                                             <Typography> </Typography>
-                                            <Typography>{this.state.user.title.charAt(0).toUpperCase()}{this.state.user.title.slice(1).toLowerCase()} {this.state.user.firstName} {this.state.user.lastName}</Typography>
-                                            <Typography>{this.state.user.street} {this.state.user.streetNumber}</Typography>
-                                            <Typography>{this.state.user.postalCode} {this.state.user.town}</Typography>
                                         </Grid>
                                     </Grid>
                                 </Card>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Grid container
-                                      wrap={"wrap-reverse"}
-                                      direction="row"
-                                      justify="space-between"
-                                      spacing={3}>
-                                    <Grid item>
-                                        <BackButton context={this}/>
-                                    </Grid>
-                                    <Grid item>
-                                        <ContinueButton context={this}/>
-                                    </Grid>
-                                </Grid>
                             </Grid>
                             <Grid item>
                                 <div style={{marginBottom: 8}}/>
@@ -102,42 +84,5 @@ class OrderSummary extends Component {
     handleChange = event => this.setState({title: event.target.value.trim()});
 
 }
-function BackButton(){
-    const history = useHistory();
-    let backToPayment = () => {
-        history.push("/payment")
-    };
 
-    return (
-        <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => {
-                backToPayment()
-            }
-            }>
-            Zurück
-        </Button>
-    )
-}
-function ContinueButton(){
-    const history = useHistory();
-    let continueToComplete = () => {
-        history.push("/ordercomplete")
-    };
-
-    return (
-        <Button
-            style={{backgroundColor: "green"}}
-            variant="contained"
-            color="primary"
-            onClick={() => {
-                continueToComplete()
-            }
-            }>
-            Bestellung aufgeben
-        </Button>
-    )
-}
-
-export default OrderSummary;
+export default OrderComplete;

@@ -16,6 +16,7 @@ import ArtistOverview from "./components/ArtistOverview";
 import Order from "./components/Order";
 import PaymentMethod from "./components/PaymentMethod";
 import OrderSummary from "./components/OrderSummary";
+import OrderComplete from "./components/OrderComplete";
 
 toast.configure();
 function App() {
@@ -37,6 +38,7 @@ function App() {
         <Route path="/artists" component={ArtistOverview} exact />
         <Route path="/placeorder" component={Order} exact />
         <Route path="/payment" component={PaymentMethod} exact />
+        <Route path="/ordercomplete" component={OrderComplete} exact />
         <Route component={AlbumOverview}/>
       </Switch>
     </div>
