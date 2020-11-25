@@ -226,7 +226,7 @@ export default function MenuDrawer(props) {
                             <HomeIcon/>
                         </IconButton>
                     </Link>
-                    <Link to="/shoppingcart">
+                    <Link to="/shoppingCart">
                         <IconButton style={{margin: 5, color: "white"}} component="span">
                             <ShoppingCartIcon/>
                         </IconButton>
@@ -271,8 +271,8 @@ export default function MenuDrawer(props) {
                 <Divider/>
                 <List>
                     <ListItemLink
-                        to="/shoppingcart"
-                        primary="Warenkorb"
+                        to="/shoppingCart"
+                        primary="Einkaufswagen"
                         icon={<ShoppingCartIcon/>}
                     />
                     <ListItemLink

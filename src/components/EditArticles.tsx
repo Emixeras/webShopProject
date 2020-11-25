@@ -614,6 +614,7 @@ function DialogComponent(arg: any) {
                                             context.forceUpdate();
                                         })
                                     }, error => {
+                                        debugger
                                         showToast("Nay " + error.message, "error");
                                     })
                                 }}>Löschen</Button>

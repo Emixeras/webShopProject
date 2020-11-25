@@ -22,12 +22,12 @@ function App() {
         <Route path="/" component={AlbumOverview} exact />
         <Route path="/login" component={Login} exact />
         <Route path="/register" component={Register} exact />
-        <Route path="/shoppingcart" component={ShoppingCart} exact />
+        <Route path="/shoppingCart" component={ShoppingCart} exact />
         <Route path="/profile" component={Profile} exact />
         <Route path="/upload" component={SimpleReactFileUpload} exact />
         <Route path="/editArticles" component={EditArticles} exact />
         <Route path="/dev" component={Dev} exact />
-        <Route path="/articleview" component={ArticleView} exact />
+        <Route path="/articleView" component={ArticleView} exact />
         <Route path="/albums" component={AlbumOverview} exact />
         <Route path="/genres" component={GenreOverview} exact />
         <Route path="/artists" component={ArtistOverview} exact />

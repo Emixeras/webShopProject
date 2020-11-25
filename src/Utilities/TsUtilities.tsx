@@ -608,4 +608,9 @@ export function renameObjectKey(object: object, oldKey: string, newKey: string):
     // }
     return object
 }
+
+export function callIfExists(what: Function | undefined | null, ...args: any[]) {
+    if (what)
+        what.call(undefined, args)
+}
 //  <------------------------- Convenience -------------------------

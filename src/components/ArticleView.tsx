@@ -16,7 +16,7 @@ import {useHistory} from "react-router-dom";
 import {
     AAR_RETURN_TYPE,
     addToShoppingCart,
-    getShoppingCartCount,
+    getShoppingCartCount, isInShoppingCart,
     removeFromShoppingCart
 } from "../services/ShoppingCartUtil";
 
@@ -61,6 +61,7 @@ class ArticleView extends React.Component<IProps, IState> {
     }
 
     render() {
+
         return (
 
             <MenuDrawer>
@@ -78,7 +79,6 @@ class ArticleView extends React.Component<IProps, IState> {
                             </Typography>
                             <Card style={padding(18)}>
                                 <Grid container spacing={2}>
-                                    {this.article.picture &&
                                     <Grid item md={4} sm={12}>
                                         <LazyImage
                                             style={{
@@ -96,8 +96,7 @@ class ArticleView extends React.Component<IProps, IState> {
                                                 })
                                             }}
                                         />
-
-                                    </Grid>}
+                                    </Grid>
                                     <Grid item md={8} sm={12}>
                                         <Card style={{...padding(18), minHeight: 250}}>
                                             <Grid container spacing={2}>
@@ -147,18 +146,16 @@ class ArticleView extends React.Component<IProps, IState> {
                                     </Grid>
                                     <Grid item sm={12}>
                                         <div style={{float: "right"}}>
-                                            <Button variant="contained" color="secondary"
-                                                    onClick={event => {
-                                                        let returnType = removeFromShoppingCart(this.article);
-                                                        showToast("Artikel Erfolgreich gelöscht " + getShoppingCartCount(this.article), returnType === AAR_RETURN_TYPE.DECREASED ?  "success" : returnType === AAR_RETURN_TYPE.REMOVED ? "info" : "error");
-                                                    }}>Löschen</Button>
                                             <Button variant="contained" color="primary"
                                                     endIcon={<ShoppingCartIcon/>}
                                                     onClick={(event) => {
                                                         addToShoppingCart(this.article)
+                                                        this.forceUpdate();
                                                         showToast(`Artikel Erfolgreich hinzugefügt (${getShoppingCartCount(this.article)})`, "success");
                                                     }}>
-                                                Artikel in den Warenkorb hinzufügen
+                                                {isInShoppingCart(this.article) ?
+                                                    "Erneut in den Einkaufswagen legen" :
+                                                    "Artikel in den Einkaufswagen hinzufügen"}
                                             </Button>
                                         </div>
                                     </Grid>

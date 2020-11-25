@@ -1,4 +1,11 @@
-import {Article} from "../Utilities/TsUtilities";
+import React from "react";
+import {Article, callIfExists, LazyImage, loadSingleImage} from "../Utilities/TsUtilities";
+import {Button, Grid, IconButton, Typography} from "@material-ui/core";
+import AddIcon from '@material-ui/icons/AddCircleOutline';
+import RemoveIcon from '@material-ui/icons/RemoveCircleOutline';
+import DeleteIcon from '@material-ui/icons/Delete';
+import {Link} from "react-router-dom";
+import {margin, showToast} from "../Utilities/Utilities";
 
 const SHOPPING_CART: string = "SHOPPING_CART";
 const emptyShoppingCart: ShoppingCartObject = {entries: []};
@@ -45,6 +52,7 @@ function getShoppingCartEntry(article: Article, shoppingCartObject?: ShoppingCar
     }
     return null;
 }
+
 //  <------------------------- Internal -------------------------
 
 
@@ -54,7 +62,6 @@ export enum AAR_RETURN_TYPE {
 }
 
 export function addToShoppingCart(article: Article): AAR_RETURN_TYPE {
-    debugger
     let shoppingCartObject = getShoppingCartObject();
     let shoppingCartEntry = getShoppingCartEntry(article, shoppingCartObject);
     let returnValue: AAR_RETURN_TYPE;
@@ -85,6 +92,7 @@ export function removeFromShoppingCart(article: Article): AAR_RETURN_TYPE {
     saveShoppingCartObject(shoppingCartObject);
     return returnValue;
 }
+
 //  <------------------------- Add and Remove -------------------------
 
 
@@ -134,6 +142,10 @@ export function getShoppingCartPrice(article?: Article): number {
     }
 }
 
+export function isShoppingCartEmpty(): boolean {
+    return getShoppingCartObject().entries.length === 0;
+}
+
 // ---------------
 
 export function getAllShoppingCartEntries(): ShoppingCartEntry[] {
@@ -143,4 +155,223 @@ export function getAllShoppingCartEntries(): ShoppingCartEntry[] {
 export function getAllShoppingCartArticles(): Article[] {
     return getAllShoppingCartEntries().map(entry => entry.article)
 }
+
 //  <------------------------- getters -------------------------
+
+
+//  ------------------------- List ------------------------->
+interface ShoppingCartList_props {
+    showChangeCount: boolean;
+    update?: () => void;
+}
+export class ShoppingCartList extends React.Component<ShoppingCartList_props, {}> {
+
+    entryArray: ShoppingCartEntry[]
+    update?: () => void;
+
+    constructor(props: ShoppingCartList_props, context: any) {
+        super(props, context);
+        this.entryArray = getAllShoppingCartEntries();
+        this.update = props.update;
+    }
+
+    componentWillUpdate(nextProps: Readonly<ShoppingCartList_props>, nextState: Readonly<{}>, nextContext: any) {
+        // debugger
+        this.entryArray = getAllShoppingCartEntries();
+    }
+
+    render() {
+        // debugger
+        return (
+            <Grid container spacing={2}>
+                {
+                    this.entryArray.map((entry, index) => {
+                        return <ShoppingCartListItem update={() => callIfExists(this.update)} entry={entry} index={index}
+                                                     showChangeCount={this.props.showChangeCount}/>
+                    })
+                }
+            </Grid>
+        )
+    }
+}
+
+interface ShoppingCartListItem_props {
+    entry: ShoppingCartEntry;
+    index: number;
+    showChangeCount: boolean;
+    update: () => void;
+}
+
+class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {}> {
+    entry: ShoppingCartEntry
+    index: number
+    showChangeCount: boolean
+    article: Article;
+    update: () => void;
+    count: number;
+    // removed: boolean = false;
+
+    constructor(props: ShoppingCartListItem_props, context: any) {
+        super(props, context);
+        this.entry = props.entry;
+        this.index = props.index;
+        this.showChangeCount = props.showChangeCount;
+        this.article = this.entry.article;
+        this.update = props.update;
+        this.count = getShoppingCartCount(this.article);
+    }
+
+    componentWillUpdate(nextProps: Readonly<ShoppingCartListItem_props>, nextState: Readonly<{}>, nextContext: any) {
+        this.entry = nextProps.entry;
+        this.index = nextProps.index;
+        this.showChangeCount = nextProps.showChangeCount;
+        this.article = this.entry.article;
+        this.update = nextProps.update;
+        this.count = getShoppingCartCount(this.article);
+        // if (this.count === 0 && !this.removed) {
+        //     showToast("Artikel wurde aus dem Einkaufswagen entfernt", "success")
+        //     this.removed = true;
+        //     // this.update();
+        // }
+    }
+
+    render() {
+        return (
+            <Grid item xs={12}
+                  style={{borderRadius: "4px", ...(this.index % 2 === 1 ? {backgroundColor: "rgba(0,0,0,0.05)"} : {})}}>
+                <Grid container >
+                    <Grid item>
+                        <div style={{
+                            display: "flex",
+                            height: "100%",
+                            alignItems: "center"
+                        }}>
+
+                            <LazyImage
+                                getSrc={setImgSrc => {
+                                    loadSingleImage("article", this.article.id, setImgSrc, 100)
+                                }}
+                                payload={this.article}
+                                shouldImageUpdate={(oldPayload: Article, newPayload: Article) => {
+                                    return oldPayload.id !== newPayload.id;
+                                }}
+                                rounded
+                                style={{
+                                    width: 75,
+                                    height: 75,
+                                    backgroundColor: "lightgray",
+                                    marginRight: 18
+                                }}/>
+                        </div>
+                    </Grid>
+                    <Grid item style={margin(0, 20, 0, 0)} md={3}>
+                        <Grid container style={{height: "100%"}} direction={"column"}>
+                            <Grid item>
+                                <Typography variant="h6" style={{color: "rgba(0,0,0,0.87)"}} gutterBottom to={(location: any) => {
+                                    location.pathname = "/articleView";
+                                    location.state = {article: this.article};
+                                    return location;
+                                }} component={Link}>
+                                    {this.article.title}
+                                </Typography>
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="body1" gutterBottom>
+                                    {(+this.article.price).toFixed(2)} €
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid item style={margin(0, 20, 0, 0)} md={2}>
+                        <Grid container style={{height: "100%"}} direction={"column"}>
+                            <Grid item>
+                                <Typography variant="body1" style={{marginBottom: 15}}>
+                                    {this.article.artists.name}
+                                </Typography>
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="body1" gutterBottom>
+                                    {this.article.genre.name}
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid item style={margin(0, 20, 0, 0)} md={3}>
+                        <Grid container style={{height: "100%"}} direction={"column"}>
+                            <Grid item>
+                                <Typography variant="body1" style={{marginBottom: 15}}>
+                                    Stück: {this.count}
+                                </Typography>
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="body1" gutterBottom>
+                                    Gesamt: {getShoppingCartPrice(this.article).toFixed(2)} €
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    {this.showChangeCount &&
+                    <Grid item md={2}>
+                        <ShoppingCartListItemButtons update={() => this.update()} article={this.article}/>
+                    </Grid>}
+                </Grid>
+            </Grid>
+        )
+    }
+
+}
+
+interface ShoppingCartListItemButtons_props {
+    article: Article;
+    update: () => void;
+}
+
+class ShoppingCartListItemButtons extends React.Component<ShoppingCartListItemButtons_props, {}> {
+    article: Article;
+    count: number;
+    update: () => void;
+
+
+    constructor(props: ShoppingCartListItemButtons_props, context: any) {
+        super(props, context);
+        this.article = props.article;
+        this.update = props.update;
+        this.count = getShoppingCartCount(this.article);
+    }
+
+    componentWillUpdate(nextProps: Readonly<ShoppingCartListItemButtons_props>, nextState: Readonly<{}>, nextContext: any) {
+        this.article = nextProps.article;
+        this.update = nextProps.update;
+        this.count = getShoppingCartCount(this.article);
+    }
+
+    render() {
+        return (
+            <div style={{
+                display: "flex",
+                height: "100%",
+                alignItems: "center"
+            }}>
+                <Grid container>
+                    <Grid item>
+                        <IconButton onClick={event => {
+                            removeFromShoppingCart(this.article);
+                            if (getShoppingCartCount(this.article) === 0)
+                                showToast("Artikel wurde aus dem Einkaufswagen entfernt", "success");
+                            this.update();
+                        }} color={"secondary"}>{this.count > 1 ? <RemoveIcon/> :
+                            <DeleteIcon/>}</IconButton>
+                    </Grid>
+                    <Grid item>
+                        <IconButton onClick={event => {
+                            addToShoppingCart(this.article);
+                            this.update();
+                        }} color={"primary"}>{<AddIcon/>}</IconButton>
+                    </Grid>
+                </Grid>
+            </div>
+        )
+    }
+}
+
+//  <------------------------- List -------------------------

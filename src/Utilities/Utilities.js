@@ -49,9 +49,9 @@ export function titles() {
 export function padding(a, b, c, d) {
     return {
         paddingTop: a,
-        paddingRight: b ? b : a,
-        paddingBottom: c ? c : a,
-        paddingLeft: d ? d : (b ? b : a)
+        paddingRight: b !== undefined ? b : a,
+        paddingBottom: c !== undefined ? c : a,
+        paddingLeft: d !== undefined ? d : (b !== undefined ? b : a)
     }
 }
 /**
@@ -64,9 +64,9 @@ export function padding(a, b, c, d) {
 export function margin(a, b, c, d) {
     return {
         marginTop: a,
-        marginRight: b ? b : a,
-        marginBottom: c ? c : a,
-        marginLeft: d ? d : (b ? b : a)
+        marginRight: b !== undefined ? b : a,
+        marginBottom: c !== undefined ? c : a,
+        marginLeft: d !== undefined ? d : (b !== undefined ? b : a)
     }
 }
 //  <------------------------- Padding & Margin -------------------------
