@@ -14,8 +14,7 @@ services:
     image: stormer1911/webshop_backend
     environment:
       - quarkus.datasource.jdbc.url=jdbc:postgresql://postgres:5432/shop
-      - quarkus.log.level=DEBUG
-      - demo.data.lazy=true
+      - quarkus.log.level=INFO
       - demo.data=true
     depends_on:
       - postgres
