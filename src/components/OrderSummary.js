@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {NavigationComponent} from "../Utilities/Utilities";
+import {NavigationComponent, showToast} from "../Utilities/Utilities";
 import Grid from "@material-ui/core/Grid";
 import {
     Card,
@@ -123,6 +123,7 @@ function BackButton(){
 function ContinueButton(){
     const history = useHistory();
     let continueToComplete = () => {
+        showToast("Bestellung erfolgreich aufgegeben", "success")
         history.push("/ordercomplete")
     };
 
