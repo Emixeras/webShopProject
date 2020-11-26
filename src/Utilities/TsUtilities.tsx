@@ -129,7 +129,7 @@ interface ImageResponseFunction {
     (imageResponse?: ImageResponseType): void
 }
 export function loadSingleImage(type: "article" | "artist", articleId: number, onFinish: (ImageResponseFunction | Function), imageResolution?: number) {
-    fetch(new Request(`http://localhost:8080/${type}/range;start=${articleId};end=${articleId};quality=${imageResolution ? imageResolution : 250}`, {method: 'GET'}))
+    fetch(new Request(`http://${window.location.hostname}:8080/${type}/range;start=${articleId};end=${articleId};quality=${imageResolution ? imageResolution : 250}`, {method: 'GET'}))
         .then(response => {
             if (response.status === 200) {
                 return response.json();

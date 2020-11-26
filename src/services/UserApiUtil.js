@@ -2,9 +2,9 @@ import axios from "axios";
 import {getSessionUser, setSessionUser, setUserLoggedIn} from "./StorageUtil";
 import {showToast} from "../Utilities/Utilities";
 
-const apiBaseUrlUserRegister = "http://localhost:8080/user";
-const apiBaseUrlUserLogin = "http://localhost:8080/user";
-const apiBaseUrlUserDelete = "http://localhost:8080/user/";
+const apiBaseUrlUserRegister = `http://${window.location.hostname}:8080/user`;
+const apiBaseUrlUserLogin = `http://${window.location.hostname}:8080/user`;
+const apiBaseUrlUserDelete = `http://${window.location.hostname}:8080/user/`;
 
 /**
  * @param {object} payload

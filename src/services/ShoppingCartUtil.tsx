@@ -108,6 +108,7 @@ export function isInShoppingCart(article: Article): boolean {
 export function clearShoppingCart() {
     localStorage.setItem(SHOPPING_CART, JSON.stringify(emptyShoppingCart))
 }
+
 //  <------------------------- Convenience -------------------------
 
 
@@ -164,6 +165,7 @@ interface ShoppingCartList_props {
     showChangeCount: boolean;
     update?: () => void;
 }
+
 export class ShoppingCartList extends React.Component<ShoppingCartList_props, {}> {
 
     entryArray: ShoppingCartEntry[]
@@ -186,7 +188,8 @@ export class ShoppingCartList extends React.Component<ShoppingCartList_props, {}
             <Grid container spacing={2}>
                 {
                     this.entryArray.map((entry, index) => {
-                        return <ShoppingCartListItem update={() => callIfExists(this.update)} entry={entry} index={index}
+                        return <ShoppingCartListItem update={() => callIfExists(this.update)}
+                                                     entry={entry} index={index}
                                                      showChangeCount={this.props.showChangeCount}/>
                     })
                 }
@@ -209,7 +212,6 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
     article: Article;
     update: () => void;
     count: number;
-    // removed: boolean = false;
 
     constructor(props: ShoppingCartListItem_props, context: any) {
         super(props, context);
@@ -228,18 +230,14 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
         this.article = this.entry.article;
         this.update = nextProps.update;
         this.count = getShoppingCartCount(this.article);
-        // if (this.count === 0 && !this.removed) {
-        //     showToast("Artikel wurde aus dem Einkaufswagen entfernt", "success")
-        //     this.removed = true;
-        //     // this.update();
-        // }
     }
 
     render() {
+        let sCc = this.showChangeCount;
         return (
             <Grid item xs={12}
                   style={{borderRadius: "4px", ...(this.index % 2 === 1 ? {backgroundColor: "rgba(0,0,0,0.05)"} : {})}}>
-                <Grid container >
+                <Grid container>
                     <Grid item>
                         <div style={{
                             display: "flex",
@@ -264,55 +262,66 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
                                 }}/>
                         </div>
                     </Grid>
-                    <Grid item style={margin(0, 20, 0, 0)} md={3}>
-                        <Grid container style={{height: "100%"}} direction={"column"}>
-                            <Grid item>
-                                <Typography variant="h6" style={{color: "rgba(0,0,0,0.87)"}} gutterBottom to={(location: any) => {
-                                    location.pathname = "/articleView";
-                                    location.state = {article: this.article};
-                                    return location;
-                                }} component={Link}>
-                                    {this.article.title}
-                                </Typography>
+                    <Grid item lg={sCc ? 3 : 4} md={8} sm={8}>
+                        <div style={margin(0, 20, 0, 0)}>
+                            <Grid container style={{height: "100%", ...margin(0, 20, 0, 0)}}
+                                  direction={"column"}>
+                                <Grid item>
+                                    <Typography variant="h6" style={{color: "rgba(0,0,0,0.87)"}}
+                                                gutterBottom to={(location: any) => {
+                                        location.pathname = "/articleView";
+                                        location.state = {article: this.article};
+                                        return location;
+                                    }} component={Link}>
+                                        {this.article.title}
+                                    </Typography>
+                                </Grid>
+                                <Grid item>
+                                    <Typography variant="body1" gutterBottom>
+                                        {(+this.article.price).toFixed(2)} €
+                                    </Typography>
+                                </Grid>
                             </Grid>
-                            <Grid item>
-                                <Typography variant="body1" gutterBottom>
-                                    {(+this.article.price).toFixed(2)} €
-                                </Typography>
-                            </Grid>
-                        </Grid>
+                        </div>
                     </Grid>
-                    <Grid item style={margin(0, 20, 0, 0)} md={2}>
-                        <Grid container style={{height: "100%"}} direction={"column"}>
-                            <Grid item>
-                                <Typography variant="body1" style={{marginBottom: 15}}>
-                                    {this.article.artists.name}
-                                </Typography>
+                    <Grid item lg={sCc ? 2 : 3} md={sCc ? 4 : 5} sm={sCc ? 4 : 5}>
+                        <div style={margin(0, 20, 0, 0)}>
+                            <Grid container style={{height: "100%", ...margin(0, 20, 0, 0)}}
+                                  direction={"column"}>
+                                <Grid item>
+                                    <Typography variant="body1" style={{marginBottom: 15}}>
+                                        {this.article.artists.name}
+                                    </Typography>
+                                </Grid>
+                                <Grid item>
+                                    <Typography variant="body1" gutterBottom>
+                                        {this.article.genre.name}
+                                    </Typography>
+                                </Grid>
                             </Grid>
-                            <Grid item>
-                                <Typography variant="body1" gutterBottom>
-                                    {this.article.genre.name}
-                                </Typography>
-                            </Grid>
-                        </Grid>
+                        </div>
                     </Grid>
-                    <Grid item style={margin(0, 20, 0, 0)} md={3}>
-                        <Grid container style={{height: "100%"}} direction={"column"}>
-                            <Grid item>
-                                <Typography variant="body1" style={{marginBottom: 15}}>
-                                    Stück: {this.count}
-                                </Typography>
+                    <Grid item lg={3} md={sCc ? 4 : 5} sm={sCc ? 4 : 5}>
+                        <div style={margin(0, 20, 0, 0)}>
+                            <Grid container style={{height: "100%", ...margin(0, 20, 0, 0)}}
+                                  direction={"column"}>
+                                <Grid item>
+                                    <Typography variant="body1" style={{marginBottom: 15}}>
+                                        Stück: {this.count}
+                                    </Typography>
+                                </Grid>
+                                <Grid item>
+                                    <Typography variant="body1" gutterBottom>
+                                        Gesamt: {getShoppingCartPrice(this.article).toFixed(2)} €
+                                    </Typography>
+                                </Grid>
                             </Grid>
-                            <Grid item>
-                                <Typography variant="body1" gutterBottom>
-                                    Gesamt: {getShoppingCartPrice(this.article).toFixed(2)} €
-                                </Typography>
-                            </Grid>
-                        </Grid>
+                        </div>
                     </Grid>
                     {this.showChangeCount &&
-                    <Grid item md={2}>
-                        <ShoppingCartListItemButtons update={() => this.update()} article={this.article}/>
+                    <Grid item lg={2} md={3} sm={3}>
+                        <ShoppingCartListItemButtons update={() => this.update()}
+                                                     article={this.article}/>
                     </Grid>}
                 </Grid>
             </Grid>

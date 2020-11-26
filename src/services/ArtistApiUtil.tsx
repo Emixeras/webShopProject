@@ -3,7 +3,7 @@ import axios from "axios";
 import {showToast} from "../Utilities/Utilities";
 import {resolve} from "dns";
 
-const apiBaseUrlUpdateArtist = 'http://localhost:8080/artist/';
+const apiBaseUrlUpdateArtist = `http://${window.location.hostname}:8080/artist/`;
 
 export const createNewArtist = (metaDataPayload: object, pictureFile: File | null, onSuccess?: (response: any) => void, onFail?: (error: any) => void) => {
     var user = getSessionUser();

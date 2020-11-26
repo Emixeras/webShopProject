@@ -123,6 +123,7 @@ export function callDrawerCallbacks(value, type) {
             pair.first(value);
     })
 }
+
 //  <------------------------- Drawer-Callbacks -------------------------
 
 
@@ -139,6 +140,10 @@ function ListItemLink(props) {
     return (
         <li>
             <ListItem button component={renderLink}
+                      onClick={event => {
+                          if (drawerClose_ref && isMobile())
+                              drawerClose_ref()
+                      }}
                       style={document.location.pathname === to ? {background: "rgba(0,64,179,0.32)"} : undefined}>
                 {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
                 <ListItemText primary={primary}/>
@@ -146,6 +151,8 @@ function ListItemLink(props) {
         </li>
     );
 }
+
+let drawerClose_ref;
 
 export default function MenuDrawer(props) {
     const classes = useStyles();
@@ -174,7 +181,7 @@ export default function MenuDrawer(props) {
         setDrawerVisible(true);
     };
 
-    const handleDrawerClose = () => {
+    const handleDrawerClose = drawerClose_ref = () => {
         setOpen(false);
         setDrawerVisible(false);
     };
@@ -201,7 +208,8 @@ export default function MenuDrawer(props) {
                         </IconButton>
                     </div>
                     <div style={{
-                        maxWidth: 58 * (hasCurrentUserRoleLevel("ADMIN") ? 4 : 3) - (open ? 0 : 48), minWidth: 0,
+                        maxWidth: 58 * (hasCurrentUserRoleLevel("ADMIN") ? 4 : 3) - (open ? 0 : 48),
+                        minWidth: 0,
                         // backgroundColor: "green",
                         flexGrow: 100,
                         flexShrink: 100,
@@ -216,7 +224,8 @@ export default function MenuDrawer(props) {
                         flexBasis: "auto",
                         // backgroundColor: "red",
                     }}>
-                        <img style={{alignSelf: 'center', cursor: "pointer"}} height="50" src={logo} onClick={event => history.push("/")}
+                        <img style={{alignSelf: 'center', cursor: "pointer"}} height="50" src={logo}
+                             onClick={event => history.push("/")}
                              alt="fireSpot"/>
                     </div>
                     {/*<div>*/}
@@ -436,7 +445,7 @@ function DevButton() {
                     </MenuItem>
                     <MenuItem onClick={event => {
                         handleClose(event);
-                        window.open("http://localhost:8080/swagger-ui/");
+                        window.open(`http://${window.location.hostname}:8080/swagger-ui/`);
                     }}>
                         <Grid container spacing={2}>
                             <Grid item>

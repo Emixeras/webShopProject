@@ -2,7 +2,7 @@ import {getSessionUser} from "./StorageUtil";
 import axios from "axios";
 import {showToast} from "../Utilities/Utilities";
 
-const apiBaseUrlUpdateArticle = 'http://localhost:8080/article';
+const apiBaseUrlUpdateArticle = `http://${window.location.hostname}:8080/article`;
 
 export const createNewArticle = (metaDataPayload, pictureFile, onSuccess, onFail) => {
     var user = getSessionUser();

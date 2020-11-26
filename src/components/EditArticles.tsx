@@ -102,7 +102,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
 
     loadData() {
         let pendingRequests = 3;
-        fetch(new Request("http://localhost:8080/article", {method: 'GET'}))
+        fetch(new Request(`http://${window.location.hostname}:8080/article`, {method: 'GET'}))
             .then(response => {
                 if (response.status === 200) {
                     return response.json();
@@ -128,7 +128,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                 this.forceUpdate()
         })
 
-        fetch(new Request("http://localhost:8080/genre", {method: 'GET'}))
+        fetch(new Request(`http://${window.location.hostname}:8080/genre`, {method: 'GET'}))
             .then(response => {
                 if (response.status === 200) {
                     return response.json();
@@ -155,7 +155,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
     }
 
     loadArtists(onLoaded: () => void) {
-        fetch(new Request("http://localhost:8080/artist", {method: 'GET'}))
+        fetch(new Request(`http://${window.location.hostname}:8080/artist`, {method: 'GET'}))
             .then(response => {
                 if (response.status === 200) {
                     return response.json();

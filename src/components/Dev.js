@@ -213,7 +213,7 @@ class Dev extends React.Component {
     }
 
     apiGetData(resultCallback, endpoint, label) {
-        fetch(new Request("http://localhost:8080/" + endpoint, {method: 'GET'}))
+        fetch(new Request(`http://${window.location.hostname}:8080/` + endpoint, {method: 'GET'}))
             .then(response => {
                 if (response.status === 200) {
                     return response.json();

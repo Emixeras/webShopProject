@@ -95,7 +95,7 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     }
 
     loadArticles(context: AlbumOverview) {
-        fetch(new Request("http://localhost:8080/article", {method: 'GET'}))
+        fetch(new Request(`http://${window.location.hostname}:8080/article`, {method: 'GET'}))
             .then(response => {
                 if (response.status === 200) {
                     return response.json();
@@ -115,7 +115,7 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     }
 
     loadSingleImage(id: number, onFinish: (imageResponse?: ImageResponseType) => void) {
-        fetch(new Request(`http://localhost:8080/article/range;start=${id};end=${id};quality=${this.imageResolution}`, {method: 'GET'}))
+        fetch(new Request(`http://${window.location.hostname}:8080/article/range;start=${id};end=${id};quality=${this.imageResolution}`, {method: 'GET'}))
             .then(response => {
                 if (response.status === 200) {
                     return response.json();

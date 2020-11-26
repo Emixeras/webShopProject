@@ -57,7 +57,7 @@ class ArtistOverview extends Component {
     }
 
     loadArtists() {
-        axios.get("http://localhost:8080/artist").then((response) => {
+        axios.get(`http://${window.location.hostname}:8080/artist`).then((response) => {
             artistResponseArray = [];
             var artistResponse = response.data;
             Object.keys(artistResponse).forEach(key => {
