@@ -20,6 +20,7 @@ import {
     getShoppingCartPrice,
     ShoppingCartList
 } from "../services/ShoppingCartUtil";
+import {placeOrder} from "../services/OrderApiUtil";
 
 
 class OrderSummary extends Component {
@@ -225,9 +226,10 @@ function ContinueButton(){
             "shoppingcartcount": getShoppingCartCount(),
             "shipping": 5.99,
         };
-        console.log(JSON.stringify(payload));
-        showToast("Bestellung erfolgreich aufgegeben", "success")
-        history.push("/ordercomplete")
+        placeOrder(payload, ()=>{
+            history.push("/ordercomplete")
+            showToast("Bestellung erfolgreich aufgegeben", "success")
+        },()=>showToast("Bestellung fehlgeschlagen"))
     };
 
     return (

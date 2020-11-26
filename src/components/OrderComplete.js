@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import {NavigationComponent} from "../Utilities/Utilities";
 import Grid from "@material-ui/core/Grid";
+import Lottie from 'react-lottie';
+import lottiedata from "../assets/order.json";
 import {
     Card,
     Button,
@@ -14,6 +16,7 @@ import {
 import HorizontalLabelPositionBelowStepper from "./Stepper";
 import {useHistory} from "react-router-dom";
 import Typography from "@material-ui/core/Typography";
+import Redirect from "react-router/lib/Redirect";
 
 
 class OrderComplete extends Component {
@@ -23,16 +26,33 @@ class OrderComplete extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            redirect: false,
             user: getSessionUser(),
             paymentMethod: -1,
         };
 
     }
+    componentDidMount() {
+        this.id = setTimeout(() => this.setState({ redirect: true }), 5000)
+    }
+    componentWillUnmount() {
+        clearTimeout(this.id)
+    }
 
     render() {
         if (isUserLoggedIn()) {
-            return (
-                <MenuDrawer>
+            const defaultOptions = {
+                loop: true,
+                autoplay: true,
+                animationData: lottiedata,
+                rendererSettings: {
+                    preserveAspectRatio: 'xMidYMid slice'
+                }
+            };
+
+            return this.state.redirect
+                ? <NavigationComponent to={"/"}/>
+                : <MenuDrawer>
                     <div style={{
                         marginTop: 8,
                         display: 'flex',
@@ -52,7 +72,12 @@ class OrderComplete extends Component {
                                                 fontSize: 22,
                                                 marginBottom: 3
                                             }}>
-                                                Vielen Dank für ihre Bestellung!
+                                                Vielen Dank für ihre Bestellung! Sie werden in wenigen Sekunden weitergeleitet.
+                                                <Lottie options={defaultOptions}
+                                                        height={250}
+                                                        width={250}
+                                                        isStopped={this.state.isStopped}
+                                                        isPaused={this.state.isPaused}/>
                                             </div>
                                         </Grid>
                                         <Grid item>
@@ -68,17 +93,9 @@ class OrderComplete extends Component {
                         </Grid>
                     </div>
                 </MenuDrawer>
-            )
+
         } else {
             return <NavigationComponent to={"/login"}/>;
-        }
-    }
-
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        if (this.scrollHelper.first !== this.editMode) {
-            this.scrollHelper.first = this.editMode;
-            if (this.scrollHelper.third)
-                window.scrollBy(0, this.scrollHelper.third.getBoundingClientRect().top - this.scrollHelper.second)
         }
     }
     handleChange = event => this.setState({title: event.target.value.trim()});
