@@ -75,6 +75,7 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
 
     constructor(props: IProps, context: any) {
         super(props, context);
+
         let state = this.props.location.state;
         if (state) {
             this.filter = Pair.make(state.filter, state.type)
@@ -84,6 +85,8 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     }
 
     render() {
+        if (!this.props.location.state)
+            this.filter = undefined; 
         if (window.location.pathname === "/") {
             return <NavigationComponent to={"/albums"}/>;
         }

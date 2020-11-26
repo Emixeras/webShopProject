@@ -225,7 +225,7 @@ export default function MenuDrawer(props) {
                         // backgroundColor: "red",
                     }}>
                         <img style={{alignSelf: 'center', cursor: "pointer"}} height="50" src={logo}
-                             onClick={event => history.push("/")}
+                             onClick={event => history.push("/", undefined)}
                              alt="fireSpot"/>
                     </div>
                     {/*<div>*/}
