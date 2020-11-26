@@ -142,7 +142,7 @@ function RadioButtonsGroup() {
     const [value, setValue] = React.useState('female');
 
     const handleChange = (event) => {
-        console.log(event.target.value)
+        localStorage.setItem('paymentmethod', event.target.value);
         setValue(event.target.value);
     };
 

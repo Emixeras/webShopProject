@@ -20,6 +20,7 @@ import {DialogBuilder} from "../Utilities/DialogBuilder";
 import {Triple} from "../Utilities/TsUtilities";
 import HorizontalLabelPositionBelowStepper from "./Stepper";
 import {useHistory} from "react-router-dom";
+import {getShoppingCartCount, getShoppingCartPrice, ShoppingCartList} from "../services/ShoppingCartUtil";
 
 
 
@@ -63,6 +64,7 @@ class Order extends Component {
             return (
                 <MenuDrawer>
                     <HorizontalLabelPositionBelowStepper index={0}/>
+
                     <div style={{
                         marginTop: 8,
                         display: 'flex',
@@ -71,6 +73,73 @@ class Order extends Component {
                         <Grid container
                               style={{width: '85%', maxWidth: "800px"}}
                               spacing={3}>
+                            <Grid item xs={12}>
+                                <Card style={padding(18)}>
+                                    <Grid
+                                        container
+                                        direction="column">
+                                        <Grid item fullWidth>
+                                            <div style={{
+                                                textAlign: "start",
+                                                fontSize: 22,
+                                                marginBottom: 10
+                                            }}>
+                                                Ihre Bestellung
+                                            </div>
+                                        </Grid>
+                                        <Grid item>
+                                        </Grid>
+                                        <Grid item fullWidth>
+                                            <Grid item fullWidth>
+                                                <ShoppingCartList
+                                                    update={() => this.forceUpdate()}
+                                                    showChangeCount={false}/>
+                                                <hr/>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Grid container ref={element => this.scrollHelper.third = element}
+                                                      wrap={"wrap-reverse"}
+                                                      direction="row"
+                                                      justify="flex-end"
+                                                      spacing={3}>
+                                                    <Grid item>
+                                                        <div>
+                                                            <b>Artikel</b> ({getShoppingCartCount()} Stk.): {getShoppingCartPrice()} € ‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎
+                                                        </div>
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Grid container ref={element => this.scrollHelper.third = element}
+                                                      wrap={"wrap-reverse"}
+                                                      direction="row"
+                                                      justify="flex-end"
+                                                      spacing={3}>
+                                                    <Grid item>
+                                                        <div>
+                                                            zzgl. Versand 5.99 € ‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎
+                                                        </div>
+                                                    </Grid>
+                                                </Grid>
+                                                <Grid item fullWidth>
+                                                    <hr/>
+                                                </Grid>
+                                                <Grid container ref={element => this.scrollHelper.third = element}
+                                                      wrap={"wrap-reverse"}
+                                                      direction="row"
+                                                      justify="flex-end"
+                                                      spacing={3}>
+                                                    <Grid item>
+                                                        <div>
+                                                            <b>Gesamtpreis</b> {parseFloat((getShoppingCartPrice() + 5.99).toString()).toFixed(2)} € ‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎
+                                                        </div>
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
+                                </Card>
+                            </Grid>
                             <Grid item xs={12}>
                                 <Card style={padding(18)}>
                                     <Grid
@@ -256,10 +325,6 @@ class Order extends Component {
         );
     }
 
-    checkEmail() {
-        return this.emailError = !(this.state.email.length === 0 || isEmail(this.state.email));
-    }
-
     toggleEditMode(notForce) {
         this.editMode = !this.editMode;
         this.scrollHelper.second = this.scrollHelper.third.getBoundingClientRect().top;
@@ -267,11 +332,10 @@ class Order extends Component {
             this.forceUpdate()
     }
 }
-
 function ContinueButton(){
     const history = useHistory();
     let continueToPayment = () => {
-            history.push("/payment")
+        history.push("/payment")
     };
 
     return (
@@ -280,12 +344,29 @@ function ContinueButton(){
             variant="contained"
             color="primary"
             onClick={() => {
-                continueToPayment()
+                checkUserAddress(()=>{
+                    continueToPayment()
+                }, ()=>{
+                    showToast('Bitte überprüfen Sie Ihre Eingaben','error')
+                })
             }
             }>
             Weiter
         </Button>
     )
+}
+function checkUserAddress(onSuccess, onFail){
+    let user = getSessionUser()
+        if( user.town === '' || user.town === undefined ||
+            user.firstName ==='' || user.firstName === undefined ||
+            user.lastName ==='' || user.lastName=== undefined ||
+            user.postalCode ==='' || user.postalCode === undefined ||
+            user.street === '' || user.street === undefined ||
+            user.title === '' || user.title === undefined){
+                onFail()
+        }else{
+                onSuccess()
+        }
 }
 function BackButton(){
     const history = useHistory();

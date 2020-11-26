@@ -31,7 +31,7 @@ apply();
 
 // ---------------
 
-function getShoppingCartObject(): ShoppingCartObject {
+export function getShoppingCartObject(): ShoppingCartObject {
     let item = localStorage.getItem(SHOPPING_CART);
     if (item)
         return JSON.parse(item);

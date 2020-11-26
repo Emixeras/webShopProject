@@ -4,7 +4,9 @@ import {Button, Card, Typography} from "@material-ui/core";
 import {
     clearShoppingCart, getAllShoppingCartArticles, getAllShoppingCartEntries,
     getShoppingCartCount,
-    getShoppingCartPrice, isShoppingCartEmpty, ShoppingCartList
+    getShoppingCartPrice,
+    isShoppingCartEmpty,
+    ShoppingCartList
 } from "../services/ShoppingCartUtil";
 import Grid from "@material-ui/core/Grid";
 import {padding} from "../Utilities/Utilities";
@@ -12,7 +14,7 @@ import PaymentIcon from '@material-ui/icons/Payment';
 import DeleteIcon from '@material-ui/icons/DeleteForever';
 import {ContextType} from "../Utilities/TsUtilities";
 import {DialogBuilder} from "../Utilities/DialogBuilder";
-import {Link} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
 
 interface IProps {
 
@@ -95,12 +97,7 @@ class ShoppingCart extends React.Component<IProps, IState> {
                                                     </Typography>
                                                 </Grid>
                                                 <Grid item xs>
-                                                    <Button variant="contained" color="primary"
-                                                            endIcon={<PaymentIcon/>}
-                                                            onClick={event => {
-                                                            }}>
-                                                        {"Zur Kasse"}
-                                                    </Button>
+                                                    <GoToOrder/>
                                                 </Grid>
                                                 <Grid item xs>
                                                     <ClearShoppingCartButton context={this}/>
@@ -117,7 +114,22 @@ class ShoppingCart extends React.Component<IProps, IState> {
         )
     }
 }
+function GoToOrder(){
+    const history = useHistory();
+    let continueToOrder = () => {
+        history.push("/placeorder")
+    };
 
+    return (
+        <Button variant="contained" color="primary"
+                endIcon={<PaymentIcon/>}
+                onClick={event => {
+                    continueToOrder()
+                }}>
+            {"Zur Kasse"}
+        </Button>
+    )
+}
 function ClearShoppingCartButton({context}: ContextType<ShoppingCart>) {
     const [open, setOpen] = useState(false);
     return (

@@ -14,6 +14,12 @@ import {
 import HorizontalLabelPositionBelowStepper from "./Stepper";
 import {useHistory} from "react-router-dom";
 import Typography from "@material-ui/core/Typography";
+import {
+    getShoppingCartCount,
+    getShoppingCartObject,
+    getShoppingCartPrice,
+    ShoppingCartList
+} from "../services/ShoppingCartUtil";
 
 
 class OrderSummary extends Component {
@@ -61,6 +67,94 @@ class OrderSummary extends Component {
                                             <Typography>{this.state.user.title.charAt(0).toUpperCase()}{this.state.user.title.slice(1).toLowerCase()} {this.state.user.firstName} {this.state.user.lastName}</Typography>
                                             <Typography>{this.state.user.street} {this.state.user.streetNumber}</Typography>
                                             <Typography>{this.state.user.postalCode} {this.state.user.town}</Typography>
+                                        </Grid>
+                                    </Grid>
+                                </Card>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Card style={padding(18)}>
+                                    <Grid
+                                        container
+                                        direction="column">
+                                        <Grid item fullWidth>
+                                            <div style={{
+                                                textAlign: "start",
+                                                fontSize: 22,
+                                                marginBottom: 3
+                                            }}>
+                                                Bezahlmethode
+                                            </div>
+                                        </Grid>
+                                        <Grid item>
+                                            <Typography> </Typography>
+                                            <Typography>Vorkasse</Typography>
+                                        </Grid>
+                                    </Grid>
+                                </Card>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Card style={padding(18)}>
+                                    <Grid
+                                        container
+                                        direction="column">
+                                        <Grid item fullWidth>
+                                            <div style={{
+                                                textAlign: "start",
+                                                fontSize: 22,
+                                                marginBottom: 10
+                                            }}>
+                                                Ihre Bestellung
+                                            </div>
+                                        </Grid>
+                                        <Grid item>
+                                        </Grid>
+                                        <Grid item fullWidth>
+                                            <Grid item fullWidth>
+                                                <ShoppingCartList
+                                                    update={() => this.forceUpdate()}
+                                                    showChangeCount={false}/>
+                                                <hr/>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Grid container
+                                                      wrap={"wrap-reverse"}
+                                                      direction="row"
+                                                      justify="flex-end"
+                                                      spacing={3}>
+                                                    <Grid item>
+                                                        <div>
+                                                            <b>Artikel</b> ({getShoppingCartCount()} Stk.): {getShoppingCartPrice()} € ‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎
+                                                        </div>
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Grid container
+                                                      wrap={"wrap-reverse"}
+                                                      direction="row"
+                                                      justify="flex-end"
+                                                      spacing={3}>
+                                                    <Grid item>
+                                                        <div>
+                                                            zzgl. Versand 5.99 € ‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎
+                                                        </div>
+                                                    </Grid>
+                                                </Grid>
+                                                <Grid item fullWidth>
+                                                    <hr/>
+                                                </Grid>
+                                                <Grid container
+                                                      wrap={"wrap-reverse"}
+                                                      direction="row"
+                                                      justify="flex-end"
+                                                      spacing={3}>
+                                                    <Grid item>
+                                                        <div>
+                                                            <b>Gesamtpreis</b> {parseFloat((getShoppingCartPrice() + 5.99).toString()).toFixed(2)} € ‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎
+                                                        </div>
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
                                         </Grid>
                                     </Grid>
                                 </Card>
@@ -123,6 +217,15 @@ function BackButton(){
 function ContinueButton(){
     const history = useHistory();
     let continueToComplete = () => {
+        let payload = {
+            "shoppingcart": getShoppingCartObject(),
+            "user": getSessionUser(),
+            "paymentmethod": localStorage.getItem('paymentmethod'),
+            "shoppingcartprice": getShoppingCartPrice(),
+            "shoppingcartcount": getShoppingCartCount(),
+            "shipping": 5.99,
+        };
+        console.log(JSON.stringify(payload));
         showToast("Bestellung erfolgreich aufgegeben", "success")
         history.push("/ordercomplete")
     };
