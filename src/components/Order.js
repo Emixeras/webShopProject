@@ -104,7 +104,7 @@ class Order extends Component {
                                                       spacing={3}>
                                                     <Grid item>
                                                         <div>
-                                                            <b>Artikel</b> ({getShoppingCartCount()} Stk.): {getShoppingCartPrice()} € ‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎
+                                                            <b>Artikel</b> ({getShoppingCartCount()} Stk.): {parseFloat((getShoppingCartPrice()).toString()).toFixed(2)} € ‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎
                                                         </div>
                                                     </Grid>
                                                 </Grid>

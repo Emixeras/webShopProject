@@ -15,6 +15,7 @@ import HorizontalLabelPositionBelowStepper from "./Stepper";
 import {useHistory} from "react-router-dom";
 import Typography from "@material-ui/core/Typography";
 import {
+    clearShoppingCart,
     getShoppingCartCount,
     getShoppingCartObject,
     getShoppingCartPrice,
@@ -124,7 +125,7 @@ class OrderSummary extends Component {
                                                       spacing={3}>
                                                     <Grid item>
                                                         <div>
-                                                            <b>Artikel</b> ({getShoppingCartCount()} Stk.): {getShoppingCartPrice()} € ‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎
+                                                            <b>Artikel</b> ({getShoppingCartCount()} Stk.): {parseFloat((getShoppingCartPrice()).toString()).toFixed(2)} € ‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎
                                                         </div>
                                                     </Grid>
                                                 </Grid>
@@ -229,7 +230,8 @@ function ContinueButton(){
         placeOrder(payload, ()=>{
             history.push("/ordercomplete")
             showToast("Bestellung erfolgreich aufgegeben", "success")
-        },()=>showToast("Bestellung fehlgeschlagen"))
+            clearShoppingCart()
+        },()=>showToast("Bestellung fehlgeschlagen", "error"))
     };
 
     return (
