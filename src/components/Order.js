@@ -61,6 +61,9 @@ class Order extends Component {
 
     render() {
         if (isUserLoggedIn()) {
+            let total = getShoppingCartPrice()
+
+            console.log(total)
             return (
                 <MenuDrawer>
                     <HorizontalLabelPositionBelowStepper index={0}/>
@@ -131,7 +134,7 @@ class Order extends Component {
                                                       spacing={3}>
                                                     <Grid item>
                                                         <div style={padding(0,90,0,0)}>
-                                                            <b>Gesamtpreis</b> {parseFloat((getShoppingCartPrice() + 5.99).toString()).toFixed(2)} €
+                                                            <b>Gesamtpreis</b> {parseFloat((parseFloat(getShoppingCartPrice()) + 5.99).toString()).toFixed(2)} €
                                                         </div>
                                                     </Grid>
                                                 </Grid>
