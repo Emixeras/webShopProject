@@ -103,8 +103,8 @@ class Order extends Component {
                                                       justify="flex-end"
                                                       spacing={3}>
                                                     <Grid item>
-                                                        <div>
-                                                            <b>Artikel</b> ({getShoppingCartCount()} Stk.): {parseFloat((getShoppingCartPrice()).toString()).toFixed(2)} € ‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎
+                                                        <div style={padding(0,90,0,0)}>
+                                                            <b>Artikel</b> ({getShoppingCartCount()} Stk.): {parseFloat((getShoppingCartPrice()).toString()).toFixed(2)} €
                                                         </div>
                                                     </Grid>
                                                 </Grid>
@@ -116,8 +116,8 @@ class Order extends Component {
                                                       justify="flex-end"
                                                       spacing={3}>
                                                     <Grid item>
-                                                        <div>
-                                                            zzgl. Versand 5.99 € ‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎
+                                                        <div style={padding(0,90,0,0)}>
+                                                            zzgl. Versand 5.99 €
                                                         </div>
                                                     </Grid>
                                                 </Grid>
@@ -130,8 +130,8 @@ class Order extends Component {
                                                       justify="flex-end"
                                                       spacing={3}>
                                                     <Grid item>
-                                                        <div>
-                                                            <b>Gesamtpreis</b> {parseFloat((getShoppingCartPrice() + 5.99).toString())} € ‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎
+                                                        <div style={padding(0,90,0,0)}>
+                                                            <b>Gesamtpreis</b> {parseFloat((getShoppingCartPrice() + 5.99).toString()).toFixed(2)} €
                                                         </div>
                                                     </Grid>
                                                 </Grid>
