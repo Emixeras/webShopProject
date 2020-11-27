@@ -374,7 +374,7 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
             <Button style={{marginTop: 15}} onClick={event => {
                 setOpen(true)
             }} endIcon={<SettingsIcon/>}>Einstellungen</Button>
-            {new DialogBuilder(open, dialogBuilder => setOpen(false))
+            {new DialogBuilder(open, setOpen)
                 .setTitle("UI Einstellungen")
                 .setText("Die Qualität der Vorschaubilder und die Schrittweite der zu ladenen Bilder")
                 .setContent(dialogBuilder => {

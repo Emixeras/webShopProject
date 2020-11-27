@@ -404,7 +404,7 @@ function DeleteAccountButton() {
                     onClick={() => setOpen(true)}
                     endIcon={<Delete/>}
                     color="secondary">Account Löschen</Button>
-            {new DialogBuilder(open, dialogBuilder => setOpen(false))
+            {new DialogBuilder(open, setOpen)
                 .setTitle("Account Löschen")
                 .setText("Möchtesten sie wirklich den Account unwiederruflich löschen?")
                 .addButton("Abbrechen")
@@ -477,7 +477,7 @@ function ModeButtons(props) {
                         else
                             that.toggleEditMode();
                     }}>Abbrechen</Button>
-                    {new DialogBuilder(cancelDialogOpen, dialogBuilder => setCancelDialogOpen(false))
+                    {new DialogBuilder(cancelDialogOpen, setCancelDialogOpen)
                         .setTitle("Änderungen Verwerfen?")
                         .setText("Sollen alle ungespeicherten Änderungen verworfen werden?")
                         .addButton("Nein")
