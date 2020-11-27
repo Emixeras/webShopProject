@@ -128,19 +128,21 @@ export function getShoppingCartCount(article?: Article): number {
     }
 }
 
-export function getShoppingCartPrice(article?: Article): number {
+export function getShoppingCartPrice(article?: Article): string {
+    let result: number;
     if (article) {
         let entry = getShoppingCartEntry(article);
         if (entry)
-            return +entry.article.price * entry.count;
+            result = +entry.article.price * entry.count;
         else
-            return -1;
+            result = -1;
     } else {
         let allPrice = 0;
         for (const entry of getShoppingCartObject().entries)
             allPrice += +entry.article.price * entry.count;
-        return allPrice;
+        result = allPrice;
     }
+    return result.toFixed(2);
 }
 
 export function isShoppingCartEmpty(): boolean {
@@ -312,7 +314,7 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
                                 </Grid>
                                 <Grid item>
                                     <Typography variant="body1" gutterBottom>
-                                        Gesamt: {getShoppingCartPrice(this.article).toFixed(2)} €
+                                        Gesamt: {getShoppingCartPrice(this.article)} €
                                     </Typography>
                                 </Grid>
                             </Grid>

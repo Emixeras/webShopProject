@@ -192,7 +192,7 @@ export default function MenuDrawer(props) {
                 position="fixed"
                 style={{background: '#2E3B55'}}
                 className={clsx(classes.appBar, {
-                    [classes.appBarShift]: open,
+                    [classes.appBarShift]: open && !isMobile(),
                 })}
             >
                 <Toolbar>
@@ -225,7 +225,7 @@ export default function MenuDrawer(props) {
                         // backgroundColor: "red",
                     }}>
                         <img style={{alignSelf: 'center', cursor: "pointer"}} height="50" src={logo}
-                             onClick={event => history.push("/")}
+                             onClick={event => history.push("/", undefined)}
                              alt="fireSpot"/>
                     </div>
                     {/*<div>*/}

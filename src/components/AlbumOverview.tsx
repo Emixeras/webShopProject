@@ -75,15 +75,18 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
 
     constructor(props: IProps, context: any) {
         super(props, context);
+
         let state = this.props.location.state;
         if (state) {
             this.filter = Pair.make(state.filter, state.type)
         }
         this.loadArticles(this);
-        window.scrollTo(0,0);
+        window.scrollTo(0, 0);
     }
 
     render() {
+        if (!this.props.location.state)
+            this.filter = undefined;
         if (window.location.pathname === "/") {
             return <NavigationComponent to={"/albums"}/>;
         }
@@ -364,6 +367,8 @@ export function FilterCard({context}: ContextType<AlbumOverview>) {
 function UiSettings({context}: ContextType<AlbumOverview>) {
     const [open, setOpen] = useState(false);
     const [checked, setChecked] = useState(context.unloadImages);
+    let resolution = context.imageResolution;
+    let stepDistance = context.stepDistance;
     return (
         <div style={{float: "right"}}>
             <Button style={{marginTop: 15}} onClick={event => {
@@ -383,15 +388,17 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
                                 step={50}
                                 min={100}
                                 max={500}
-                                onMouseUp={event => {
-                                    // @ts-ignore
-                                    let value = +event.target.ariaValueNow;
-                                    if (context.imageResolution !== value) {
-                                        context.imageResolution = value;
-                                        localStorage.setItem(context.IMAGE_RESOLUTION, `${value}`);
-                                        reloadImages(context);
-                                    }
-                                }}
+                                // onMouseUp={event => {
+                                //     // @ts-ignore
+                                //     let value = +event.target.ariaValueNow;
+                                //     if (context.imageResolution !== value) {
+                                //         context.imageResolution = value;
+                                //         localStorage.setItem(context.IMAGE_RESOLUTION, `${value}`);
+                                //         reloadImages(context);
+                                //     }
+                                // }}
+                                // @ts-ignore
+                                onChange={(event, value) => resolution = value}
                                 marks={[
                                     {
                                         value: 100,
@@ -420,15 +427,17 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
                                 step={12}
                                 min={12}
                                 max={96}
-                                onMouseUp={event => {
-                                    // @ts-ignore
-                                    let value = +event.target.ariaValueNow;
-                                    if (context.stepDistance !== value) {
-                                        context.stepDistance = value;
-                                        localStorage.setItem(context.STEP_DISTANCE, `${value}`);
-                                        reloadImages(context);
-                                    }
-                                }}
+                                // onMouseUp={event => {
+                                //     // @ts-ignore
+                                //     let value = +event.target.ariaValueNow;
+                                //     if (context.stepDistance !== value) {
+                                //         context.stepDistance = value;
+                                //         localStorage.setItem(context.STEP_DISTANCE, `${value}`);
+                                //         reloadImages(context);
+                                //     }
+                                // }}
+                                // @ts-ignore
+                                onChange={(event, value) => stepDistance = value}
                                 marks={[
                                     {
                                         value: 12,
@@ -471,8 +480,21 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
                         </div>
                     )
                 })
-                // .addButton("Abbrechen")
-                .addButton({label: "Ok", isActionButton: true})
+                .addButton("Abbrechen")
+                .addButton({
+                    label: "Ok", isActionButton: true, onClick: dialogBuilder => {
+                        if (context.imageResolution !== resolution) {
+                            context.imageResolution = resolution;
+                            localStorage.setItem(context.IMAGE_RESOLUTION, `${resolution}`);
+                            reloadImages(context);
+                        }
+                        if (context.imageResolution !== resolution) {
+                            context.imageResolution = resolution;
+                            localStorage.setItem(context.IMAGE_RESOLUTION, `${resolution}`);
+                            reloadImages(context);
+                        }
+                    },
+                })
                 .build()}
         </div>
     )
