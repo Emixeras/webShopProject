@@ -94,6 +94,7 @@ export function deleteArtist(id: number, onSuccess?: (response: any) => void, on
             password: user.password
         },
     };
+
     axios.delete(apiBaseUrlUpdateArtist + id, config)
         .then(function (response) {
             console.log(response);

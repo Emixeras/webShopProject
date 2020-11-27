@@ -138,7 +138,7 @@ function ClearShoppingCartButton({context}: ContextType<ShoppingCart>) {
                     onClick={event => setOpen(true)}>
                 {"Leeren"}
             </Button>
-            {new DialogBuilder(open, dialogBuilder => setOpen(false))
+            {new DialogBuilder(open, setOpen)
                 .setTitle("Einkaufswagen Leeren")
                 .setText("Möchten Sie wirklich den kompletten Einkaufswagen unwiederruflich leeren?")
                 .addButton("Abbrechen")

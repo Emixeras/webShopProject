@@ -48,21 +48,20 @@ interface InputObject {
 let persistentErrorState: Triple<string, boolean, string> = Triple.make("", false, "");
 let setPersistentErrorState: Dispatch<SetStateAction<Triple<string, boolean, string>>> = value => {};
 
-
 export class DialogBuilder {
     readonly open: boolean;
     _title: string = "";
     _text: string = "";
     _buttonList: LinkedList<ButtonObject> = new LinkedList();
     actionButton: any = undefined;
-    handleClose: DialogOnClick = (dialogBuilder, event) => new DOMException("Handle Close nicht überschrieben");
+    handleClose: DialogOnClick | Dispatch<SetStateAction<boolean>> = (dialogBuilder, event) => new DOMException("Handle Close nicht überschrieben");
     input: InputObject | undefined = undefined;
     content: ((dialogBuilder: DialogBuilder) => JSX.Element) | undefined = undefined;
     // persistentErrorState: Triple<string, boolean, string>
 
 
     //  ------------------------- Constructor ------------------------->
-    constructor(open: boolean, handleClose: DialogOnClick) {
+    constructor(open: boolean, handleClose: DialogOnClick | Dispatch<SetStateAction<boolean>>) {
         this.open = open;
         if (handleClose)
             this.setHandleClose(handleClose);
@@ -105,13 +104,18 @@ export class DialogBuilder {
         return this;
     }
 
-    setHandleClose(handleClose: (dialogBuilder: DialogBuilder, event: any) => void): DialogBuilder {
+    setHandleClose(handleClose: DialogOnClick | Dispatch<SetStateAction<boolean>>): DialogBuilder {
         this.handleClose = (dialogBuilder, event) => {
-            handleClose(dialogBuilder, event);
+            if (handleClose.name === "bound dispatchAction")
+                (handleClose as Dispatch<SetStateAction<boolean>>)(false);
+            else
+                (handleClose as DialogOnClick)(dialogBuilder, event);
+
             if (this.input) {
                 this.validate(this.input.initialValue ? this.input.initialValue : "");
                 setPersistentErrorState(persistentErrorState)
-            }
+            } else
+                setPersistentErrorState(Triple.make("", false, ""));
         };
         return this;
     }
@@ -156,8 +160,11 @@ export class DialogBuilder {
 
 
     //  ------------------------- Convenience ------------------------->
-    dismiss(): DialogBuilder {
-        this.handleClose(this);
+    dismiss(event?: any): DialogBuilder {
+        if (this.handleClose.name === "DialogOnClick")
+            (this.handleClose as DialogOnClick)(this, event);
+        else
+            (this.handleClose as Dispatch<SetStateAction<boolean>>)(false);
         return this;
     }
     //  <------------------------- Convenience -------------------------
@@ -169,13 +176,15 @@ function Builder({context}: ContextType<DialogBuilder>) {
             if (context.input.inputValidator) {
                 context.validate(context.input.initialValue ? context.input.initialValue : "")
             }
-        }
+        } else
+            persistentErrorState = Triple.make("", false, "");
+
         return persistentErrorState;
     });
     persistentErrorState = state[0];
     setPersistentErrorState = state[1];
     return (
-        <Dialog open={context.open} onClose={event => context.handleClose(context, event)}>
+        <Dialog open={context.open} onClose={event => context.dismiss(event)}>
             <DialogTitle id="form-dialog-title">{context.title}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
@@ -187,7 +196,7 @@ function Builder({context}: ContextType<DialogBuilder>) {
             <DialogActions>
                 {context._buttonList.toArray().map(buttonObject => {
                     let buttonColor: PropTypes.Color = (boolOr(buttonObject.color, 'inherit', 'primary', 'secondary', 'default') ? buttonObject.color : undefined) as PropTypes.Color;
-                    if (!buttonColor && buttonObject.isActionButton)
+                    if (!buttonColor && buttonObject.isActionButton && !buttonObject.color)
                         buttonColor = "primary";
                     return (
                         <Button variant={buttonColor ? "contained" : undefined}
@@ -196,7 +205,7 @@ function Builder({context}: ContextType<DialogBuilder>) {
                                 buttonObject.onClick(context, event)
 
                             if (boolOr(buttonObject.dismissOnClick, undefined, true))
-                                context.handleClose(context, event)
+                                context.dismiss(event)
                         }} id={buttonObject.id}
                                 startIcon={buttonObject.iconAtStart && buttonObject.icon ? buttonObject.icon : undefined}
                                 endIcon={!buttonObject.iconAtStart && buttonObject.icon ? buttonObject.icon : undefined}

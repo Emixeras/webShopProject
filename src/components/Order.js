@@ -405,7 +405,7 @@ function ModeButtons(props) {
                         else
                             that.toggleEditMode();
                     }}>Abbrechen</Button>
-                    {new DialogBuilder(cancelDialogOpen, dialogBuilder => setCancelDialogOpen(false))
+                    {new DialogBuilder(cancelDialogOpen, setCancelDialogOpen)
                         .setTitle("Änderungen Verwerfen?")
                         .setText("Sollen alle ungespeicherten Änderungen verworfen werden?")
                         .addButton("Nein")

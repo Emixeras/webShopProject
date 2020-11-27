@@ -1,12 +1,12 @@
 import * as React from "react";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {
     Button,
     Card,
     Grid,
     IconButton,
     InputAdornment,
-    TextField,
+    TextField, Tooltip,
     Typography,
 } from "@material-ui/core";
 import MenuDrawer from "./MenuDrawer";
@@ -18,6 +18,8 @@ import EditIcon from '@material-ui/icons/Edit';
 import ClearIcon from '@material-ui/icons/Clear';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
+import CopyIcon from '@material-ui/icons/FileCopy';
+import SaveIcon from "@material-ui/icons/Save";
 import {DialogBuilder} from "../Utilities/DialogBuilder";
 import {
     base64ToDataUri,
@@ -30,18 +32,13 @@ import {
     RestrictedPage,
     RETURN_MODE
 } from "../Utilities/TsUtilities";
-import {Save} from "@material-ui/icons";
-import {createNewArticle, updateArticle} from "../services/ItemApiUtil";
+import {createNewArticle, deleteArticle, updateArticle} from "../services/ItemApiUtil";
 import {createNewArtist, deleteArtist, updateArtist} from "../services/ArtistApiUtil";
+import {addToShoppingCart} from "../services/ShoppingCartUtil";
 
 interface IProps {
     // @ts-ignore
     location: history.Location;
-}
-
-interface ImageResponseType {
-    article: Article;
-    file: string;
 }
 
 interface IState {
@@ -52,7 +49,7 @@ interface IState {
     price: string;
     artists?: ArtistOrGenre;
     genre?: ArtistOrGenre;
-    articlePicture?: {id: number};
+    articlePicture?: { id: number };
 }
 
 export interface Article {
@@ -177,11 +174,11 @@ export default class EditArticles extends React.Component<IProps, IState> {
             })
     }
 
-    checkPrice = (price: string) => price.length > 0 && !/^(\d+([.,]\d{1,2})?)$/.test(price);
+    checkPriceError = (price: string) => price.length > 0 && !/^(\d+([.,]\d{1,2})?)$/.test(price);
 
     render() {
-        const priceError: boolean = this.checkPrice(this.state.price);
-        const eanError: boolean = !/^(-1|\d{8}|\d{13})$/.test(this.state.ean + "");
+        const priceError: boolean = this.checkPriceError(this.state.price);
+        const eanError: boolean = !/^(-1|\d{8})$/.test(this.state.ean + "");
 
         return (
             <RestrictedPage>
@@ -493,37 +490,39 @@ export default class EditArticles extends React.Component<IProps, IState> {
 let setIsPictureNotSelected: (visibility: boolean) => void = visibility => {
 };
 
-function DialogComponent(arg: any) {
-    const context: EditArticles = arg.context;
-    const artist: ArtistOrGenre | undefined = context.state.artists;
+function DialogComponent({context}: ContextType<EditArticles>) {
+    const artist: ArtistOrGenre = (context.state.artists as ArtistOrGenre);
+    let editMode: boolean = typeof artist === "object";
     const [open, setOpen] = React.useState(false);
     const [picture, setPicture] = useState<File>();
 
     return (
         <div>
-            <IconButton style={{maxHeight: 30, maxWidth: 30}}
-                        onClick={event => {
-                            return setOpen(true);
-                        }}
-                        onMouseDown={(event) => {
-                            event.preventDefault();
-                        }}>
-                {<EditIcon/>}
-            </IconButton>
-
-            {new DialogBuilder(open, dialogBuilder => {
+            <Tooltip
+                title={`Künstler ${editMode ? "Bearbeiten" : "Anlegen"}`}
+                placement="top">
+                <IconButton style={{maxHeight: 30, maxWidth: 30}}
+                            onClick={event => {
+                                return setOpen(true);
+                            }}
+                            onMouseDown={(event) => {
+                                event.preventDefault();
+                            }}>
+                    {<EditIcon/>}
+                </IconButton>
+            </Tooltip>
+            {new DialogBuilder(open, (dialogBuilder: DialogBuilder) => {
                 setPicture(undefined)
                 setOpen(false);
             })
-                .setTitle("Künstler " + (artist ? `Bearbeiten (${artist.name})` : "Anlegen"))
-                .setText(!artist ? "Bitte den Namen des neuen Künstlers eingeben und auf 'Anlegen' klicken." :
-                    "Die Daten des Künstlers bearbeiten und dann auf 'Speichern' klicken")
+                .setTitle("Künstler " + (editMode ? `Bearbeiten (${artist.name})` : "Anlegen"))
+                .setText(editMode ? "Die Daten des Künstlers bearbeiten und dann auf 'Speichern' klicken" : "Bitte den Namen des neuen Künstlers eingeben und auf 'Anlegen' klicken.")
                 .setInput({
                     label: "Künstler Name",
-                    initialValue: artist ? artist.name : undefined,
+                    initialValue: editMode ? artist.name : undefined,
                     inputValidator: text => {
                         let newInput = text.toLowerCase().trim();
-                        if (artist && artist.name.toLowerCase() === newInput)
+                        if (editMode && artist.name.toLowerCase() === newInput)
                             return Pair.make("", false);
                         let result = "";
                         for (let artist of context.artists) {
@@ -564,7 +563,7 @@ function DialogComponent(arg: any) {
                                                 if (picture) {
                                                     setImgSrc(URL.createObjectURL(picture));
                                                     setIsPictureNotSelected(false);
-                                                } else if (artist) {
+                                                } else if (editMode) {
                                                     loadSingleImage("artist", artist.id, imageResponse => {
                                                         if (imageResponse && imageResponse.file) {
                                                             setImgSrc(base64ToDataUri(imageResponse.file));
@@ -594,7 +593,7 @@ function DialogComponent(arg: any) {
                                     </div>
                                 </div>
                             </Grid>
-                            {artist &&
+                            {editMode &&
                             <Grid item>
                                 <Button style={margin(15, 0, 0, 15)} variant={"contained"}
                                         color={"secondary"} endIcon={<DeleteIcon/>}
@@ -616,26 +615,13 @@ function DialogComponent(arg: any) {
                 })
                 .addButton("Abbrechen")
                 .addButton({
-                    label: artist ? "Speichern" : "Anlegen",
+                    label: editMode ? "Speichern" : "Anlegen",
                     isActionButton: true,
+                    color: editMode ? "primary" : "green",
+                    textColor: editMode ? undefined : "white",
+                    icon: editMode ? <SaveIcon/> : <AddIcon/>,
                     onClick: dialogBuilder => {
-                        if (!artist) {
-                            let netArtist = {
-                                // id: context.artists.length + 1,
-                                name: dialogBuilder.getInputText().trim(),
-                            };
-                            createNewArtist(netArtist, picture ? picture : null, response => {
-                                // showToast("Jay", "success");
-                                context.loadArtists(() => {
-                                    context.forceUpdate();
-                                    showToast("Der Künstler wurde angelegt", "success")
-                                })
-                            }, error => {
-                                console.log(error);
-                                showToast(error.message, "error");
-                                debugger
-                            });
-                        } else {
+                        if (editMode) {
                             let newName = dialogBuilder.getInputText().trim()
                             if (artist.name === newName && !picture)
                                 showToast("Keine Änderungen wurden vorgenommen", "info");
@@ -656,6 +642,22 @@ function DialogComponent(arg: any) {
                                     debugger
                                 })
                             }
+                        } else {
+                            let netArtist = {
+                                // id: context.artists.length + 1,
+                                name: dialogBuilder.getInputText().trim(),
+                            };
+                            createNewArtist(netArtist, picture ? picture : null, response => {
+                                // showToast("Jay", "success");
+                                context.loadArtists(() => {
+                                    context.forceUpdate();
+                                    showToast("Der Künstler wurde angelegt", "success")
+                                })
+                            }, error => {
+                                console.log(error);
+                                showToast(error.message, "error");
+                                debugger
+                            });
                         }
 
                         // context.artists.push(netArtist);
@@ -670,28 +672,65 @@ function DialogComponent(arg: any) {
 }
 
 function ActionButtons({context}: ContextType<EditArticles>) {
-    let isCreateNewEnabled = !shallowEqual(initialState, context.state);
+    let state = context.state;
+    let isCreateNewEnabled
+    const [open, setOpen] = useState(false);
+    // ToDo: bei erstellen vollständig logik verwenden
     return (
         <Grid container>
             <Grid item xs>
                 {context.selectedArticle &&
-                <Button endIcon={<DeleteIcon/>}
-                        onClick={event => {
-                            deleteArtist(context.state.id,  (response: any) => {
-                                showToast("Der Artikel wurde gelöscht", "success");
-                            }, (response: any) => {
-                                debugger
-                                showToast("Es Ist ein Fehler aufgetreten: " + response.message, "error");
+                <Grid container>
+                    <Grid item>
+                        <Button endIcon={<DeleteIcon/>}
+                                onClick={event => {
+                                    setOpen(true);
+                                }}
+                                variant="contained"
+                                color="secondary">
+                            Löschen
+                        </Button>
+                        {new DialogBuilder(open, setOpen)
+                            .setTitle("Artikel Löschen")
+                            .setText(`Möchten Sie wirklich den Artikel '${context.selectedArticle.title}' löschen?`)
+                            .addButton("Abbrechen")
+                            .addButton({
+                                label: "Löschen", color: "secondary", icon: <DeleteIcon/>,
+                                onClick: dialogBuilder => {
+                                    deleteArticle(context.state.id, (response: any) => {
+                                        showToast("Der Artikel wurde gelöscht", "success");
+                                        context.selectedArticle = undefined;
+                                        context.setState(initialState);
+                                    }, (response: any) => {
+                                        debugger
+                                        showToast("Es Ist ein Fehler aufgetreten: " + response.message, "error");
+                                    })
+                                }
                             })
-                        }}
-                        variant="contained"
-                        color="secondary">
-                    Löschen
-                </Button>
-                }            </Grid>
+                            .build()}
+                    </Grid>
+                    <Grid item>
+                        <Tooltip
+                            title="Artikel Kopieren"
+                            placement="top">
+                            <IconButton style={{width: 36, height: 36}} onClick={event => {
+                                // addToShoppingCart(this.article);
+                                // this.update();
+                                context.selectedArticle = undefined;
+                                context.setState({
+                                    id: -1,
+                                    ean: -1,
+                                    articlePicture: undefined,
+                                });
+                            }} color={"primary"}>{<CopyIcon/>}</IconButton>
+                        </Tooltip>
+                    </Grid>
+                </Grid>
+                }
+            </Grid>
             <Grid item>
                 {context.selectedArticle ?
-                    <Button endIcon={<Save/>}
+                    <Button endIcon={<SaveIcon/>}
                             disabled={deepEqual(context.selectedArticle, context.state)}
                             onClick={event => {
                                 console.log(context.state.description);
@@ -708,7 +747,7 @@ function ActionButtons({context}: ContextType<EditArticles>) {
                     </Button>
                     :
                     <Button endIcon={<AddIcon/>}
-                            disabled={!isCreateNewEnabled}
+                            disabled={!(isCreateNewEnabled = state.title && typeof state.artists === "object" && typeof state.genre === "object" && state.ean.toString().length === 8 && context.currentPicture && !context.checkPriceError(state.price))}
                             onClick={event => {
                                 console.log(context.state.description);
                                 createNewArticle(context.state, context.currentPicture, (response: any) => {
@@ -719,7 +758,10 @@ function ActionButtons({context}: ContextType<EditArticles>) {
                                 })
                             }}
                             variant="contained"
-                            style={{color: "white", backgroundColor: isCreateNewEnabled ? "green" : "rgba(0, 0, 0, 0.26)"}}>
+                            style={{
+                                color: "white",
+                                backgroundColor: isCreateNewEnabled ? "green" : "rgba(0, 0, 0, 0.26)"
+                            }}>
                         Anlegen
                     </Button>
                 }
@@ -727,5 +769,3 @@ function ActionButtons({context}: ContextType<EditArticles>) {
         </Grid>
     )
 }
-
-// @ts-ignore
