@@ -150,11 +150,11 @@ function RadioButtonsGroup() {
         <FormControl component="fieldset">
             <FormLabel component="legend"/>
             <RadioGroup aria-label="gender" name="gender1" value={value} onChange={handleChange}>
-                <FormControlLabel value="0" control={<Radio />} label="Vorkasse" checked={localStorage.getItem('paymentmethod')==='0'}/>
-                <FormControlLabel value="1" control={<Radio />} label="Rechnung" checked={localStorage.getItem('paymentmethod')==='1'}/>
-                <FormControlLabel value="2" disabled control={<Radio />} label="(Kreditkarte)" />
-                <FormControlLabel value="3" disabled control={<Radio />} label="(Paypal)" />
-                <FormControlLabel value="3" disabled control={<Radio />} label="(Bitcoins)" />
+                <FormControlLabel value="VORKASSE" control={<Radio />} label="Vorkasse" checked={localStorage.getItem('paymentmethod')==='VORKASSE'}/>
+                <FormControlLabel value="RECHNUNG" control={<Radio />} label="Rechnung" checked={localStorage.getItem('paymentmethod')==='RECHNUNG'}/>
+                <FormControlLabel value="KREDITKARTE" disabled control={<Radio />} label="(Kreditkarte)" />
+                <FormControlLabel value="PAYPAL" disabled control={<Radio />} label="(Paypal)" />
+                <FormControlLabel value="BITCOINS" disabled control={<Radio />} label="(Bitcoins)" />
             </RadioGroup>
         </FormControl>
     );

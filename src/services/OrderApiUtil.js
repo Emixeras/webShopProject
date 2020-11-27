@@ -3,9 +3,8 @@ import {getSessionUser, setSessionUser, setUserLoggedIn} from "./StorageUtil";
 import {showToast} from "../Utilities/Utilities";
 
 //todo enpoint anpassen
-const apiBaseUrlPlaceOrder = `http://${window.location.hostname}:8080/`;
+const apiBaseUrlPlaceOrder = `http://${window.location.hostname}:8080/order`;
 
-//todo mit oder ohne basic auth?
 export const placeOrder = (payload, onSuccess, onFail) => {
     var user = getSessionUser();
     axios.post(apiBaseUrlPlaceOrder, payload, {

@@ -220,11 +220,8 @@ function ContinueButton(){
     const history = useHistory();
     let continueToComplete = () => {
         let payload = {
-            "shoppingcart": getShoppingCartObject(),
-            "user": getSessionUser(),
-            "paymentmethod": localStorage.getItem('paymentmethod'),
-            "shoppingcartprice": getShoppingCartPrice(),
-            "shoppingcartcount": getShoppingCartCount(),
+            "shoppingCartEntries": getShoppingCartObject().entries,
+            "paymentMethod": localStorage.getItem('paymentmethod'),
             "shipping": 5.99,
         };
         placeOrder(payload, ()=>{
