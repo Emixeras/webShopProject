@@ -10,13 +10,14 @@ import {
     Typography,
 } from "@material-ui/core";
 import MenuDrawer from "./MenuDrawer";
-import {margin, padding, shallowEqual, showToast} from "../Utilities/Utilities";
+import {deepEqual, margin, padding, shallowEqual, showToast} from "../Utilities/Utilities";
 import SimpleReactFileUpload from "./SimpleReactFileUpload";
 import {Combobox} from 'react-widgets'
 import 'react-widgets/dist/css/react-widgets.css';
 import EditIcon from '@material-ui/icons/Edit';
 import ClearIcon from '@material-ui/icons/Clear';
 import DeleteIcon from '@material-ui/icons/Delete';
+import AddIcon from '@material-ui/icons/Add';
 import {DialogBuilder} from "../Utilities/DialogBuilder";
 import {
     base64ToDataUri,
@@ -30,7 +31,7 @@ import {
     RETURN_MODE
 } from "../Utilities/TsUtilities";
 import {Save} from "@material-ui/icons";
-import {updateArticle} from "../services/ItemApiUtil";
+import {createNewArticle, updateArticle} from "../services/ItemApiUtil";
 import {createNewArtist, deleteArtist, updateArtist} from "../services/ArtistApiUtil";
 
 interface IProps {
@@ -51,6 +52,7 @@ interface IState {
     price: string;
     artists?: ArtistOrGenre;
     genre?: ArtistOrGenre;
+    articlePicture?: {id: number};
 }
 
 export interface Article {
@@ -77,25 +79,26 @@ const initialState = {
     ean: -1,
     description: "",
     artists: undefined,
-    genre: undefined
+    genre: undefined,
+    articlePicture: undefined,
 };
 
 export default class EditArticles extends React.Component<IProps, IState> {
     currentPicture: File | undefined = undefined;
     setFileUploadDefaultVisibility: (visibility: boolean) => void = visibility => {
     };
-    IMAGE_RESOLUTION: string = "IMAGE_RESOLUTION";
     articles: Array<Article> = [];
     artists: Array<ArtistOrGenre> = [];
     genres: Array<ArtistOrGenre> = [];
     selectArticle_input: string = "";
+    selectedArticle?: Article;
 
     constructor(props: IProps, context: any) {
         super(props, context);
         this.state = initialState;
 
         if (this.props.location.state)
-            this.state = this.props.location.state.article;
+            this.state = this.selectedArticle = this.props.location.state.article;
         this.loadData();
         window.scrollTo(0, 0);
     }
@@ -284,7 +287,8 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                   }}
                                                   onSelect={(article: Article) => {
                                                       this.currentPicture = undefined;
-                                                      this.setState({
+                                                      this.selectedArticle = article;
+                                                      this.setState(article/*{
                                                           id: article.id,
                                                           title: article.title,
                                                           price: article.price,
@@ -292,7 +296,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                           genre: article.genre,
                                                           ean: article.ean,
                                                           description: article.description
-                                                      })
+                                                      }*/)
                                                   }}
                                                   onChange={value => {
                                                       if (typeof value === "string") {
@@ -311,6 +315,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                     onClick={event => {
                                                         this.selectArticle_input = "";
                                                         this.currentPicture = undefined;
+                                                        this.selectedArticle = undefined;
                                                         this.setState(initialState);
                                                     }}>
                                             {<ClearIcon/>}
@@ -467,11 +472,11 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                        variant={"outlined"}/>
                                         </Grid>
                                         <Grid item xs={12}>
-                                            <Grid container justify="flex-end">
-                                                <Grid item>
-                                                    <ActionButtons context={this}/>
-                                                </Grid>
-                                            </Grid>
+                                            {/*<Grid container justify="flex-end">*/}
+                                            {/*    <Grid item>*/}
+                                            <ActionButtons context={this}/>
+                                            {/*    </Grid>*/}
+                                            {/*</Grid>*/}
                                         </Grid>
 
                                     </Grid>
@@ -483,21 +488,6 @@ export default class EditArticles extends React.Component<IProps, IState> {
             </RestrictedPage>
         )
     }
-
-    // loadSingleImage(id: number, onFinish: (imageResponse?: ImageResponseType) => void) {
-    //     fetch(new Request(`http://localhost:8080/article/range;start=${id};end=${id};quality=${300}`, {method: 'GET'}))
-    //         .then(response => {
-    //             if (response.status === 200) {
-    //                 return response.json();
-    //             } else {
-    //                 throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
-    //             }
-    //         })
-    //         .then((response: ImageResponseType[]) => onFinish(response[0]))
-    //         .catch(reason => {
-    //             showToast(reason.message, "error")
-    //         })
-    // }
 }
 
 let setIsPictureNotSelected: (visibility: boolean) => void = visibility => {
@@ -534,7 +524,7 @@ function DialogComponent(arg: any) {
                     inputValidator: text => {
                         let newInput = text.toLowerCase().trim();
                         if (artist && artist.name.toLowerCase() === newInput)
-                            return Pair.make("" , false);
+                            return Pair.make("", false);
                         let result = "";
                         for (let artist of context.artists) {
                             if (artist.name.toLowerCase() === newInput) {
@@ -566,8 +556,8 @@ function DialogComponent(arg: any) {
                                             rounded
                                             alt={"Ausgewähltes Künstler-Bild"}
                                             payload={Pair.make(picture, artist)}
-                                            shouldImageUpdate={(oldPayload: Pair<File,ArtistOrGenre>, newPayload: Pair<File,ArtistOrGenre>) => {
-                                                return open && (oldPayload.first !== newPayload.first ||  !shallowEqual(oldPayload.second, newPayload.second))
+                                            shouldImageUpdate={(oldPayload: Pair<File, ArtistOrGenre>, newPayload: Pair<File, ArtistOrGenre>) => {
+                                                return open && (oldPayload.first !== newPayload.first || !shallowEqual(oldPayload.second, newPayload.second))
                                             }}
                                             // shouldImageUpdate={oldPayload => true}
                                             getSrc={setImgSrc => {
@@ -606,18 +596,20 @@ function DialogComponent(arg: any) {
                             </Grid>
                             {artist &&
                             <Grid item>
-                                <Button style={margin(15,0,0,15)} variant={"contained"} color={"secondary"} endIcon={<DeleteIcon/>} onClick={event => {
-                                    deleteArtist(artist.id, response => {
-                                        context.loadArtists(() => {
-                                            showToast("Der Nutzer wurde gelöscht", "success");
-                                            dialogBuilder.dismiss();
-                                            context.forceUpdate();
-                                        })
-                                    }, error => {
-                                        debugger
-                                        showToast("Nay " + error.message, "error");
-                                    })
-                                }}>Löschen</Button>
+                                <Button style={margin(15, 0, 0, 15)} variant={"contained"}
+                                        color={"secondary"} endIcon={<DeleteIcon/>}
+                                        onClick={event => {
+                                            deleteArtist(artist.id, response => {
+                                                context.loadArtists(() => {
+                                                    showToast("Der Nutzer wurde gelöscht", "success");
+                                                    dialogBuilder.dismiss();
+                                                    context.forceUpdate();
+                                                })
+                                            }, error => {
+                                                debugger
+                                                showToast("Nay " + error.message, "error");
+                                            })
+                                        }}>Löschen</Button>
                             </Grid>}
                         </Grid>
                     )
@@ -649,7 +641,10 @@ function DialogComponent(arg: any) {
                                 showToast("Keine Änderungen wurden vorgenommen", "info");
                             else {
                                 debugger
-                                updateArtist({id: artist.id, name: newName}, picture ? picture : null, response => {
+                                updateArtist({
+                                    id: artist.id,
+                                    name: newName
+                                }, picture ? picture : null, response => {
                                     // showToast("Jay", "success");
                                     context.loadArtists(() => {
                                         context.forceUpdate();
@@ -674,21 +669,63 @@ function DialogComponent(arg: any) {
 
 }
 
-function ActionButtons(props: ContextType<EditArticles>) {
-    let that: EditArticles = props.context;
+function ActionButtons({context}: ContextType<EditArticles>) {
+    let isCreateNewEnabled = !shallowEqual(initialState, context.state);
     return (
-        <Button endIcon={<Save/>}
-                onClick={event => {
-                    console.log(that.state.description);
-                    updateArticle(that.state, that.currentPicture, (response: any) => {
-                        showToast("Artikel wurde aktualisiert", "success");
-                    }, (response: any) => {
-                        debugger
-                    })
-                }}
-                variant="contained"
-                color="primary">
-            Speichern
-        </Button>
+        <Grid container>
+            <Grid item xs>
+                {context.selectedArticle &&
+                <Button endIcon={<DeleteIcon/>}
+                        onClick={event => {
+                            deleteArtist(context.state.id,  (response: any) => {
+                                showToast("Der Artikel wurde gelöscht", "success");
+                            }, (response: any) => {
+                                debugger
+                                showToast("Es Ist ein Fehler aufgetreten: " + response.message, "error");
+                            })
+                        }}
+                        variant="contained"
+                        color="secondary">
+                    Löschen
+                </Button>
+                }            </Grid>
+            <Grid item>
+                {context.selectedArticle ?
+                    <Button endIcon={<Save/>}
+                            disabled={deepEqual(context.selectedArticle, context.state)}
+                            onClick={event => {
+                                console.log(context.state.description);
+                                updateArticle(context.state, context.currentPicture, (response: any) => {
+                                    showToast("Der Artikel wurde aktualisiert", "success");
+                                }, (response: any) => {
+                                    debugger
+                                    showToast("Es Ist ein Fehler aufgetreten: " + response.message, "error");
+                                })
+                            }}
+                            variant="contained"
+                            color="primary">
+                        Speichern
+                    </Button>
+                    :
+                    <Button endIcon={<AddIcon/>}
+                            disabled={!isCreateNewEnabled}
+                            onClick={event => {
+                                console.log(context.state.description);
+                                createNewArticle(context.state, context.currentPicture, (response: any) => {
+                                    showToast("Der Artikel wurde Erstellt", "success");
+                                }, (response: any) => {
+                                    debugger
+                                    showToast("Es Ist ein Fehler aufgetreten: " + response.message, "error");
+                                })
+                            }}
+                            variant="contained"
+                            style={{color: "white", backgroundColor: isCreateNewEnabled ? "green" : "rgba(0, 0, 0, 0.26)"}}>
+                        Anlegen
+                    </Button>
+                }
+            </Grid>
+        </Grid>
     )
 }
+
+// @ts-ignore

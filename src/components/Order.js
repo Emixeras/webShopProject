@@ -131,7 +131,7 @@ class Order extends Component {
                                                       spacing={3}>
                                                     <Grid item>
                                                         <div>
-                                                            <b>Gesamtpreis</b> {parseFloat((getShoppingCartPrice() + 5.99).toString()).toFixed(2)} € ‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎‏‏‎ ‎
+                                                            <b>Gesamtpreis</b> {parseFloat((getShoppingCartPrice() + 5.99).toString())} €
                                                         </div>
                                                     </Grid>
                                                 </Grid>

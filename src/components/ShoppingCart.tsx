@@ -85,7 +85,7 @@ class ShoppingCart extends React.Component<IProps, IState> {
                                                         Gesamtpreis der Bestellung
                                                     </Typography>
                                                     <Typography variant="h5">
-                                                        {getShoppingCartPrice().toFixed(2)} €
+                                                        {getShoppingCartPrice()} €
                                                     </Typography>
                                                 </Grid>
                                                 <Grid item xs={12}>

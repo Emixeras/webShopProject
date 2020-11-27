@@ -71,3 +71,32 @@ export const updateArticle = (metaDataPayload, pictureFile, onSuccess, onFail) =
                 onFail(error);
         });
 };
+
+export const deleteArticle = (metaDataPayload, onSuccess, onFail) => {
+    var user = getSessionUser();
+    if (!user) {
+        showToast("Nicht angemeldet", "error");
+        return
+    }
+
+    const config = {
+        auth: {
+            username: user.email,
+            password: user.password
+        },
+        headers: {
+            'content-type': 'multipart/form-data'
+        }
+    };
+    axios.delete(apiBaseUrlUpdateArticle,config)
+        .then(function (response) {
+            console.log(response);
+            if(onSuccess)
+                onSuccess(response)
+        })
+        .catch(function (error) {
+            console.log(error);
+            if(onFail)
+                onFail(error);
+        });
+};

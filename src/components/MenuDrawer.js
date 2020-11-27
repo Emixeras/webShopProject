@@ -192,7 +192,7 @@ export default function MenuDrawer(props) {
                 position="fixed"
                 style={{background: '#2E3B55'}}
                 className={clsx(classes.appBar, {
-                    [classes.appBarShift]: open,
+                    [classes.appBarShift]: open && !isMobile(),
                 })}
             >
                 <Toolbar>
