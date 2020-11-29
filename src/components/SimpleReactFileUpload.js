@@ -74,19 +74,31 @@ class SimpleReactFileUpload extends React.Component {
         };
         return (
             <div style={{width: "100%", height: "100%"}}
-                 onMouseEnter={event => this.setState({visible: true})}
-                 onMouseLeave={event => this.setState({visible: false})}>
-                {showUpload &&
+                 onMouseEnter={event => {
+                     if (!this.state.defaultVisibility)
+                        this.setState({visible: true});
+                 }}
+                 onMouseLeave={event => {
+                     if (!this.state.defaultVisibility)
+                         this.setState({visible: false});
+                 }}>
+                {
                 <div className="form-group files"
-                     style={!this.state.defaultVisibility ? {/*backgroundColor: "rgba(255,255,255,0.8)",*/
-                         height: "100%"
-                     } : {height: "100%"}}>
+                     style={!this.state.defaultVisibility ? {height: "100%", opacity: +showUpload} : {height: "100%"}}>
                     <Button color={"primary"}
                             variant="contained"
                             style={{
                                 position: "absolute",
                                 opacity: (this.state.defaultVisibility ? 1 : 0.8),
                                 fontWeight: 600
+                            }}
+                            onFocus={event => {
+                                if (!this.state.defaultVisibility)
+                                    this.setState({visible: true});
+                            }}
+                            onBlur={event => {
+                                if (!this.state.defaultVisibility)
+                                    this.setState({visible: false});
                             }}
                             onDragEnter={preventDefault}
                             onDragLeave={preventDefault}
@@ -101,15 +113,17 @@ class SimpleReactFileUpload extends React.Component {
                             position: "absolute",
                             zIndex: -1,
                             height: "100%",
-                            width: "100%"
+                            width: "100%",
+
                         }}
+                        tabIndex={-1}
                         ref={instance => this.inputRef = instance}
                         type="file" name="photo" id="upload-photo-button"
                         onChange={this.onDrop}/>
                     <Typography
                         style={{
                             width: "100%",
-                            opacity: 1,
+                            opacity: (this.state.defaultVisibility ? 1 : 0.8),
                             position: "absolute",
                             zIndex: 1,
                             textAlign: "center",

@@ -7,15 +7,6 @@ import {useHistory} from "react-router-dom";
 import {logoutUser} from "../services/UserApiUtil";
 import MenuDrawer from "../components/MenuDrawer";
 
-export function boolOr<T>(input: T, ...ors: T[]): boolean {
-    for (let or of ors) {
-        if (input === or)
-            return true;
-    }
-    return false;
-}
-
-
 //  ------------------------- Tuple ------------------------->
 export class Pair<A, B> {
     public first: A;
@@ -82,8 +73,12 @@ export interface ImageResponseType {
 export enum ROLES {
     USER, EMPLOYEE, ADMIN
 }
-
 //  <------------------------- Types -------------------------
+
+
+//  ------------------------- Values ------------------------->
+export const textColor = "rgba(0, 0, 0, 0.87)";
+//  <------------------------- Values -------------------------
 
 
 //  ------------------------- Image ------------------------->
@@ -424,9 +419,9 @@ export function orElse<T>(input: T, orElse: T | (() => T)): T {
     }
 }
 
-export function ifExistsReturnOrElse<T, R>(input: T, returnFunction: (input: T) => R, orElse: R | (() => R)): R {
+export function ifExistsReturnOrElse<T, R>(input: T, returnFunction: (input: NonNullable<T>) => R, orElse: R | (() => R)): R {
     if (input)
-        return returnFunction(input);
+        return returnFunction((input as NonNullable<T>));
     else {
         if (typeof orElse === "function")
             return (orElse as Function)();
@@ -450,21 +445,12 @@ export function ifValueReturnOrElse<T, R>(input: T, value: T, returnFunction: ((
     }
 }
 
-export function artistOrGenre_comparator (a: ArtistOrGenre, b: ArtistOrGenre) {
-    return name_comparator(a.name, b.name)
-}
-
-export function name_comparator(a: string, b: string) {
-    a = a.toUpperCase();
-    b = b.toUpperCase();
-
-    if (a < b) {
-        return -1;
+export function boolOr<T>(input: T, ...ors: T[]): boolean {
+    for (let or of ors) {
+        if (input === or)
+            return true;
     }
-    if (a > b) {
-        return 1;
-    }
-    return 0;
+    return false;
 }
 
 // ---------------
@@ -483,8 +469,31 @@ export function hasCurrentUserRoleLevel(level: string | number = "EMPLOYEE"): bo
     // @ts-ignore
     return user && roleMap[user.role] >= roleMap[level];
 }
-
 //  <------------------------- Logic -------------------------
+
+
+//  ------------------------- Comperators ------------------------->
+export function article_comparator (a: Article, b: Article) {
+    return name_comparator(a.title, b.title)
+}
+
+export function artistOrGenre_comparator (a: ArtistOrGenre, b: ArtistOrGenre) {
+    return name_comparator(a.name, b.name)
+}
+
+export function name_comparator(a: string, b: string) {
+    a = a.toUpperCase();
+    b = b.toUpperCase();
+
+    if (a < b) {
+        return -1;
+    }
+    if (a > b) {
+        return 1;
+    }
+    return 0;
+}
+//  <------------------------- Comperators -------------------------
 
 
 //  ------------------------- Components ------------------------->

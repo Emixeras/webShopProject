@@ -460,7 +460,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                        value={this.state.ean === -1 ? "" : this.state.ean}
                                                        onChange={event => {
                                                            let newValue = event.target.value;
-                                                           if (/\d*/.test(newValue))
+                                                           if (/^\d*$/.test(newValue))
                                                                this.setState({ean: newValue ? +newValue : -1});
                                                        }}
                                                        error={eanError}
@@ -673,99 +673,96 @@ function DialogComponent({context}: ContextType<EditArticles>) {
 
 function ActionButtons({context}: ContextType<EditArticles>) {
     let state = context.state;
-    let isCreateNewEnabled
+    let shouldButtonBeEnabled: boolean = Boolean(state.title && typeof state.artists === "object" && typeof state.genre === "object" && state.ean.toString().length === 8 && (context.currentPicture || state.id !== -1) && !context.checkPriceError(state.price))
     const [open, setOpen] = useState(false);
-    // ToDo: bei erstellen vollständig logik verwenden
-    return (
-        <Grid container>
-            <Grid item xs>
-                {context.selectedArticle &&
-                <Grid container>
-                    <Grid item>
-                        <Button endIcon={<DeleteIcon/>}
-                                onClick={event => {
-                                    setOpen(true);
-                                }}
-                                variant="contained"
-                                color="secondary">
-                            Löschen
-                        </Button>
-                        {new DialogBuilder(open, setOpen)
-                            .setTitle("Artikel Löschen")
-                            .setText(`Möchten Sie wirklich den Artikel '${context.selectedArticle.title}' löschen?`)
-                            .addButton("Abbrechen")
-                            .addButton({
-                                label: "Löschen", color: "secondary", icon: <DeleteIcon/>,
-                                onClick: dialogBuilder => {
-                                    deleteArticle(context.state.id, (response: any) => {
-                                        showToast("Der Artikel wurde gelöscht", "success");
-                                        context.selectedArticle = undefined;
-                                        context.setState(initialState);
-                                    }, (response: any) => {
-                                        debugger
-                                        showToast("Es Ist ein Fehler aufgetreten: " + response.message, "error");
-                                    })
-                                }
-                            })
-                            .build()}
-                    </Grid>
-                    <Grid item>
-                        <Tooltip
-                            title="Artikel Kopieren"
-                            placement="top">
-                            <IconButton style={{width: 36, height: 36}} onClick={event => {
-                                // addToShoppingCart(this.article);
-                                // this.update();
-                                context.selectedArticle = undefined;
-                                context.setState({
-                                    id: -1,
-                                    ean: -1,
-                                    articlePicture: undefined,
-                                });
-                            }} color={"primary"}>{<CopyIcon/>}</IconButton>
-                        </Tooltip>
-                    </Grid>
+    return <Grid container>
+        <Grid item xs>
+            {context.selectedArticle &&
+            <Grid container>
+                <Grid item>
+                    <Button endIcon={<DeleteIcon/>}
+                            onClick={event => {
+                                setOpen(true);
+                            }}
+                            variant="contained"
+                            color="secondary">
+                        Löschen
+                    </Button>
+                    {new DialogBuilder(open, setOpen)
+                        .setTitle("Artikel Löschen")
+                        .setText(`Möchten Sie wirklich den Artikel '${context.selectedArticle.title}' löschen?`)
+                        .addButton("Abbrechen")
+                        .addButton({
+                            label: "Löschen", color: "secondary", icon: <DeleteIcon/>,
+                            onClick: dialogBuilder => {
+                                deleteArticle(context.state.id, (response: any) => {
+                                    showToast("Der Artikel wurde gelöscht", "success");
+                                    context.selectedArticle = undefined;
+                                    context.setState(initialState);
+                                }, (response: any) => {
+                                    debugger
+                                    showToast("Es Ist ein Fehler aufgetreten: " + response.message, "error");
+                                })
+                            }
+                        })
+                        .build()}
                 </Grid>
-                }
+                <Grid item>
+                    <Tooltip
+                        title="Artikel Kopieren"
+                        placement="top">
+                        <IconButton style={{width: 36, height: 36}} onClick={event => {
+                            // addToShoppingCart(this.article);
+                            // this.update();
+                            context.selectedArticle = undefined;
+                            context.setState({
+                                id: -1,
+                                ean: -1,
+                                articlePicture: undefined,
+                            });
+                        }} color={"primary"}>{<CopyIcon/>}</IconButton>
+                    </Tooltip>
+                </Grid>
             </Grid>
-            <Grid item>
-                {context.selectedArticle ?
-                    <Button endIcon={<SaveIcon/>}
-                            disabled={deepEqual(context.selectedArticle, context.state)}
-                            onClick={event => {
-                                console.log(context.state.description);
-                                updateArticle(context.state, context.currentPicture, (response: any) => {
-                                    showToast("Der Artikel wurde aktualisiert", "success");
-                                }, (response: any) => {
-                                    debugger
-                                    showToast("Es Ist ein Fehler aufgetreten: " + response.message, "error");
-                                })
-                            }}
-                            variant="contained"
-                            color="primary">
-                        Speichern
-                    </Button>
-                    :
-                    <Button endIcon={<AddIcon/>}
-                            disabled={!(isCreateNewEnabled = state.title && typeof state.artists === "object" && typeof state.genre === "object" && state.ean.toString().length === 8 && context.currentPicture && !context.checkPriceError(state.price))}
-                            onClick={event => {
-                                console.log(context.state.description);
-                                createNewArticle(context.state, context.currentPicture, (response: any) => {
-                                    showToast("Der Artikel wurde Erstellt", "success");
-                                }, (response: any) => {
-                                    debugger
-                                    showToast("Es Ist ein Fehler aufgetreten: " + response.message, "error");
-                                })
-                            }}
-                            variant="contained"
-                            style={{
-                                color: "white",
-                                backgroundColor: isCreateNewEnabled ? "green" : "rgba(0, 0, 0, 0.26)"
-                            }}>
-                        Anlegen
-                    </Button>
-                }
-            </Grid>
+            }
         </Grid>
-    )
+        <Grid item>
+            {context.selectedArticle ?
+                <Button endIcon={<SaveIcon/>}
+                        disabled={!shouldButtonBeEnabled || deepEqual(context.selectedArticle, context.state)}
+                        onClick={event => {
+                            console.log(context.state.description);
+                            updateArticle(context.state, context.currentPicture, (response: any) => {
+                                showToast("Der Artikel wurde aktualisiert", "success");
+                            }, (response: any) => {
+                                debugger
+                                showToast("Es Ist ein Fehler aufgetreten: " + response.message, "error");
+                            })
+                        }}
+                        variant="contained"
+                        color="primary">
+                    Speichern
+                </Button>
+                :
+                <Button endIcon={<AddIcon/>}
+                        disabled={!shouldButtonBeEnabled}
+                        onClick={event => {
+                            console.log(context.state.description);
+                            createNewArticle(context.state, context.currentPicture, (response: any) => {
+                                showToast("Der Artikel wurde Erstellt", "success");
+                            }, (response: any) => {
+                                debugger
+                                showToast("Es Ist ein Fehler aufgetreten: " + response.message, "error");
+                            })
+                        }}
+                        variant="contained"
+                        style={{
+                            color: "white",
+                            backgroundColor: shouldButtonBeEnabled ? "green" : "rgba(0, 0, 0, 0.26)"
+                        }}>
+                    Anlegen
+                </Button>
+            }
+        </Grid>
+    </Grid>
 }

@@ -9,13 +9,14 @@ import Container from '@material-ui/core/Container';
 import CardActionArea from "@material-ui/core/CardActionArea";
 import {margin, NavigationComponent, padding, showToast} from "../Utilities/Utilities";
 import {
+    article_comparator,
     base64ToDataUri,
     ContextType,
     filterArticle,
     ifExistsReturnOrElse, ifValueReturnOrElse,
-    LazyImage,
+    LazyImage, name_comparator,
     Pair,
-    RETURN_MODE
+    RETURN_MODE, textColor
 } from "../Utilities/TsUtilities";
 import {Link} from "react-router-dom";
 import MenuDrawer, {addDrawerCallback, removeDrawerCallback} from "./MenuDrawer";
@@ -25,7 +26,7 @@ import {
     FormControlLabel,
     IconButton,
     InputAdornment,
-    InputLabel,
+    InputLabel, Menu, MenuItem,
     OutlinedInput,
     Slider,
     Switch, TextField
@@ -33,6 +34,7 @@ import {
 import {DialogBuilder} from "../Utilities/DialogBuilder";
 import SettingsIcon from '@material-ui/icons/Settings';
 import SearchIcon from '@material-ui/icons/Search';
+import SortIcon from '@material-ui/icons/Sort';
 import {Article} from "./EditArticles";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ResizeObserver from 'resize-observer-polyfill';
@@ -60,6 +62,45 @@ interface ImageResponseType {
     file: string;
 }
 
+enum SORT_TYPE {
+    TITLE, TITLE_REVERSED, TIME, TIME_REVERSED,
+}
+
+const useStyles = makeStyles((theme) => ({
+    icon: {
+        marginRight: theme.spacing(2),
+    },
+    heroContent: {
+        backgroundColor: theme.palette.background.paper,
+        padding: theme.spacing(3, 0, 2),
+    },
+    heroButtons: {
+        marginTop: theme.spacing(4),
+    },
+    cardGrid: {
+        paddingTop: theme.spacing(8),
+        paddingBottom: theme.spacing(8),
+    },
+    card: {
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+    },
+    cardMedia: {
+        paddingTop: '100%', // 16:9
+        backgroundColor: "lightgrey"
+    },
+    cardContent: {
+        flexGrow: 1,
+    },
+    footer: {
+        backgroundColor: theme.palette.background.paper,
+        padding: theme.spacing(6),
+    },
+}));
+
+let articleArray: Array<Article> = [];
+
 export default class AlbumOverview extends React.Component<IProps, IState> {
     IMAGE_RESOLUTION: string = "IMAGE_RESOLUTION";
     imageResolution: number = +(localStorage.getItem(this.IMAGE_RESOLUTION) as string);
@@ -67,6 +108,8 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     stepDistance: number = ifValueReturnOrElse(+(localStorage.getItem(this.STEP_DISTANCE) as string), 0, undefined, 48, true);
     UNLOAD_IMAGES: string = "UNLOAD_IMAGES";
     unloadImages: boolean = (localStorage.getItem(this.UNLOAD_IMAGES) as string) == 'true';
+    SORT_TYPE: string = "SORT_TYPE"
+    sortType: SORT_TYPE = (+(localStorage.getItem(this.SORT_TYPE) as string))
     imageReloadArray: Array<() => void> = [];
     query: Pair<string, boolean> = Pair.make("", false);
     filter?: Pair<FilterPayload, string>;
@@ -107,14 +150,35 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
                 }
             })
             .then((response: Article[]) => {
-                response.sort((a, b) => a.id - b.id);
+                // debugger
                 articleArray = response;
+                this.sortList();
                 this.forceUpdate();
                 // this.performanceTest(context);
             })
             .catch(reason => {
                 showToast(reason.message, "error")
             })
+    }
+
+    sortList() {
+        let idSorter = (a: Article, b: Article) => a.id - b.id;
+        switch (this.sortType) {
+            case SORT_TYPE.TIME:
+                articleArray.sort(idSorter);
+                break;
+            case SORT_TYPE.TIME_REVERSED:
+                articleArray.sort((a, b) => idSorter(a, b) * -1);
+                break;
+            case SORT_TYPE.TITLE:
+                articleArray.sort(article_comparator);
+                break;
+            case SORT_TYPE.TITLE_REVERSED:
+                articleArray.sort((a, b) => article_comparator(a, b) * -1);
+                break;
+
+
+        }
     }
 
     loadSingleImage(id: number, onFinish: (imageResponse?: ImageResponseType) => void) {
@@ -138,41 +202,6 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     }
 }
 
-const useStyles = makeStyles((theme) => ({
-    icon: {
-        marginRight: theme.spacing(2),
-    },
-    heroContent: {
-        backgroundColor: theme.palette.background.paper,
-        padding: theme.spacing(3, 0, 2),
-    },
-    heroButtons: {
-        marginTop: theme.spacing(4),
-    },
-    cardGrid: {
-        paddingTop: theme.spacing(8),
-        paddingBottom: theme.spacing(8),
-    },
-    card: {
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-    },
-    cardMedia: {
-        paddingTop: '100%', // 16:9
-        backgroundColor: "lightgrey"
-    },
-    cardContent: {
-        flexGrow: 1,
-    },
-    footer: {
-        backgroundColor: theme.palette.background.paper,
-        padding: theme.spacing(6),
-    },
-}));
-
-let articleArray: Array<Article> = [];
-
 function Album(props: ContextType<AlbumOverview>) {
     const classes = useStyles();
     let context = props.context;
@@ -183,13 +212,11 @@ function Album(props: ContextType<AlbumOverview>) {
     if (articleArray.length === 0)
         buildDummyData();
 
-    // @ts-ignore
     let queryText = context.query.first + ifExistsReturnOrElse(context.filter, input => ifExistsReturnOrElse(context.query.first, input1 => " & ", "") + input.second + ": " + input.first.artistOrGenre.name.toLowerCase(), "");
     if (queryText && articleArray[0].id !== -2) {
         filteredArticleArray = articleArray.filter(article => filterArticle(queryText, article))
     } else
         filteredArticleArray = articleArray;
-
 
     return (
         <React.Fragment>
@@ -248,8 +275,6 @@ function Album(props: ContextType<AlbumOverview>) {
                 </div>
                 <Container className={classes.cardGrid} maxWidth="lg">
                     {filteredArticleArray.length > 0 ?
-
-
                         <GridList context={context} filteredArticleArray={filteredArticleArray}/>
                         :
                         <Typography style={{marginTop: 50}} variant="h6" align="center"
@@ -367,10 +392,40 @@ export function FilterCard({context}: ContextType<AlbumOverview>) {
 function UiSettings({context}: ContextType<AlbumOverview>) {
     const [open, setOpen] = useState(false);
     const [checked, setChecked] = useState(context.unloadImages);
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     let resolution = context.imageResolution;
     let stepDistance = context.stepDistance;
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    function setSortType(sortType: SORT_TYPE) {
+        handleClose();
+        context.sortType = sortType;
+        localStorage.setItem(context.SORT_TYPE, `${sortType}`);
+        context.sortList();
+        context.forceUpdate();
+        reloadImages(context);
+    }
+    function listItem(text: string, sortType: SORT_TYPE, divider?: boolean): JSX.Element {
+        return <MenuItem divider={divider} style={context.sortType === sortType ?  {backgroundColor: "rgba(0,0,0,0.1)"} : undefined} onClick={event => setSortType(sortType)}>{text}</MenuItem>
+    }
     return (
         <div style={{float: "right"}}>
+            <Button style={{marginTop: 15, marginRight: 15}} onClick={event => {
+                setAnchorEl(event.currentTarget);
+            }} endIcon={<SortIcon/>}>Sortierung</Button>
+            <Menu
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+            >
+                {listItem("Titel - Aufsteigend", SORT_TYPE.TITLE)}
+                {listItem("Titel - Absteigend", SORT_TYPE.TITLE_REVERSED, true)}
+                {listItem("Hinzugefügt - Aufsteigend", SORT_TYPE.TIME)}
+                {listItem("Hinzugefügt - Absteigend", SORT_TYPE.TIME_REVERSED)}
+            </Menu>
             <Button style={{marginTop: 15}} onClick={event => {
                 setOpen(true)
             }} endIcon={<SettingsIcon/>}>Einstellungen</Button>
@@ -381,24 +436,14 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
                     return (
                         <div>
                             <Slider
-                                style={{width: "95%", ...margin(30, 15, 0)}}
+                                style={{width: "95%", ...margin(30, 15, 15)}}
                                 defaultValue={context.imageResolution}
                                 getAriaValueText={value => `${value} Pixel`}
                                 aria-labelledby="discrete-slider-small-steps"
                                 step={50}
                                 min={100}
                                 max={500}
-                                // onMouseUp={event => {
-                                //     // @ts-ignore
-                                //     let value = +event.target.ariaValueNow;
-                                //     if (context.imageResolution !== value) {
-                                //         context.imageResolution = value;
-                                //         localStorage.setItem(context.IMAGE_RESOLUTION, `${value}`);
-                                //         reloadImages(context);
-                                //     }
-                                // }}
-                                // @ts-ignore
-                                onChange={(event, value) => resolution = value}
+                                onChange={(event, value) => resolution = (value as number)}
                                 marks={[
                                     {
                                         value: 100,
@@ -419,25 +464,16 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
                                 ]}
                                 valueLabelDisplay="on"
                             />
+                            <Typography>Auflösung</Typography>
                             <Slider
-                                style={{width: "95%", ...margin(30, 15, 0)}}
+                                style={{width: "95%", ...margin(50, 15, 15)}}
                                 defaultValue={context.stepDistance}
                                 getAriaValueText={value => `${value} Elemente`}
                                 aria-labelledby="discrete-slider-small-steps"
                                 step={12}
                                 min={12}
                                 max={96}
-                                // onMouseUp={event => {
-                                //     // @ts-ignore
-                                //     let value = +event.target.ariaValueNow;
-                                //     if (context.stepDistance !== value) {
-                                //         context.stepDistance = value;
-                                //         localStorage.setItem(context.STEP_DISTANCE, `${value}`);
-                                //         reloadImages(context);
-                                //     }
-                                // }}
-                                // @ts-ignore
-                                onChange={(event, value) => stepDistance = value}
+                                onChange={(event, value) => stepDistance = (value as number)}
                                 marks={[
                                     {
                                         value: 12,
@@ -462,6 +498,7 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
                                 ]}
                                 valueLabelDisplay="on"
                             />
+                            <Typography>Schrittweite</Typography>
                             {/*<FormControlLabel*/}
                             {/*    control={*/}
                             {/*        <Switch*/}
@@ -482,15 +519,16 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
                 })
                 .addButton("Abbrechen")
                 .addButton({
-                    label: "Ok", isActionButton: true, onClick: dialogBuilder => {
+                    label: "Ok",
+                    isActionButton: true, onClick: dialogBuilder => {
                         if (context.imageResolution !== resolution) {
                             context.imageResolution = resolution;
                             localStorage.setItem(context.IMAGE_RESOLUTION, `${resolution}`);
                             reloadImages(context);
                         }
-                        if (context.imageResolution !== resolution) {
-                            context.imageResolution = resolution;
-                            localStorage.setItem(context.IMAGE_RESOLUTION, `${resolution}`);
+                        if (context.stepDistance !== stepDistance) {
+                            context.stepDistance = stepDistance;
+                            localStorage.setItem(context.STEP_DISTANCE, `${stepDistance}`);
                             reloadImages(context);
                         }
                     },
@@ -514,21 +552,16 @@ function GridList({context, filteredArticleArray}: { context: AlbumOverview, fil
             return;
 
         if (shortedFilteredArticleArray.length >= filteredArticleArray.length) {
-            // setState(prevState => ({...prevState, hasMore: false}));
             context.hasMore = false;
             setDummy(dummy + 1);
             return;
         }
 
-        if (context.maxVisible + step >= filteredArticleArray.length - 1) {
-            // setState(({count: filteredArticleArray.length - 1, hasMore: false}));
-            // setState(filteredArticleArray.length - 1);
-            context.maxVisible = filteredArticleArray.length - 1;
+        if (context.maxVisible + step >= filteredArticleArray.length) {
+            context.maxVisible = filteredArticleArray.length;
             context.hasMore = false;
             setDummy(dummy + 1);
         } else {
-            // setState(prevState => ({...prevState, count: count + step}));
-            // setState(count + step);
             context.maxVisible += step;
             setDummy(dummy + 1);
         }

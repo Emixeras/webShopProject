@@ -144,7 +144,7 @@ function ListItemLink(props) {
                           if (drawerClose_ref && isMobile())
                               drawerClose_ref()
                       }}
-                      style={document.location.pathname === to ? {background: "rgba(0,64,179,0.32)"} : undefined}>
+                      style={document.location.pathname === to ? {background: "rgba(0,0,0,0.1)"} : undefined}>
                 {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
                 <ListItemText primary={primary}/>
             </ListItem>
