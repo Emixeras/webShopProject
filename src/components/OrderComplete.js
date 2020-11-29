@@ -42,7 +42,7 @@ class OrderComplete extends Component {
     render() {
         if (isUserLoggedIn()) {
             const defaultOptions = {
-                loop: true,
+                loop: false,
                 autoplay: true,
                 animationData: lottiedata,
                 rendererSettings: {
