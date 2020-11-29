@@ -68,7 +68,8 @@ class ShoppingCart extends React.Component<IProps, IState> {
                                                         :
                                                         <ShoppingCartList
                                                             update={() => this.forceUpdate()}
-                                                            showChangeCount={true}/>
+                                                            showChangeCount={true}
+                                                        shoppingcart={undefined}/>
                                                     }
                                                 </Card>
                                             </Grid>

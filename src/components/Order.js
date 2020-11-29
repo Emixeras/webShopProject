@@ -96,7 +96,8 @@ class Order extends Component {
                                             <Grid item fullWidth>
                                                 <ShoppingCartList
                                                     update={() => this.forceUpdate()}
-                                                    showChangeCount={false}/>
+                                                    showChangeCount={false}
+                                                shoppingcart={undefined}/>
                                                 <hr/>
                                             </Grid>
                                             <Grid item xs={12}>

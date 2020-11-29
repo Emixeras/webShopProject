@@ -166,6 +166,7 @@ export function getAllShoppingCartArticles(): Article[] {
 interface ShoppingCartList_props {
     showChangeCount: boolean;
     update?: () => void;
+    shoppingcart: any;
 }
 
 export class ShoppingCartList extends React.Component<ShoppingCartList_props, {}> {
@@ -176,6 +177,8 @@ export class ShoppingCartList extends React.Component<ShoppingCartList_props, {}
     constructor(props: ShoppingCartList_props, context: any) {
         super(props, context);
         this.entryArray = getAllShoppingCartEntries();
+        if(this.props.shoppingcart!==undefined)
+            //todo add custom shopping cart
         this.update = props.update;
     }
 

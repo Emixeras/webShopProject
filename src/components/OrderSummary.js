@@ -114,7 +114,9 @@ class OrderSummary extends Component {
                                             <Grid item fullWidth>
                                                 <ShoppingCartList
                                                     update={() => this.forceUpdate()}
-                                                    showChangeCount={false}/>
+                                                    showChangeCount={false}
+                                                    shoppingcart = {undefined}
+                                                />
                                                 <hr/>
                                             </Grid>
                                             <Grid item xs={12}>
@@ -197,6 +199,12 @@ class OrderSummary extends Component {
     }
     handleChange = event => this.setState({title: event.target.value.trim()});
 
+}
+function OrderSummaryComponent(){
+
+    return(
+        <div></div>
+    )
 }
 function BackButton(){
     const history = useHistory();
