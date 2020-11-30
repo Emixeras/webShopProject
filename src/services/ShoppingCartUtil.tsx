@@ -173,29 +173,44 @@ export class ShoppingCartList extends React.Component<ShoppingCartList_props, {}
 
     entryArray: ShoppingCartEntry[]
     update?: () => void;
+    totalpricewithoutshipping: number
 
     constructor(props: ShoppingCartList_props, context: any) {
         super(props, context);
-        this.entryArray = getAllShoppingCartEntries();
+        this.totalpricewithoutshipping = 0;
         if(this.props.shoppingcart!==undefined)
-            //todo add custom shopping cart
+        {
+            this.entryArray = this.props.shoppingcart
+            // @ts-ignore
+            this.props.shoppingcart.map((item) =>
+                this.totalpricewithoutshipping=this.totalpricewithoutshipping+(parseFloat(item.count)*parseFloat(item.article.price))
+            );
+        console.log(this.totalpricewithoutshipping)
+        }else{
+            this.entryArray = getAllShoppingCartEntries();
+        }
         this.update = props.update;
     }
 
     componentWillUpdate(nextProps: Readonly<ShoppingCartList_props>, nextState: Readonly<{}>, nextContext: any) {
         // debugger
-        this.entryArray = getAllShoppingCartEntries();
+        if(this.props.shoppingcart!==undefined)
+        {
+            this.entryArray = this.props.shoppingcart
+        }else{
+            this.entryArray = getAllShoppingCartEntries();
+        }
     }
 
     render() {
-        // debugger
         return (
             <Grid container spacing={2}>
                 {
                     this.entryArray.map((entry, index) => {
                         return <ShoppingCartListItem update={() => callIfExists(this.update)}
                                                      entry={entry} index={index}
-                                                     showChangeCount={this.props.showChangeCount}/>
+                                                     showChangeCount={this.props.showChangeCount}
+                                                     isDetails={true}/>
                     })
                 }
             </Grid>
@@ -204,6 +219,7 @@ export class ShoppingCartList extends React.Component<ShoppingCartList_props, {}
 }
 
 interface ShoppingCartListItem_props {
+    isDetails: boolean;
     entry: ShoppingCartEntry;
     index: number;
     showChangeCount: boolean;
@@ -211,30 +227,37 @@ interface ShoppingCartListItem_props {
 }
 
 class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {}> {
+    isDetails: boolean
     entry: ShoppingCartEntry
     index: number
     showChangeCount: boolean
     article: Article;
     update: () => void;
     count: number;
+    price: number;
 
     constructor(props: ShoppingCartListItem_props, context: any) {
+        console.log(JSON.stringify(props))
         super(props, context);
+        this.isDetails = props.isDetails;
         this.entry = props.entry;
         this.index = props.index;
         this.showChangeCount = props.showChangeCount;
         this.article = this.entry.article;
         this.update = props.update;
-        this.count = getShoppingCartCount(this.article);
+        this.count = this.isDetails?props.entry.count:getShoppingCartCount(this.article);
+        this.price = this.isDetails?parseFloat(props.entry.article.price):parseFloat(getShoppingCartPrice(this.article));
     }
 
     componentWillUpdate(nextProps: Readonly<ShoppingCartListItem_props>, nextState: Readonly<{}>, nextContext: any) {
+        this.isDetails = nextProps.isDetails;
         this.entry = nextProps.entry;
         this.index = nextProps.index;
         this.showChangeCount = nextProps.showChangeCount;
         this.article = this.entry.article;
         this.update = nextProps.update;
-        this.count = getShoppingCartCount(this.article);
+        this.count = this.isDetails?nextProps.entry.count:getShoppingCartCount(this.article);
+        this.price = this.isDetails?parseFloat(nextProps.entry.article.price):parseFloat(getShoppingCartPrice(this.article));
     }
 
     render() {
@@ -317,7 +340,7 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
                                 </Grid>
                                 <Grid item>
                                     <Typography variant="body1" gutterBottom>
-                                        Gesamt: {getShoppingCartPrice(this.article)} €
+                                        Gesamt: {(this.price*this.count).toFixed(2)} €
                                     </Typography>
                                 </Grid>
                             </Grid>

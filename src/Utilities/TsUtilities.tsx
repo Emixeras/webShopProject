@@ -134,6 +134,7 @@ export function loadSingleImage(type: "article" | "artist", articleId: number, o
         })
         .then((response: ImageResponseType[]) => {
             if (onFinish.name === "setImgSrc") {
+                console.log(articleId)
                 // @ts-ignore
                 onFinish(base64ToDataUri(response[0].file))
             } else
