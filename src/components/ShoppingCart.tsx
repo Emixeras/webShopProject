@@ -2,8 +2,7 @@ import React, {useState} from "react";
 import MenuDrawer from "./MenuDrawer";
 import {Button, Card, Typography} from "@material-ui/core";
 import {
-    clearShoppingCart, getAllShoppingCartArticles, getAllShoppingCartEntries,
-    getShoppingCartCount,
+    clearShoppingCart, getShoppingCartCount,
     getShoppingCartPrice,
     isShoppingCartEmpty,
     ShoppingCartList
@@ -68,7 +67,8 @@ class ShoppingCart extends React.Component<IProps, IState> {
                                                         :
                                                         <ShoppingCartList
                                                             update={() => this.forceUpdate()}
-                                                            showChangeCount={true}/>
+                                                            showChangeCount={true}
+                                                        shoppingCart={undefined}/>
                                                     }
                                                 </Card>
                                             </Grid>

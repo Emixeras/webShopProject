@@ -86,8 +86,10 @@ class Dev extends React.Component {
     }
 
     generateContent(category) {
+
         return (
             category.content.map(call => {
+                console.log(hexToRgbA((this.buttonColors[call.type]), 0.2))
                 var key = category.title + "/" + call.name;
                 if (!this.callResultMap[key])
                     this.callResultMap[key] = {
