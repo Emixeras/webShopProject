@@ -18,6 +18,7 @@ import HomeIcon from "@material-ui/icons/Home";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import DescriptionIcon from '@material-ui/icons/Description';
+import SwaggerIcon from '@material-ui/icons/BallotOutlined';
 import logo from "../assets/text4549.png";
 import AlbumIcon from '@material-ui/icons/Album';
 import LibraryMusicIcon from '@material-ui/icons/LibraryMusic';
@@ -226,7 +227,7 @@ export default function MenuDrawer(props) {
                         // backgroundColor: "red",
                     }}>
                         <img style={{alignSelf: 'center', cursor: "pointer"}} height="50" src={logo}
-                             onClick={event => history.push("/", undefined)}
+                             onClick={event => history.push("/", {home: true})}
                              alt="fireSpot"/>
                     </div>
                     {/*<div>*/}
@@ -454,7 +455,21 @@ function DevButton() {
                                 <DeveloperBoardIcon style={{display: "block"}}/>
                             </Grid>
                             <Grid item xs>
-                                Admin-Panel
+                                Dev-Panel
+                            </Grid>
+                        </Grid>
+                    </MenuItem>
+                    <MenuItem disabled={history.location.pathname === "/roleManagement"}
+                        onClick={event => {
+                            handleClose(event);
+                            history.push("/roleManagement")
+                        }}>
+                        <Grid container spacing={2}>
+                            <Grid item>
+                                <ListAltIcon style={{display: "block"}}/>
+                            </Grid>
+                            <Grid item xs>
+                                Berechtigungen
                             </Grid>
                         </Grid>
                     </MenuItem>
@@ -464,13 +479,12 @@ function DevButton() {
                     }}>
                         <Grid container spacing={2}>
                             <Grid item>
-                                <ListAltIcon style={{display: "block"}}/>
+                                <SwaggerIcon style={{display: "block"}}/>
                             </Grid>
                             <Grid item xs>
                                 Swagger-UI
                             </Grid>
                         </Grid>
-
                     </MenuItem>
                 </Menu>
 

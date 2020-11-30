@@ -57,8 +57,8 @@ class ArtistOverview extends Component {
     }
 
     loadArtists() {
+        artistResponseArray = [];
         axios.get(`http://${window.location.hostname}:8080/artist`).then((response) => {
-            artistResponseArray = [];
             var artistResponse = response.data;
             Object.keys(artistResponse).forEach(key => {
                 artistResponseArray.push({file: "", artistOrGenre: artistResponse[key]});
@@ -111,6 +111,8 @@ function ArtistComponent({artistResponse}) {
     return (
         <Grid item /*key={article}*/ xs={12} sm={6} md={4} lg={3}>
             <CardActionArea component={Link} to={(location) => {
+                // if (artistResponse.artistOrGenre.id === 2)
+                //     debugger
                 location.pathname = "/albums";
                 location.state = {filter: artistResponse, type: 'a'};
                 return location;
@@ -122,11 +124,9 @@ function ArtistComponent({artistResponse}) {
                         className={classes.cardMedia}
                         // payload={artistResponse}
                         getSrc={setImgSrc => {
-                            // if (artistResponse.artistOrGenre.name === "Green Artist")
-                            //     debugger
-                            // if (artistResponse.artistOrGenre.id === 54)
-                            //     debugger
                             loadSingleImage("artist", artistResponse.artistOrGenre.id, imageResponse => {
+                                // if (artistResponse.artistOrGenre.id === 2)
+                                //     debugger
                                 // if (artistResponse.artistOrGenre.id === 54)
                                 //     debugger
                                 if (imageResponse) {

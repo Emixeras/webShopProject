@@ -70,6 +70,21 @@ export interface ImageResponseType {
     file: string;
 }
 
+export interface User {
+    id: number;
+    birth: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    password: string;
+    role: string;
+    postalCode?: number;
+    street?: string;
+    streetNumber?: number;
+    title?: string;
+    town?: string;
+}
+
 export enum ROLES {
     USER, EMPLOYEE, ADMIN
 }
@@ -78,6 +93,15 @@ export enum ROLES {
 
 //  ------------------------- Values ------------------------->
 export const textColor = "rgba(0, 0, 0, 0.87)";
+
+export const roleMap = {
+    USER: 0,
+    EMPLOYEE: 1,
+    ADMIN: 2,
+    "0": 0,
+    "1": 1,
+    "2": 2,
+};
 //  <------------------------- Values -------------------------
 
 
@@ -147,7 +171,7 @@ export function loadSingleImage(type: "article" | "artist", articleId: number, o
 // ---------------
 /* Credit: https://slashgear.github.io/creating-an-image-lazy-loading-component-with-react/*/
 
-const placeHolder = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="; //""; //'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII=';
+const placeHolder = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
 interface LazyImageProperties {
     getSrc: (setImgSrc: ((result: string) => void), payload: any) => void;
@@ -350,7 +374,6 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
 
     }
 }
-
 //  <------------------------- Image -------------------------
 
 
@@ -456,15 +479,6 @@ export function boolOr<T>(input: T, ...ors: T[]): boolean {
 // ---------------
 
 export function hasCurrentUserRoleLevel(level: string | number = "EMPLOYEE"): boolean {
-    let roleMap = {
-        USER: 0,
-        EMPLOYEE: 1,
-        ADMIN: 2,
-        "0": 0,
-        "1": 1,
-        "2": 2,
-    };
-
     let user = getSessionUser();
     // @ts-ignore
     return user && roleMap[user.role] >= roleMap[level];
@@ -472,7 +486,7 @@ export function hasCurrentUserRoleLevel(level: string | number = "EMPLOYEE"): bo
 //  <------------------------- Logic -------------------------
 
 
-//  ------------------------- Comperators ------------------------->
+//  ------------------------- Comparators ------------------------->
 export function article_comparator (a: Article, b: Article) {
     return name_comparator(a.title, b.title)
 }
@@ -493,7 +507,7 @@ export function name_comparator(a: string, b: string) {
     }
     return 0;
 }
-//  <------------------------- Comperators -------------------------
+//  <------------------------- Comparators -------------------------
 
 
 //  ------------------------- Components ------------------------->
@@ -594,11 +608,10 @@ function LogoutAndLoginLink({text}: { text: string }) {
     )
 }
 
-// export function DomDebugger({debugIf}: {debugIf?: () => boolean}): JSX.Element {
-//     if (!debugIf || debugIf())
-//         debugger
-//     return null;
-// }
+export function useForceUpdate(){
+    const setValue = useState(0)[1];
+    return () => setValue(value => ++value);
+}
 //  <------------------------- Components -------------------------
 
 

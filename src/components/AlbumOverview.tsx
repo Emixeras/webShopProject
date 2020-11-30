@@ -128,8 +128,10 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     }
 
     render() {
-        if (!this.props.location.state)
+        if (!this.props.location.state || this.props.location.state.home) {
             this.filter = undefined;
+            this.query = Pair.make("", false);
+        }
         if (window.location.pathname === "/") {
             return <NavigationComponent to={"/albums"}/>;
         }
@@ -214,6 +216,7 @@ function Album(props: ContextType<AlbumOverview>) {
 
     let queryText = context.query.first + ifExistsReturnOrElse(context.filter, input => ifExistsReturnOrElse(context.query.first, input1 => " & ", "") + input.second + ": " + input.first.artistOrGenre.name.toLowerCase(), "");
     if (queryText && articleArray[0].id !== -2) {
+        console.log(context.query)
         filteredArticleArray = articleArray.filter(article => filterArticle(queryText, article))
     } else
         filteredArticleArray = articleArray;
@@ -441,16 +444,16 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
                                 getAriaValueText={value => `${value} Pixel`}
                                 aria-labelledby="discrete-slider-small-steps"
                                 step={50}
-                                min={100}
+                                min={50}
                                 max={500}
                                 onChange={(event, value) => resolution = (value as number)}
                                 marks={[
                                     {
-                                        value: 100,
+                                        value: 50,
                                         label: 'Klein',
                                     },
                                     {
-                                        value: 250,
+                                        value: 200,
                                         label: 'Mittel',
                                     },
                                     {
