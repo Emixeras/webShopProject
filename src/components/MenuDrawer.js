@@ -38,6 +38,7 @@ import {isMobile, showToast} from "../Utilities/Utilities";
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import EditIcon from '@material-ui/icons/Edit';
 import {hasCurrentUserRoleLevel, Pair} from "../Utilities/TsUtilities";
+import HistoryIcon from '@material-ui/icons/History';
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -365,6 +366,20 @@ function ProfileButton() {
                         </Grid>
                         <Grid item xs>
                             Profil Anzeigen
+                        </Grid>
+                    </Grid>
+                </MenuItem>
+                <MenuItem disabled={history.location.pathname === "/orderoverview"}
+                          onClick={event => {
+                              handleClose(event);
+                              history.push("/orderoverview")
+                          }}>
+                    <Grid container spacing={2}>
+                        <Grid item>
+                            <HistoryIcon style={{display: "block"}}/>
+                        </Grid>
+                        <Grid item xs>
+                            Bestellübersicht
                         </Grid>
                     </Grid>
                 </MenuItem>

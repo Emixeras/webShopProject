@@ -17,6 +17,7 @@ import Order from "./components/Order";
 import PaymentMethod from "./components/PaymentMethod";
 import OrderSummary from "./components/OrderSummary";
 import OrderComplete from "./components/OrderComplete";
+import OrderOverview from "./components/OrderOverview"
 
 toast.configure();
 function App() {
@@ -39,6 +40,7 @@ function App() {
         <Route path="/placeorder" component={Order} exact />
         <Route path="/payment" component={PaymentMethod} exact />
         <Route path="/ordercomplete" component={OrderComplete} exact />
+        <Route path="/orderoverview" component={OrderOverview} exact />
         <Route component={AlbumOverview}/>
       </Switch>
     </div>
