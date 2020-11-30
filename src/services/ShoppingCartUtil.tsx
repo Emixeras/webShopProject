@@ -166,27 +166,26 @@ export function getAllShoppingCartArticles(): Article[] {
 interface ShoppingCartList_props {
     showChangeCount: boolean;
     update?: () => void;
-    shoppingcart: any;
+    shoppingCart: any;
 }
 
 export class ShoppingCartList extends React.Component<ShoppingCartList_props, {}> {
 
     entryArray: ShoppingCartEntry[]
     update?: () => void;
-    totalpricewithoutshipping: number
+    totalPriceWithoutShipping: number
 
     constructor(props: ShoppingCartList_props, context: any) {
         super(props, context);
-        this.totalpricewithoutshipping = 0;
-        if(this.props.shoppingcart!==undefined)
-        {
-            this.entryArray = this.props.shoppingcart
+        this.totalPriceWithoutShipping = 0;
+        if (this.props.shoppingCart) {
+            this.entryArray = this.props.shoppingCart
             // @ts-ignore
-            this.props.shoppingcart.map((item) =>
-                this.totalpricewithoutshipping=this.totalpricewithoutshipping+(parseFloat(item.count)*parseFloat(item.article.price))
+            this.props.shoppingCart.map((item) =>
+                this.totalPriceWithoutShipping = this.totalPriceWithoutShipping + (parseFloat(item.count) * parseFloat(item.article.price))
             );
-        console.log(this.totalpricewithoutshipping)
-        }else{
+            console.log(this.totalPriceWithoutShipping)
+        } else {
             this.entryArray = getAllShoppingCartEntries();
         }
         this.update = props.update;
@@ -194,10 +193,9 @@ export class ShoppingCartList extends React.Component<ShoppingCartList_props, {}
 
     componentWillUpdate(nextProps: Readonly<ShoppingCartList_props>, nextState: Readonly<{}>, nextContext: any) {
         // debugger
-        if(this.props.shoppingcart!==undefined)
-        {
-            this.entryArray = this.props.shoppingcart
-        }else{
+        if (this.props.shoppingCart) {
+            this.entryArray = this.props.shoppingCart
+        } else {
             this.entryArray = getAllShoppingCartEntries();
         }
     }
@@ -245,8 +243,8 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
         this.showChangeCount = props.showChangeCount;
         this.article = this.entry.article;
         this.update = props.update;
-        this.count = this.isDetails?props.entry.count:getShoppingCartCount(this.article);
-        this.price = this.isDetails?parseFloat(props.entry.article.price):parseFloat(getShoppingCartPrice(this.article));
+        this.count = this.isDetails ? props.entry.count : getShoppingCartCount(this.article);
+        this.price = this.isDetails ? parseFloat(props.entry.article.price) : parseFloat(getShoppingCartPrice(this.article));
     }
 
     componentWillUpdate(nextProps: Readonly<ShoppingCartListItem_props>, nextState: Readonly<{}>, nextContext: any) {
@@ -256,8 +254,8 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
         this.showChangeCount = nextProps.showChangeCount;
         this.article = this.entry.article;
         this.update = nextProps.update;
-        this.count = this.isDetails?nextProps.entry.count:getShoppingCartCount(this.article);
-        this.price = this.isDetails?parseFloat(nextProps.entry.article.price):parseFloat(getShoppingCartPrice(this.article));
+        this.count = this.isDetails ? nextProps.entry.count : getShoppingCartCount(this.article);
+        this.price = this.isDetails ? parseFloat(nextProps.entry.article.price) : parseFloat(getShoppingCartPrice(this.article));
     }
 
     render() {
@@ -340,7 +338,7 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
                                 </Grid>
                                 <Grid item>
                                     <Typography variant="body1" gutterBottom>
-                                        Gesamt: {(this.price*this.count).toFixed(2)} €
+                                        Gesamt: {(this.price * this.count).toFixed(2)} €
                                     </Typography>
                                 </Grid>
                             </Grid>

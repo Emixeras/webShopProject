@@ -27,17 +27,17 @@ import {placeOrder} from "../services/OrderApiUtil";
 class OrderDetails extends Component {
 
     user = {};
-    shoppingcart = {}
-    totalpricewithoutshipping = 0;
-    totalitemcount = 0;
+    shoppingCart = {}
+    totalPriceWithoutShipping = 0;
+    totalItemCount = 0;
 
     constructor(props) {
         super(props);
 
         this.state = {
-            totalitemcount: 0,
-            totalpricewithoutshipping: 0,
-            shoppingcart: [
+            totalItemCount: 0,
+            totalPriceWithoutShipping: 0,
+            shoppingCart: [
                 {
                     "article": {
                         "artists": {
@@ -91,9 +91,9 @@ class OrderDetails extends Component {
             },
             paymentMethod: -1,
         };
-        this.state.shoppingcart.map((item) =>{
-                this.state.totalpricewithoutshipping=this.state.totalpricewithoutshipping+(parseFloat(item.count).toFixed(2)*parseFloat(item.article.price).toFixed(2))
-            this.state.totalitemcount = this.state.totalitemcount + (item.count);
+        this.state.shoppingCart.map((item) =>{
+                this.state.totalPriceWithoutShipping=this.state.totalPriceWithoutShipping+(parseFloat(item.count).toFixed(2)*parseFloat(item.article.price).toFixed(2))
+            this.state.totalItemCount = this.state.totalItemCount + (item.count);
         }
         );
 
@@ -198,7 +198,7 @@ class OrderDetails extends Component {
                                                 <ShoppingCartList
                                                     update={() => this.forceUpdate()}
                                                     showChangeCount={false}
-                                                    shoppingcart = {this.state.shoppingcart}
+                                                    shoppingCart = {this.state.shoppingCart}
                                                 />
                                                 <hr/>
                                             </Grid>
@@ -210,7 +210,7 @@ class OrderDetails extends Component {
                                                       spacing={3}>
                                                     <Grid item>
                                                         <div style={padding(0,90,0,0)}>
-                                                            <b>Artikel</b> ({this.state.totalitemcount} Stk.): {this.state.totalpricewithoutshipping.toFixed(2)} €
+                                                            <b>Artikel</b> ({this.state.totalItemCount} Stk.): {this.state.totalPriceWithoutShipping.toFixed(2)} €
                                                         </div>
                                                     </Grid>
                                                 </Grid>
@@ -237,7 +237,7 @@ class OrderDetails extends Component {
                                                       spacing={3}>
                                                     <Grid item>
                                                         <div style={padding(0,90,0,0)}>
-                                                            <b>Gesamtpreis</b> {(this.state.totalpricewithoutshipping + 5.99).toFixed(2)} €
+                                                            <b>Gesamtpreis</b> {(this.state.totalPriceWithoutShipping + 5.99).toFixed(2)} €
                                                         </div>
                                                     </Grid>
                                                 </Grid>

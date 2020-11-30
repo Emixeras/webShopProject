@@ -97,7 +97,7 @@ class Order extends Component {
                                                 <ShoppingCartList
                                                     update={() => this.forceUpdate()}
                                                     showChangeCount={false}
-                                                shoppingcart={undefined}/>
+                                                shoppingCart={undefined}/>
                                                 <hr/>
                                             </Grid>
                                             <Grid item xs={12}>
