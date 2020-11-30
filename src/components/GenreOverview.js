@@ -73,7 +73,6 @@ function Genre() {
                 <Typography variant="subtitle1" align="center" color="textSecondary" component="p">
                     Something here to give the footer a purpose!
                 </Typography>
-
             </footer>
             {/* End footer */}
         </React.Fragment>

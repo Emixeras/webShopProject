@@ -16,7 +16,7 @@ import {
     ifExistsReturnOrElse, ifValueReturnOrElse,
     LazyImage, name_comparator,
     Pair,
-    RETURN_MODE, textColor
+    RETURN_MODE, Article, loadSingleImage
 } from "../Utilities/TsUtilities";
 import {Link} from "react-router-dom";
 import MenuDrawer, {addDrawerCallback, removeDrawerCallback} from "./MenuDrawer";
@@ -35,7 +35,6 @@ import {DialogBuilder} from "../Utilities/DialogBuilder";
 import SettingsIcon from '@material-ui/icons/Settings';
 import SearchIcon from '@material-ui/icons/Search';
 import SortIcon from '@material-ui/icons/Sort';
-import {Article} from "./EditArticles";
 import InfiniteScroll from "react-infinite-scroll-component";
 import ResizeObserver from 'resize-observer-polyfill';
 
@@ -181,21 +180,6 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
 
 
         }
-    }
-
-    loadSingleImage(id: number, onFinish: (imageResponse?: ImageResponseType) => void) {
-        fetch(new Request(`http://${window.location.hostname}:8080/article/range;start=${id};end=${id};quality=${this.imageResolution}`, {method: 'GET'}))
-            .then(response => {
-                if (response.status === 200) {
-                    return response.json();
-                } else {
-                    throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
-                }
-            })
-            .then((response: ImageResponseType[]) => onFinish(response[0]))
-            .catch(reason => {
-                showToast(reason.message, "error")
-            })
     }
 
     componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any): void {
@@ -663,13 +647,13 @@ function ArticleComponent(props: any) {
                             className={classes.cardMedia}
                             payload={article}
                             getSrc={setImgSrc => {
-                                if (article.picture && article.picture.data) {
-                                    setImgSrc(base64ToDataUri(article.picture.data))
+                                if (article.picture && article.picture) {
+                                    setImgSrc(base64ToDataUri(article.picture))
                                 } else {
-                                    context.loadSingleImage(article.id, imageResponse => {
+                                    loadSingleImage("article", article.id, imageResponse => {
                                         if (imageResponse)
                                             setImgSrc(base64ToDataUri(imageResponse.file));
-                                    });
+                                    }, context.imageResolution);
                                 }
                             }}
                             reload={reload => context.imageReloadArray.push(reload)}

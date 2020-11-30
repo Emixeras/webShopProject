@@ -56,7 +56,7 @@ export interface Article {
     price: string;
     artists: ArtistOrGenre;
     genre: ArtistOrGenre;
-    picture?: { id: number, data: string };
+    picture?: string;
 }
 
 export interface ArtistOrGenre {
@@ -147,8 +147,8 @@ export function base64ToDataUri(base64: string): string {
 interface ImageResponseFunction {
     (imageResponse?: ImageResponseType): void
 }
-export function loadSingleImage(type: "article" | "artist", articleId: number, onFinish: (ImageResponseFunction | Function), imageResolution?: number) {
-    fetch(new Request(`http://${window.location.hostname}:8080/${type}/range;start=${articleId};end=${articleId};quality=${imageResolution ? imageResolution : 250}`, {method: 'GET'}))
+export function loadSingleImage(type: "article" | "artist", id: number, onFinish: (ImageResponseFunction | Function), imageResolution?: number) {
+    fetch(new Request(`http://${window.location.hostname}:8080/${type}/range;start=${id};end=${id};quality=${imageResolution ? imageResolution : 250}`, {method: 'GET'}))
         .then(response => {
             if (response.status === 200) {
                 return response.json();
@@ -156,12 +156,13 @@ export function loadSingleImage(type: "article" | "artist", articleId: number, o
                 throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
             }
         })
-        .then((response: ImageResponseType[]) => {
+        .then((response: ImageResponseType) => {
             if (onFinish.name === "setImgSrc") {
+                console.log(id)
                 // @ts-ignore
-                onFinish(base64ToDataUri(response[0].file))
+                onFinish(base64ToDataUri(response.file))
             } else
-                onFinish(response[0])
+                onFinish(response)
         })
         .catch(reason => {
             showToast(reason.message, "error")

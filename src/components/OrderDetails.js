@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {NavigationComponent, showToast} from "../Utilities/Utilities";
+import {hexToRgbA, NavigationComponent, showToast} from "../Utilities/Utilities";
 import Grid from "@material-ui/core/Grid";
 import {
     Card,
@@ -24,16 +24,78 @@ import {
 import {placeOrder} from "../services/OrderApiUtil";
 
 
-class OrderSummary extends Component {
+class OrderDetails extends Component {
 
     user = {};
+    shoppingCart = {}
+    totalPriceWithoutShipping = 0;
+    totalItemCount = 0;
 
     constructor(props) {
         super(props);
+
         this.state = {
-            user: getSessionUser(),
+            totalItemCount: 0,
+            totalPriceWithoutShipping: 0,
+            shoppingCart: [
+                {
+                    "article": {
+                        "artists": {
+                            "id": 28,
+                            "name": "Led Zeppelin"
+                        },
+                        "description": "Nullam molestie nibh in lectus.",
+                        "ean": 94095533,
+                        "genre": {
+                            "id": 2,
+                            "name": "Country"
+                        },
+                        "id": 153,
+                        "price": "15.11",
+                        "title": "Abshire-Thiel"
+                    },
+                    "count": 99
+                },
+                {
+                    "article": {
+                        "artists": {
+                            "id": 8,
+                            "name": "Barbra Streisand"
+                        },
+                        "description": "In quis justo.",
+                        "ean": 1862514,
+                        "genre": {
+                            "id": 14,
+                            "name": "Techno"
+                        },
+                        "id": 377,
+                        "price": "6.92",
+                        "title": "Abbott, Torphy and Gusikowski"
+                    },
+                    "count": 88
+                }
+            ],
+            user: {
+                "birth": "2020-01-26T00:00:00Z[UTC]",
+                "email": "employee@employee.de",
+                "firstName": "tttt",
+                "id": 3,
+                "lastName": "tttt",
+                "password": "tttt",
+                "postalCode": 111,
+                "role": "EMPLOYEE",
+                "street": "street",
+                "streetNumber": 111,
+                "title": "FRAU",
+                "town": "town"
+            },
             paymentMethod: -1,
         };
+        this.state.shoppingCart.map((item) =>{
+                this.state.totalPriceWithoutShipping=this.state.totalPriceWithoutShipping+(parseFloat(item.count).toFixed(2)*parseFloat(item.article.price).toFixed(2))
+            this.state.totalItemCount = this.state.totalItemCount + (item.count);
+        }
+        );
 
     }
 
@@ -41,7 +103,6 @@ class OrderSummary extends Component {
         if (isUserLoggedIn()) {
             return (
                 <MenuDrawer>
-                    <HorizontalLabelPositionBelowStepper index={2}/>
                     <div style={{
                         marginTop: 8,
                         display: 'flex',
@@ -50,6 +111,28 @@ class OrderSummary extends Component {
                         <Grid container
                               style={{width: '85%', maxWidth: "800px"}}
                               spacing={3}>
+                            <Grid item xs={12}>
+                                <Card style={{
+                                    ...padding(18),
+                                    backgroundColor: "rgba(46,59,85,1)"
+                                }}>
+                                    <Grid
+                                        container
+                                        direction="column">
+                                        <Grid item fullWidth>
+                                            <div style={{
+                                                fontWeight: "bold",
+                                                textAlign: "center",
+                                                fontSize: 22,
+                                                marginBottom: 3,
+                                                color: "white"
+                                            }}>
+                                                Ihre Bestellung (id: 123) vom 12.12.2020
+                                            </div>
+                                        </Grid>
+                                    </Grid>
+                                </Card>
+                            </Grid>
                             <Grid item xs={12}>
                                 <Card style={padding(18)}>
                                     <Grid
@@ -61,7 +144,7 @@ class OrderSummary extends Component {
                                                 fontSize: 22,
                                                 marginBottom: 3
                                             }}>
-                                                Anschrift
+                                                Lieferadresse
                                             </div>
                                         </Grid>
                                         <Grid item>
@@ -115,7 +198,7 @@ class OrderSummary extends Component {
                                                 <ShoppingCartList
                                                     update={() => this.forceUpdate()}
                                                     showChangeCount={false}
-                                                    shoppingcart = {undefined}
+                                                    shoppingCart = {this.state.shoppingCart}
                                                 />
                                                 <hr/>
                                             </Grid>
@@ -127,7 +210,7 @@ class OrderSummary extends Component {
                                                       spacing={3}>
                                                     <Grid item>
                                                         <div style={padding(0,90,0,0)}>
-                                                            <b>Artikel</b> ({getShoppingCartCount()} Stk.): {parseFloat((getShoppingCartPrice()).toString()).toFixed(2)} €
+                                                            <b>Artikel</b> ({this.state.totalItemCount} Stk.): {this.state.totalPriceWithoutShipping.toFixed(2)} €
                                                         </div>
                                                     </Grid>
                                                 </Grid>
@@ -154,7 +237,7 @@ class OrderSummary extends Component {
                                                       spacing={3}>
                                                     <Grid item>
                                                         <div style={padding(0,90,0,0)}>
-                                                            <b>Gesamtpreis</b> {parseFloat((parseFloat(getShoppingCartPrice()) + 5.99).toString()).toFixed(2)} €
+                                                            <b>Gesamtpreis</b> {(this.state.totalPriceWithoutShipping + 5.99).toFixed(2)} €
                                                         </div>
                                                     </Grid>
                                                 </Grid>
@@ -162,20 +245,6 @@ class OrderSummary extends Component {
                                         </Grid>
                                     </Grid>
                                 </Card>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Grid container
-                                      wrap={"wrap-reverse"}
-                                      direction="row"
-                                      justify="space-between"
-                                      spacing={3}>
-                                    <Grid item>
-                                        <BackButton context={this}/>
-                                    </Grid>
-                                    <Grid item>
-                                        <ContinueButton context={this}/>
-                                    </Grid>
-                                </Grid>
                             </Grid>
                             <Grid item>
                                 <div style={{marginBottom: 8}}/>
@@ -200,57 +269,5 @@ class OrderSummary extends Component {
     handleChange = event => this.setState({title: event.target.value.trim()});
 
 }
-function OrderSummaryComponent(){
 
-    return(
-        <div></div>
-    )
-}
-function BackButton(){
-    const history = useHistory();
-    let backToPayment = () => {
-        history.push("/payment")
-    };
-
-    return (
-        <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => {
-                backToPayment()
-            }
-            }>
-            Zurück
-        </Button>
-    )
-}
-function ContinueButton(){
-    const history = useHistory();
-    let continueToComplete = () => {
-        let payload = {
-            "shoppingCartEntries": getShoppingCartObject().entries,
-            "paymentMethod": localStorage.getItem('paymentmethod'),
-            "shipping": 5.99,
-        };
-        placeOrder(payload, ()=>{
-            history.push("/ordercomplete")
-            showToast("Bestellung erfolgreich aufgegeben", "success")
-            clearShoppingCart()
-        },()=>showToast("Bestellung fehlgeschlagen", "error"))
-    };
-
-    return (
-        <Button
-            style={{backgroundColor: "green"}}
-            variant="contained"
-            color="primary"
-            onClick={() => {
-                continueToComplete()
-            }
-            }>
-            Bestellung aufgeben
-        </Button>
-    )
-}
-
-export default OrderSummary;
+export default OrderDetails;
