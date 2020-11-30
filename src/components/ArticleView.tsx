@@ -50,10 +50,7 @@ class ArticleView extends React.Component<IProps, IState> {
                 },
                 price: "16.20",
                 ean: 12345678,
-                picture: {
-                    id: 1,
-                    data: ""
-                },
+                picture: "",
                 description: "test Api - provides basic test Functions and example Data. test Api - provides basic test Functions and example Data. test Api - provides basic test Functions and example Data"
             }
         }

@@ -30,7 +30,7 @@ import {
     artistOrGenre_comparator,
     Pair,
     RestrictedPage,
-    RETURN_MODE
+    RETURN_MODE, Article
 } from "../Utilities/TsUtilities";
 import {createNewArticle, deleteArticle, updateArticle} from "../services/ItemApiUtil";
 import {createNewArtist, deleteArtist, updateArtist} from "../services/ArtistApiUtil";
@@ -52,16 +52,16 @@ interface IState {
     articlePicture?: { id: number };
 }
 
-export interface Article {
-    id: number;
-    title: string;
-    description: string;
-    ean: number;
-    price: string;
-    artists: ArtistOrGenre;
-    genre: ArtistOrGenre;
-    picture?: { id: number, data: string };
-}
+// export interface Article {
+//     id: number;
+//     title: string;
+//     description: string;
+//     ean: number;
+//     price: string;
+//     artists: ArtistOrGenre;
+//     genre: ArtistOrGenre;
+//     picture?: { id: number, data: string };
+// }
 
 interface ArtistOrGenre {
     id: number;
