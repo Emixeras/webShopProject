@@ -9,27 +9,24 @@ import Grid from "@material-ui/core/Grid";
 import {Card} from "@material-ui/core";
 import {Link, useHistory} from "react-router-dom";
 import axios from "axios";
-import {alignCenter, subString} from "../Utilities/TsUtilities";
+import {alignCenter, formatDate} from "../Utilities/TsUtilities";
 import Button from "@material-ui/core/Button";
 import SearchIcon from '@material-ui/icons/Search';
-
-function isOrderHistoryEmpty() {
-    return false
-}
 
 
 export default class OrderOverview extends React.Component {
     emptyOrderHistory = {entries: []};
     user = {};
-    orders = [];
-    dateFormat = require('dateformat')
+    orders = [-1];
 
     constructor(props) {
         super(props);
+        let sessionUser = getSessionUser();
         this.state = {
-            user: getSessionUser(),
+            user: sessionUser,
         };
-        this.loadOrders();
+        if (sessionUser)
+            this.loadOrders();
 
     }
 
@@ -62,7 +59,7 @@ export default class OrderOverview extends React.Component {
 
 
     render() {
-        let isEmpty = isOrderHistoryEmpty();
+        let isEmpty = this.orders.length === 0;
         if (isUserLoggedIn())
             return (
                 <MenuDrawer>
@@ -75,7 +72,7 @@ export default class OrderOverview extends React.Component {
                         <div style={{width: '95%', maxWidth: isEmpty ? "1000px" : "800px"}}>
                             <div style={{marginTop: +isEmpty * 50,}}>
                                 {isEmpty ?
-                                    <div style={{textAlign: "center"}}>
+                                    <Card style={{textAlign: "center", ...padding(18)}}>
                                         <Typography variant="h4" gutterBottom>
                                             Sie haben noch keine Bestellungen aufgegeben.
                                         </Typography>
@@ -84,7 +81,7 @@ export default class OrderOverview extends React.Component {
                                             Ihrer Wahl aus unserem {<Link
                                             to={"/albums"}>Sortiment</Link>} aus
                                         </Typography>
-                                    </div>
+                                    </Card>
                                     :
                                     <OrderList orderArray={this.orders} context={this}/>
                                 }
@@ -102,22 +99,23 @@ export default class OrderOverview extends React.Component {
 function OrderList({orderArray, context}) {
     const history = useHistory()
 
+    if (orderArray[0] === -1)
+        return null
+
     return (
         <Grid container spacing={2}>
             {orderArray.map((entry, index) => {
-                let dateString = subString(entry.order.orderDate, 0, -5);
-                const date = Date.parse(dateString)
                 return (
                     <Grid item xs={12}>
                         <Card style={{...padding(18), ...(index % 2 === 1 ? {backgroundColor: "rgba(0,0,0,0.05)"} : {})}}>
                             <Grid container spacing={2} style={alignCenter(true)}>
                                 <Grid item>
                                     <div>
-                                        <b>Datum:</b> {context.dateFormat(date, "dd.mm.yyyy HH:MM")} Uhr
+                                        <b>Datum:</b> {formatDate(entry.order.orderDate)}
                                     </div>
                                 </Grid>
                                 <Grid item xs>
-                                    <b>Gesamtpreis:</b> {entry.fullPrice.toFixed(2)} €
+                                    <b>Gesamtpreis:</b> {(entry.fullPrice + entry.order.shipping).toFixed(2)} €
                                 </Grid>
                                 <Grid item>
                                     <Button variant="contained" color="primary" onClick={event => {

@@ -31,11 +31,13 @@ interface IState {
 class ArticleView extends React.Component<IProps, IState> {
 
     article: Article;
+    isDetails: boolean = false;
 
     constructor(props: IProps, context: any) {
         super(props, context);
         if (this.props.location.state) {
             this.article = this.props.location.state.article;
+            this.isDetails = this.props.location.state.isDetails
         } else {
             this.article = {
                 id: 1,
@@ -54,7 +56,7 @@ class ArticleView extends React.Component<IProps, IState> {
                 description: "test Api - provides basic test Functions and example Data. test Api - provides basic test Functions and example Data. test Api - provides basic test Functions and example Data"
             }
         }
-        window.scrollTo(0,0);
+        window.scrollTo(0, 0);
     }
 
     render() {
@@ -141,6 +143,7 @@ class ArticleView extends React.Component<IProps, IState> {
                                             </Grid>
                                         </Card>
                                     </Grid>
+                                    {!this.isDetails &&
                                     <Grid item sm={12}>
                                         <div style={{float: "right"}}>
                                             <Button variant="contained" color="primary"
@@ -155,7 +158,7 @@ class ArticleView extends React.Component<IProps, IState> {
                                                     "Artikel in den Einkaufswagen hinzufügen"}
                                             </Button>
                                         </div>
-                                    </Grid>
+                                    </Grid>}
                                     {this.article.description &&
                                     <Grid item sm={12}>
                                         <Card style={padding(18)}>
@@ -179,7 +182,7 @@ class ArticleView extends React.Component<IProps, IState> {
 
 function EditButton({context}: ContextType<ArticleView>) {
     const history = useHistory();
-    if (hasCurrentUserRoleLevel()) {
+    if (hasCurrentUserRoleLevel() && !context.isDetails) {
         return (
             <Grid item sm={12}>
                 <div style={{float: "right"}}>

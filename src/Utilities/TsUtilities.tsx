@@ -158,7 +158,6 @@ export function loadSingleImage(type: "article" | "artist", id: number, onFinish
         })
         .then((response: ImageResponseType) => {
             if (onFinish.name === "setImgSrc") {
-                console.log(id)
                 // @ts-ignore
                 onFinish(base64ToDataUri(response.file))
             } else
@@ -479,7 +478,7 @@ export function boolOr<T>(input: T, ...ors: T[]): boolean {
 
 // ---------------
 
-export function hasCurrentUserRoleLevel(level: string | number = "EMPLOYEE"): boolean {
+export function hasCurrentUserRoleLevel(level: "USER" | "EMPLOYEE" | "ADMIN" | number = "EMPLOYEE"): boolean {
     let user = getSessionUser();
     // @ts-ignore
     return user && roleMap[user.role] >= roleMap[level];
@@ -653,6 +652,16 @@ export function subString(text: string, start: number, end?: number): string {
             end = text.length + end;
         return text.substring(start, end);
     }
+}
+
+const dateFormat = require('dateformat')
+export function formatDate(date: string | number, pattern?: (string | boolean)): string {
+    if (typeof date === "string") {
+        if (date.includes("[UTC]"))
+            date = subString(date, 0, -5);
+        date = Date.parse(date);
+    }
+    return dateFormat(date, (typeof pattern === "string" ? pattern : (pattern ? "dd.mm.yyyy HH:MM" : "dd.mm.yyyy")));
 }
 //  <------------------------- Convenience -------------------------
 

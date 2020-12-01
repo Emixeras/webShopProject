@@ -1,5 +1,11 @@
 import React from "react";
-import {Article, callIfExists, LazyImage, loadSingleImage} from "../Utilities/TsUtilities";
+import {
+    Article,
+    base64ToDataUri,
+    callIfExists,
+    LazyImage,
+    loadSingleImage
+} from "../Utilities/TsUtilities";
 import {Button, Grid, IconButton, Typography} from "@material-ui/core";
 import AddIcon from '@material-ui/icons/AddCircleOutline';
 import RemoveIcon from '@material-ui/icons/RemoveCircleOutline';
@@ -208,7 +214,7 @@ export class ShoppingCartList extends React.Component<ShoppingCartList_props, {}
                         return <ShoppingCartListItem update={() => callIfExists(this.update)}
                                                      entry={entry} index={index}
                                                      showChangeCount={this.props.showChangeCount}
-                                                     isDetails={true}/>
+                                                     isDetails={!!this.props.shoppingCart}/>
                     })
                 }
             </Grid>
@@ -273,7 +279,12 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
 
                             <LazyImage
                                 getSrc={setImgSrc => {
-                                    loadSingleImage("article", this.article.id, setImgSrc, 100)
+                                    if (this.isDetails) {
+                                        if (this.article.picture)
+                                            setImgSrc(base64ToDataUri(this.article.picture))
+                                    }
+                                    else
+                                        loadSingleImage("article", this.article.id, setImgSrc, 100)
                                 }}
                                 payload={this.article}
                                 shouldImageUpdate={(oldPayload: Article, newPayload: Article) => {
@@ -296,7 +307,7 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
                                     <Typography variant="h6" style={{color: "rgba(0,0,0,0.87)"}}
                                                 gutterBottom to={(location: any) => {
                                         location.pathname = "/articleView";
-                                        location.state = {article: this.article};
+                                        location.state = {article: this.article, isDetails: this.isDetails};
                                         return location;
                                     }} component={Link}>
                                         {this.article.title}

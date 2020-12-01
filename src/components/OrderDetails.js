@@ -22,6 +22,7 @@ import {
     ShoppingCartList
 } from "../services/ShoppingCartUtil";
 import {placeOrder} from "../services/OrderApiUtil";
+import {formatDate} from "../Utilities/TsUtilities";
 
 
 class OrderDetails extends Component {
@@ -34,63 +35,18 @@ class OrderDetails extends Component {
     constructor(props) {
         super(props);
 
+        let payload = this.props.location.state;
+
         this.state = {
             totalItemCount: 0,
             totalPriceWithoutShipping: 0,
-            shoppingCart: [
-                {
-                    "article": {
-                        "artists": {
-                            "id": 28,
-                            "name": "Led Zeppelin"
-                        },
-                        "description": "Nullam molestie nibh in lectus.",
-                        "ean": 94095533,
-                        "genre": {
-                            "id": 2,
-                            "name": "Country"
-                        },
-                        "id": 153,
-                        "price": "15.11",
-                        "title": "Abshire-Thiel"
-                    },
-                    "count": 99
-                },
-                {
-                    "article": {
-                        "artists": {
-                            "id": 8,
-                            "name": "Barbra Streisand"
-                        },
-                        "description": "In quis justo.",
-                        "ean": 1862514,
-                        "genre": {
-                            "id": 14,
-                            "name": "Techno"
-                        },
-                        "id": 377,
-                        "price": "6.92",
-                        "title": "Abbott, Torphy and Gusikowski"
-                    },
-                    "count": 88
-                }
-            ],
-            user: {
-                "birth": "2020-01-26T00:00:00Z[UTC]",
-                "email": "employee@employee.de",
-                "firstName": "tttt",
-                "id": 3,
-                "lastName": "tttt",
-                "password": "tttt",
-                "postalCode": 111,
-                "role": "EMPLOYEE",
-                "street": "street",
-                "streetNumber": 111,
-                "title": "FRAU",
-                "town": "town"
-            },
-            paymentMethod: -1,
+            shoppingCart: payload.order.entries,
+            orderDate: payload.order.orderDate,
+            id: payload.order.id,
+            user: payload.order.shopOrderUser,
+            paymentMethod: payload.order.payment,
         };
+
         this.state.shoppingCart.map((item) =>{
                 this.state.totalPriceWithoutShipping=this.state.totalPriceWithoutShipping+(parseFloat(item.count).toFixed(2)*parseFloat(item.article.price).toFixed(2))
             this.state.totalItemCount = this.state.totalItemCount + (item.count);
@@ -127,7 +83,7 @@ class OrderDetails extends Component {
                                                 marginBottom: 3,
                                                 color: "white"
                                             }}>
-                                                Ihre Bestellung (id: 123) vom 12.12.2020
+                                                Ihre Bestellung (id: {this.state.id}) vom {formatDate(this.state.orderDate, true)} Uhr
                                             </div>
                                         </Grid>
                                     </Grid>

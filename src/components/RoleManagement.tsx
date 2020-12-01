@@ -1,6 +1,6 @@
 import React from "react";
 import {
-    ContextType,
+    ContextType, hasCurrentUserRoleLevel,
     RestrictedPage,
     roleMap,
     ROLES,
@@ -43,7 +43,8 @@ export default class RoleManagement extends React.Component<RoleManagement_State
 
     constructor(props: RoleManagement_State, context: any) {
         super(props, context);
-        this.loadUsers();
+        if (hasCurrentUserRoleLevel("ADMIN"))
+            this.loadUsers();
     }
 
     loadUsers() {
