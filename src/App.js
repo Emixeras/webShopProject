@@ -6,6 +6,7 @@ import Register from "./components/Register";
 import ShoppingCart from "./components/ShoppingCart";
 import Profile from "./components/Profile";
 import Dev from "./components/Dev";
+import RoleManagement from "./components/RoleManagement";
 import ArticleView from "./components/ArticleView";
 import SimpleReactFileUpload from "./components/SimpleReactFileUpload";
 import {toast} from 'react-toastify'
@@ -33,6 +34,7 @@ function App() {
         <Route path="/upload" component={SimpleReactFileUpload} exact />
         <Route path="/editArticles" component={EditArticles} exact />
         <Route path="/dev" component={Dev} exact />
+        <Route path="/roleManagement" component={RoleManagement} exact />
         <Route path="/articleView" component={ArticleView} exact />
         <Route path="/albums" component={AlbumOverview} exact />
         <Route path="/genres" component={GenreOverview} exact />

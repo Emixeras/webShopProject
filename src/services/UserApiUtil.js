@@ -72,6 +72,7 @@ export const loginUser = (email, password, onSuccess, onFail) => {
 };
 
 export const updateUser = (payload, onSuccess, onFail) => {
+    debugger
     var user = getSessionUser();
     axios.put(apiBaseUrlUserLogin, payload, {
         auth: {
@@ -83,7 +84,9 @@ export const updateUser = (payload, onSuccess, onFail) => {
             console.log(response);
             if (response.status === 200) {
                 console.log("update successfull");
-                setSessionUser(response.data);
+                debugger
+                if (user.id === payload.id)
+                    setSessionUser(response.data);
                 if (onSuccess)
                     onSuccess(response);
             } else {
