@@ -636,4 +636,34 @@ export function callIfExists(what: Function | undefined | null, ...args: any[]) 
     if (what)
         what.call(undefined, args)
 }
+
+/**
+ * @param {string} text Input String
+ * @param {number} start Start Index (can be negative)
+ * @param {number} [end] End Index (can be negative)
+ * @return {string} The SubString
+ */
+export function subString(text: string, start: number, end?: number): string {
+    if (start < 0)
+        start = text.length + start;
+    if (end === undefined) {
+        return text.substring(start);
+    } else {
+        if (end < 0)
+            end = text.length + end;
+        return text.substring(start, end);
+    }
+}
 //  <------------------------- Convenience -------------------------
+
+
+//  ------------------------- Styles ------------------------->
+export function alignCenter(vertical?: boolean, horizontal?: boolean) {
+    return {
+        display: "flex",
+        height: "100%",
+        alignItems: vertical ?  "center" : undefined,
+        justifyContent: horizontal ? "center": undefined,
+    }
+}
+//  <------------------------- Styles -------------------------
