@@ -102,7 +102,7 @@ let articleArray: Array<Article> = [];
 
 export default class AlbumOverview extends React.Component<IProps, IState> {
     IMAGE_RESOLUTION: string = "IMAGE_RESOLUTION";
-    imageResolution: number = +(localStorage.getItem(this.IMAGE_RESOLUTION) as string);
+    imageResolution: number = ifValueReturnOrElse(+(localStorage.getItem(this.IMAGE_RESOLUTION) as string), 0, undefined, 250, true);
     STEP_DISTANCE: string = "STEP_DISTANCE";
     stepDistance: number = ifValueReturnOrElse(+(localStorage.getItem(this.STEP_DISTANCE) as string), 0, undefined, 48, true);
     UNLOAD_IMAGES: string = "UNLOAD_IMAGES";

@@ -233,7 +233,7 @@ function RoleListItemButton({context, user}: { context: RoleManagement, user: Us
                     updateUser(user, (response: any) => {
                         console.log(response);
                         debugger
-                        showToast(`Der Nuzer wurde geupdated`, "success");
+                        showToast(`Der Nutzer wurde geupdated`, "success");
                         forceUpdate();
                     }, (error: any) => {
                         console.log(error);
