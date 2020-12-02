@@ -20,12 +20,14 @@ import OrderSummary from "./components/OrderSummary";
 import OrderComplete from "./components/OrderComplete";
 import OrderOverview from "./components/OrderOverview"
 import OrderDetails from "./components/OrderDetails";
+import Charts from "./components/Charts";
 
 toast.configure();
 function App() {
   return (
     <div className="App">
       <Switch>
+        <Route path="/charts" component={Charts} exact />
         <Route path="/" component={AlbumOverview} exact />
         <Route path="/login" component={Login} exact />
         <Route path="/register" component={Register} exact />
