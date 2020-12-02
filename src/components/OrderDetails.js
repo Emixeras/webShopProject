@@ -1,32 +1,26 @@
 import React, {Component} from 'react';
-import {hexToRgbA, NavigationComponent, showToast} from "../Utilities/Utilities";
+import {NavigationComponent} from "../Utilities/Utilities";
 import Grid from "@material-ui/core/Grid";
 import {
     Card,
     Button,
 } from '@material-ui/core';
-import MenuDrawer from "./MenuDrawer";
+import MenuDrawer, {addDrawerCallback, setOpen_ref, removeDrawerCallback} from "./MenuDrawer";
 import 'react-toastify/dist/ReactToastify.css';
 import {padding} from "../Utilities/Utilities";
 import {
-    getSessionUser, isUserLoggedIn
+    isDrawerVisible,
+    isUserLoggedIn
 } from "../services/StorageUtil";
-import HorizontalLabelPositionBelowStepper from "./Stepper";
-import {useHistory} from "react-router-dom";
 import Typography from "@material-ui/core/Typography";
 import {
-    clearShoppingCart,
-    getShoppingCartCount,
-    getShoppingCartObject,
-    getShoppingCartPrice,
     ShoppingCartList
 } from "../services/ShoppingCartUtil";
-import {placeOrder} from "../services/OrderApiUtil";
-import {formatDate} from "../Utilities/TsUtilities";
+import {formatDate, matchParent} from "../Utilities/TsUtilities";
+import PrintIcon from '@material-ui/icons/Print';
 
 
-class OrderDetails extends Component {
-
+export default class OrderDetails extends Component {
     user = {};
     shoppingCart = {}
     totalPriceWithoutShipping = 0;
@@ -82,7 +76,7 @@ class OrderDetails extends Component {
                                                 fontSize: 22,
                                                 marginBottom: 3,
                                                 color: "white"
-                                            }}>
+                                            }} className={"black-on-print"}>
                                                 Ihre Bestellung (id: {this.state.id}) vom {formatDate(this.state.orderDate, true)} Uhr
                                             </div>
                                         </Grid>
@@ -99,7 +93,7 @@ class OrderDetails extends Component {
                                                 textAlign: "start",
                                                 fontSize: 22,
                                                 marginBottom: 3
-                                            }}>
+                                            }} className={"bold-on-print"}>
                                                 Lieferadresse
                                             </div>
                                         </Grid>
@@ -122,7 +116,7 @@ class OrderDetails extends Component {
                                                 textAlign: "start",
                                                 fontSize: 22,
                                                 marginBottom: 3
-                                            }}>
+                                            }} className={"bold-on-print"}>
                                                 Bezahlmethode
                                             </div>
                                         </Grid>
@@ -143,7 +137,7 @@ class OrderDetails extends Component {
                                                 textAlign: "start",
                                                 fontSize: 22,
                                                 marginBottom: 10
-                                            }}>
+                                            }} className={"bold-on-print"}>
                                                 Ihre Bestellung
                                             </div>
                                         </Grid>
@@ -202,6 +196,13 @@ class OrderDetails extends Component {
                                     </Grid>
                                 </Card>
                             </Grid>
+                            <Grid item xs={12}>
+                                <div style={{display: "flex", justifyContent: "flex-end", ...matchParent(false, true)}}>
+                                    <Button onClick={event => window.print()} variant={"contained"} color={"primary"} startIcon={<PrintIcon/>} className={"no-print"}>
+                                        Drucken
+                                    </Button>
+                                </div>
+                            </Grid>
                             <Grid item>
                                 <div style={{marginBottom: 8}}/>
                             </Grid>
@@ -225,5 +226,3 @@ class OrderDetails extends Component {
     handleChange = event => this.setState({title: event.target.value.trim()});
 
 }
-
-export default OrderDetails;

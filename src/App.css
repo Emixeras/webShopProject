@@ -13,6 +13,22 @@
     }
 }
 
+@media print {
+    .no-print, .no-print * {
+        display: none !important;
+    }
+    .black-on-print{
+        color: black !important;
+    }
+    .bold-on-print{
+        font-weight: bold !important;
+    }
+    .no-margin-left-on-print{
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+}
+
 .files:after {
     pointer-events: none;
     position: absolute;

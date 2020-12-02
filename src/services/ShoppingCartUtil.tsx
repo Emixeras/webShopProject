@@ -282,8 +282,7 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
                                     if (this.isDetails) {
                                         if (this.article.picture)
                                             setImgSrc(base64ToDataUri(this.article.picture))
-                                    }
-                                    else
+                                    } else
                                         loadSingleImage("article", this.article.id, setImgSrc, 100)
                                 }}
                                 payload={this.article}
@@ -291,11 +290,12 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
                                     return oldPayload.id !== newPayload.id;
                                 }}
                                 rounded
+                                className={"no-print"}
                                 style={{
                                     width: 75,
                                     height: 75,
                                     backgroundColor: "lightgray",
-                                    marginRight: 18
+                                    marginRight: 18,
                                 }}/>
                         </div>
                     </Grid>

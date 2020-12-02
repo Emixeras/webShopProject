@@ -4,12 +4,12 @@ import MenuDrawer from "./MenuDrawer";
 import {
     getSessionUser, isUserLoggedIn
 } from "../services/StorageUtil";
-import {NavigationComponent, padding} from "../Utilities/Utilities";
+import {margin, NavigationComponent, padding} from "../Utilities/Utilities";
 import Grid from "@material-ui/core/Grid";
 import {Card} from "@material-ui/core";
 import {Link, useHistory} from "react-router-dom";
 import axios from "axios";
-import {alignCenter, formatDate} from "../Utilities/TsUtilities";
+import {alignCenter, formatDate, ImageGrid} from "../Utilities/TsUtilities";
 import Button from "@material-ui/core/Button";
 import SearchIcon from '@material-ui/icons/Search';
 
@@ -110,12 +110,27 @@ function OrderList({orderArray, context}) {
                         <Card style={{...padding(18), ...(index % 2 === 1 ? {backgroundColor: "rgba(0,0,0,0.05)"} : {})}}>
                             <Grid container spacing={2} style={alignCenter(true)}>
                                 <Grid item>
-                                    <div>
-                                        <b>Datum:</b> {formatDate(entry.order.orderDate)}
-                                    </div>
+                                    <ImageGrid rounded style={{width: "100px", height: "100px"}} articleList={entry.order.entries.map(value => value.article)}/>
+                                </Grid>
+                                <Grid item>
+                                    <Grid container spacing={2} direction={"column"} >
+                                        <Grid item>
+                                            <b>Datum:</b> {formatDate(entry.order.orderDate)}
+                                        </Grid>
+                                        <Grid item>
+                                            <b>ID:</b> {entry.order.id}
+                                        </Grid>
+                                    </Grid>
                                 </Grid>
                                 <Grid item xs>
-                                    <b>Gesamtpreis:</b> {(entry.fullPrice + entry.order.shipping).toFixed(2)} €
+                                    <Grid container style={margin(0, 15)} spacing={2} direction={"column"}>
+                                        <Grid item>
+                                            <b>Gesamtpreis:</b> {(entry.fullPrice + entry.order.shipping).toFixed(2)} €
+                                        </Grid>
+                                        <Grid item>
+                                            <b>Artikel:</b> {entry.order.entries.map(obj => obj.count).reduce((res, curr) => res + curr)}
+                                        </Grid>
+                                    </Grid>
                                 </Grid>
                                 <Grid item>
                                     <Button variant="contained" color="primary" onClick={event => {

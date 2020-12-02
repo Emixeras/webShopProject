@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Card, CardMedia, Link, Typography} from "@material-ui/core";
+import {Card, CardMedia, Grid, Link, Typography} from "@material-ui/core";
 import {number} from "prop-types";
 import {padding, showToast} from "../Utilities/Utilities";
 import {getSessionUser} from "../services/StorageUtil";
@@ -374,6 +374,151 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
 
     }
 }
+
+// ---------------
+
+interface ImageGrid_state {
+
+}
+
+interface ImageGrid_props {
+    articleList?: Article[];
+    imageList?: string[];
+    style?: React.CSSProperties;
+    rounded?: boolean | string | "circle" | "small" | "medium" | "large";
+}
+
+export class ImageGrid extends React.Component<ImageGrid_props, ImageGrid_state>{
+    articleList?: Article[];
+    imageList?: string[];
+    style?: React.CSSProperties;
+    rounded?: boolean | string | "circle" | "small" | "medium" | "large";
+
+    constructor(props: ImageGrid_props, context: any) {
+        super(props, context);
+
+        this.setProps(props);
+    }
+
+    setProps(props: ImageGrid_props) {
+        this.articleList = props.articleList;
+        this.imageList = props.imageList;
+        this.style = props.style;
+        this.rounded = props.rounded;
+    }
+
+    render() {
+        let borderRadius: any;
+        switch (this.rounded) {
+            default:
+                if (this.rounded === false)
+                    borderRadius = "";
+                else
+                    borderRadius = this.rounded;
+                break;
+            case true:
+                borderRadius = "4px";
+                break;
+            case "circle":
+                borderRadius = "50%";
+                break;
+            case "small":
+                borderRadius = "5%";
+                break;
+            case "medium":
+                borderRadius = "10%";
+                break;
+            case "large":
+                borderRadius = "15%";
+                break;
+        }
+
+        if (!this.imageList) {
+            if (!this.articleList || this.articleList?.length === 0)
+                return null;
+            this.imageList = this.articleList?.filter(article => !!article.picture).map(article => (article.picture as string))
+        }
+
+        this.imageList = this.imageList?.slice(0, 4);
+        
+        const borderRadius_byIndex = (index: number): string => {
+            let ret;
+            switch (this.imageList?.length) {
+                default:
+                    return "0px";
+                case 1:
+                    return borderRadius;
+                case 2:
+                    return index === 0 ? `${borderRadius} ${0}px ${0}px ${borderRadius}` : `${0}px ${borderRadius} ${borderRadius} ${0}px`
+                case 3:
+                    switch (index) {
+                        default:
+                            ret =  "0px";
+                            break;
+                        case 0:
+                            ret = `${borderRadius} ${0}px ${0}px ${0}px`
+                            break;
+                        case 1:
+                            ret = `${0}px ${borderRadius} ${0}px ${0}px`
+                            break;
+                        case 2:
+                            ret = `${0}px ${0}px ${borderRadius} ${borderRadius}`
+                            break;
+                    }
+                    return ret;
+                case 4:
+                    switch (index) {
+                        default:
+                            ret =  "0px";
+                            break;
+                        case 0:
+                            ret = `${borderRadius} ${0}px ${0}px ${0}px`
+                            break;
+                        case 1:
+                            ret = `${0}px ${borderRadius} ${0}px ${0}px`
+                            break;
+                        case 2:
+                            ret = `${0}px ${0}px ${0}px ${borderRadius}`
+                            break;
+                        case 3:
+                            ret = `${0}px ${0}px ${borderRadius} ${0}px`
+                            break;
+                    }
+                    return ret;
+            }
+        };
+
+        const xs_byIndex = (index: number): number => {
+            switch (this.imageList?.length) {
+                case 1:
+                    return 12;
+                case 2:
+                case 4:
+                    return 6;
+                case 3:
+                    return index < 2 ? 6 : 12;
+            }
+            return 6;
+        };
+
+        return (
+            <div style={{backgroundColor: "red", borderRadius, ...this.style}}>
+                <Grid container style={matchParent(true, true)}>
+                    {this.imageList?.map((file, index) => {
+                        // debugger
+                        return (
+                            //@ts-ignore
+                            <Grid item xs={xs_byIndex(index)}>
+                                {/*<LazyImage getSrc={setImgSrc => setImgSrc(base64ToDataUri(file))}/>*/}
+                                <CardMedia style={{borderRadius: borderRadius_byIndex(index), ...matchParent(true, true)}} image={base64ToDataUri(file)}/>
+                            </Grid>
+                        )
+                    })}
+                </Grid>
+            </div>
+        );
+    }
+}
 //  <------------------------- Image -------------------------
 
 
@@ -667,12 +812,19 @@ export function formatDate(date: string | number, pattern?: (string | boolean)):
 
 
 //  ------------------------- Styles ------------------------->
-export function alignCenter(vertical?: boolean, horizontal?: boolean) {
+export function alignCenter(vertical?: boolean, horizontal?: boolean): React.CSSProperties {
     return {
         display: "flex",
         height: "100%",
         alignItems: vertical ?  "center" : undefined,
         justifyContent: horizontal ? "center": undefined,
+    }
+}
+
+export function matchParent(parentHeight?: boolean, parentWith?: boolean): React.CSSProperties {
+    return {
+        height: parentHeight ? "100%" : undefined,
+        width: parentWith ? "100%" : undefined,
     }
 }
 //  <------------------------- Styles -------------------------

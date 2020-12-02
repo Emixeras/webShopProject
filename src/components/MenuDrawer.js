@@ -192,10 +192,10 @@ export default function MenuDrawer(props) {
         <div>
             <AppBar
                 position="fixed"
-                style={{background: '#2E3B55'}}
+                style={{background: '#2e3b55'}}
                 className={clsx(classes.appBar, {
                     [classes.appBarShift]: open && !isMobile(),
-                })}
+                }, "no-margin-left-on-print")}
             >
                 <Toolbar>
                     <div>
@@ -248,7 +248,7 @@ export default function MenuDrawer(props) {
                 </Toolbar>
             </AppBar>
             <Drawer
-                className={classes.drawer}
+                className={clsx(classes.drawer, "no-print")}
                 variant="persistent"
                 anchor="left"
                 open={open}
@@ -307,7 +307,7 @@ export default function MenuDrawer(props) {
                 id={"menuDrawer_main"}
                 className={clsx(classes.content, {
                     [classes.contentShift]: open && shouldShift,
-                })}
+                }, "no-margin-left-on-print")}
             >
                 <div className={classes.drawerHeader}/>
                 {props.children}
@@ -460,10 +460,10 @@ function DevButton() {
                         </Grid>
                     </MenuItem>
                     <MenuItem disabled={history.location.pathname === "/roleManagement"}
-                        onClick={event => {
-                            handleClose(event);
-                            history.push("/roleManagement")
-                        }}>
+                              onClick={event => {
+                                  handleClose(event);
+                                  history.push("/roleManagement")
+                              }}>
                         <Grid container spacing={2}>
                             <Grid item>
                                 <ListAltIcon style={{display: "block"}}/>
