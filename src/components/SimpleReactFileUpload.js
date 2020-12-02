@@ -83,8 +83,11 @@ class SimpleReactFileUpload extends React.Component {
                          this.setState({visible: false});
                  }}>
                 {
-                <div className="form-group files"
-                     style={!this.state.defaultVisibility ? {height: "100%", opacity: +showUpload} : {height: "100%"}}>
+                <div className={`files ${this.state.defaultVisibility ? "" :"image-opacity"}`}
+                     style={this.state.defaultVisibility ? {height: "100%"} : {
+                         height: "100%",
+                         opacity: +showUpload // ? 0.8 : 0
+                     }}>
                     <Button color={"primary"}
                             variant="contained"
                             style={{

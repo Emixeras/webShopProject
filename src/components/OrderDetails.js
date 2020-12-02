@@ -47,6 +47,7 @@ export default class OrderDetails extends Component {
         }
         );
 
+        window.scrollTo(0, 0);
     }
 
     render() {

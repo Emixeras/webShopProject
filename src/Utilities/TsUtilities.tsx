@@ -116,7 +116,6 @@ export function base64ToDataUri(base64: string): string {
         mime = "image/jpeg";
 
     // for (let s in signatures) {
-    //     debugger
     //     if (base64.startsWith(s)) {
     //          mime = signatures[s as string] as string;
     //     }
@@ -502,10 +501,9 @@ export class ImageGrid extends React.Component<ImageGrid_props, ImageGrid_state>
         };
 
         return (
-            <div style={{backgroundColor: "red", borderRadius, ...this.style}}>
+            <div style={{borderRadius, ...this.style}}>
                 <Grid container style={matchParent(true, true)}>
                     {this.imageList?.map((file, index) => {
-                        // debugger
                         return (
                             //@ts-ignore
                             <Grid item xs={xs_byIndex(index)}>
