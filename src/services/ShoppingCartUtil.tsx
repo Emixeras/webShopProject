@@ -281,7 +281,9 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
                                 getSrc={setImgSrc => {
                                     if (this.isDetails) {
                                         if (this.article.picture)
-                                            setImgSrc(base64ToDataUri(this.article.picture))
+                                            { // @ts-ignore
+                                                setImgSrc(base64ToDataUri(this.article.picture))
+                                            }
                                     } else
                                         loadSingleImage("article", this.article.id, setImgSrc, 100)
                                 }}
@@ -349,7 +351,7 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
                                 </Grid>
                                 <Grid item>
                                     <Typography variant="body1" gutterBottom>
-                                        Gesamt: {(this.price * this.count).toFixed(2)} €
+                                        Gesamt: {(this.price).toFixed(2)} €
                                     </Typography>
                                 </Grid>
                             </Grid>
