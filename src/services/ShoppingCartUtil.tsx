@@ -250,7 +250,7 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
         this.article = this.entry.article;
         this.update = props.update;
         this.count = this.isDetails ? props.entry.count : getShoppingCartCount(this.article);
-        this.price = this.isDetails ? parseFloat(props.entry.article.price) : parseFloat(getShoppingCartPrice(this.article));
+        this.price = this.isDetails ? (parseFloat(props.entry.article.price)*props.entry.count) : parseFloat(getShoppingCartPrice(this.article));
     }
 
     componentWillUpdate(nextProps: Readonly<ShoppingCartListItem_props>, nextState: Readonly<{}>, nextContext: any) {
@@ -261,7 +261,7 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
         this.article = this.entry.article;
         this.update = nextProps.update;
         this.count = this.isDetails ? nextProps.entry.count : getShoppingCartCount(this.article);
-        this.price = this.isDetails ? parseFloat(nextProps.entry.article.price) : parseFloat(getShoppingCartPrice(this.article));
+        this.price = this.isDetails ? (parseFloat(nextProps.entry.article.price)*nextProps.entry.count) : parseFloat(getShoppingCartPrice(this.article));
     }
 
     render() {
