@@ -16,9 +16,9 @@ import {
     ifExistsReturnOrElse, ifValueReturnOrElse,
     LazyImage, name_comparator,
     Pair,
-    RETURN_MODE, Article, loadSingleImage
+    RETURN_MODE, Article, loadSingleImage, hasCurrentUserRoleLevel
 } from "../Utilities/TsUtilities";
-import {Link} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
 import MenuDrawer, {addDrawerCallback, removeDrawerCallback} from "./MenuDrawer";
 import {
     Button,
@@ -35,8 +35,14 @@ import {DialogBuilder} from "../Utilities/DialogBuilder";
 import SettingsIcon from '@material-ui/icons/Settings';
 import SearchIcon from '@material-ui/icons/Search';
 import SortIcon from '@material-ui/icons/Sort';
+import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
+import EditIcon from '@material-ui/icons/Edit';
+import ArtistIcon from '@material-ui/icons/LibraryMusic';
+import GenreIcon from '@material-ui/icons/Radio';
 import InfiniteScroll from "react-infinite-scroll-component";
 import ResizeObserver from 'resize-observer-polyfill';
+import { ContextMenu, MenuItem as ContextMenuItem, ContextMenuTrigger } from "react-contextmenu";
+import {addToShoppingCart, getShoppingCartCount} from "../services/ShoppingCartUtil";
 
 interface IProps {
     // @ts-ignore
@@ -182,6 +188,14 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
         }
     }
 
+    componentWillUpdate(nextProps: Readonly<IProps>, nextState: Readonly<IState>, nextContext: any) {
+        if (this.query.second) {
+            this.maxVisible = this.stepDistance;
+            this.hasMore = true;
+        }
+
+    }
+
     componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any): void {
         if (this.query.second)
             reloadImages(this);
@@ -192,8 +206,8 @@ function Album(props: ContextType<AlbumOverview>) {
     const classes = useStyles();
     let context = props.context;
     let filteredArticleArray: Array<Article>;
-    context.maxVisible = context.stepDistance;
-    context.hasMore = true;
+    // context.maxVisible = context.stepDistance;
+    // context.hasMore = true;
 
     if (articleArray.length === 0)
         buildDummyData();
@@ -339,11 +353,17 @@ export function FilterCard({context}: ContextType<AlbumOverview>) {
                 <Grid container alignItems={direction === "row" ? "flex-end" : "flex-start"}
                       direction={direction}>
                     <Grid item>
-                        {/*<div>*/}
                         <LazyImage
                             getSrc={setImgSrc => {
-                                // @ts-ignore
-                                setImgSrc(base64ToDataUri(context.filter.first.file));
+                                let file = context.filter!.first.file;
+                                if (file)
+                                    setImgSrc(base64ToDataUri(file));
+                                else {
+                                    if (context.filter!.second === "a")
+                                        loadSingleImage("artist", context.filter!.first.artistOrGenre.id, setImgSrc)
+                                    else
+                                        setImgSrc(context.filter!.first.file)
+                                }
                             }}
                             returnMode={RETURN_MODE.CARD_MEDIA}
                             style={{
@@ -351,9 +371,9 @@ export function FilterCard({context}: ContextType<AlbumOverview>) {
                                 height: "250px",
                                 backgroundColor: (context.filter && context.filter.second === "g" ? '#00BCD4' : "lightgrey")
                             }}
-                            shouldImageUpdate={oldPayload => false}
+                            payload={context.filter!.second}
+                            shouldImageUpdate
                         />
-                        {/*</div>*/}
                     </Grid>
                     <Grid item>
                         <Typography component="h1" variant="h2" id={"filterCard_text"}
@@ -527,9 +547,6 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
 
 function GridList({context, filteredArticleArray}: { context: AlbumOverview, filteredArticleArray: Article[] }): JSX.Element {
 
-    // const [{hasMore, count}, setState] = useState(initialState);
-    // const [hasMore, setHasMore] = useState(true);
-    // const [count, setCount] = useState(24);
     const [dummy, setDummy] = useState(0);
     const step = context.stepDistance;
     let shortedFilteredArticleArray: Article[];
@@ -588,6 +605,8 @@ function ArticleComponent(props: any) {
     let article: Article = props.article;
     let context: AlbumOverview = props.context;
     let isDummy: boolean = article.id === -2;
+    let contextMenuId = `contextMenu_${article.id}`;
+    const history = useHistory();
     if (isDummy) {
         return (
             <Grid item xs={12} sm={6} md={4} lg={3}>
@@ -631,9 +650,11 @@ function ArticleComponent(props: any) {
             </Grid>
         )
     } else {
+        let roleLevel = hasCurrentUserRoleLevel();
         return (
             <Grid item xs={12} sm={6} md={4} lg={3}>
-                <CardActionArea component={Link} to={(location: any) => {
+                <ContextMenuTrigger disableIfShiftIsPressed id={contextMenuId}>
+                    <CardActionArea component={Link} to={(location: any) => {
                     location.pathname = "/articleView";
 
                     location.state = {article: article};
@@ -688,6 +709,33 @@ function ArticleComponent(props: any) {
                         </CardContent>
                     </Card>
                 </CardActionArea>
+                </ContextMenuTrigger>
+                <ContextMenu style={{zIndex: 1}} id={contextMenuId}>
+                    <Card style={padding(8,0)}>
+                        <MenuItem  divider style={padding(10,16)} onClick={(event) => {
+                            addToShoppingCart(article)
+                            showToast(`Artikel Erfolgreich hinzugefügt (${getShoppingCartCount(article)})`, "success");
+                        }}><ShoppingCartIcon/>{"⠀"}In den Einkaufswagen</MenuItem>
+                        <MenuItem style={padding(10,16)} onClick={(event) => {
+                            context.filter = Pair.make({file: "", artistOrGenre: article.artists}, "a");
+                            context.forceUpdate();
+                            reloadImages(context);
+                            window.scrollTo({top: 0})
+                        }} disabled={context.filter && context.filter.second === "a"}><ArtistIcon/>{"⠀"}Nach Künstler suchen</MenuItem>
+                        <MenuItem  divider={roleLevel} style={padding(10,16)} onClick={(event) => {
+                            context.filter = Pair.make({file: "", artistOrGenre: article.genre}, "g");
+                            context.forceUpdate();
+                            reloadImages(context);
+                            window.scrollTo({top: 0})
+                        }}disabled={context.filter && context.filter.second === "g"}><GenreIcon/>{"⠀"}Nach Genre suchen</MenuItem>
+                        {roleLevel &&
+                            <MenuItem style={padding(10,16)} onClick={(event) => {
+                                history.push("/editArticles", {article})
+                            }}><EditIcon/>{"⠀"}Bearbeiten</MenuItem>
+                        }
+                        <ContextMenuItem divider/>
+                    </Card>
+                </ContextMenu>
             </Grid>
         )
     }

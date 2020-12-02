@@ -181,7 +181,7 @@ interface LazyImageProperties {
     autoUnloadImages?: boolean;
     returnMode?: RETURN_MODE;
     loadImageMode?: LOAD_IMAGE_MODE;
-    shouldImageUpdate?: ((oldPayload: any, newPayload: any) => boolean) | null;
+    shouldImageUpdate?: ((oldPayload: any, newPayload: any) => boolean) | boolean;
     payload?: any;
     imageRef?: any;
     rounded?: boolean | string | "circle" | "small" | "medium" | "large";
@@ -211,7 +211,7 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
     className?: string;
     returnMode?: RETURN_MODE;
     loadImageMode?: LOAD_IMAGE_MODE;
-    shouldImageUpdate?: ((oldPayload: any, newPayload: any) => boolean) | null;
+    shouldImageUpdate?: ((oldPayload: any, newPayload: any) => boolean) | boolean;
     payload?: any;
     imageRef?: Element = undefined;
     initialLoad: boolean = true;
@@ -279,9 +279,9 @@ export class LazyImage extends React.Component<LazyImageProperties, LazyImageSta
     }
 
     shouldComponentUpdate(nextProps: Readonly<LazyImageProperties>, nextState: Readonly<LazyImageState>, nextContext: any): boolean {
-        if (this.shouldImageUpdate !== undefined) {
+        if (this.shouldImageUpdate !== undefined && this.shouldImageUpdate !== false) {
             let shouldUpdate: boolean;
-            if (this.shouldImageUpdate === null)
+            if (this.shouldImageUpdate === true)
                 shouldUpdate = this.payload !== nextProps.payload;
             else
                 shouldUpdate = this.shouldImageUpdate(this.payload, nextProps.payload);
