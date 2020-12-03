@@ -41,7 +41,7 @@ import ArtistIcon from '@material-ui/icons/LibraryMusic';
 import GenreIcon from '@material-ui/icons/Radio';
 import InfiniteScroll from "react-infinite-scroll-component";
 import ResizeObserver from 'resize-observer-polyfill';
-import { ContextMenu, MenuItem as ContextMenuItem, ContextMenuTrigger } from "react-contextmenu";
+import {ContextMenu, MenuItem as ContextMenuItem, ContextMenuTrigger} from "react-contextmenu";
 import {addToShoppingCart, getShoppingCartCount} from "../services/ShoppingCartUtil";
 
 interface IProps {
@@ -213,10 +213,9 @@ function Album(props: ContextType<AlbumOverview>) {
         buildDummyData();
 
     let queryText = context.query.first + ifExistsReturnOrElse(context.filter, input => ifExistsReturnOrElse(context.query.first, input1 => " & ", "") + input.second + ": " + input.first.artistOrGenre.name.toLowerCase(), "");
-    if (queryText && articleArray[0].id !== -2) {
-        console.log(context.query)
+    if (queryText && articleArray[0].id !== -2)
         filteredArticleArray = articleArray.filter(article => filterArticle(queryText, article))
-    } else
+    else
         filteredArticleArray = articleArray;
 
     return (
@@ -414,9 +413,13 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
         context.forceUpdate();
         reloadImages(context);
     }
+
     function listItem(text: string, sortType: SORT_TYPE, divider?: boolean): JSX.Element {
-        return <MenuItem divider={divider} style={context.sortType === sortType ?  {backgroundColor: "rgba(0,0,0,0.1)"} : undefined} onClick={event => setSortType(sortType)}>{text}</MenuItem>
+        return <MenuItem divider={divider}
+                         style={context.sortType === sortType ? {backgroundColor: "rgba(0,0,0,0.1)"} : undefined}
+                         onClick={event => setSortType(sortType)}>{text}</MenuItem>
     }
+
     return (
         <div style={{float: "right"}}>
             <Button style={{marginTop: 15, marginRight: 15}} onClick={event => {
@@ -655,83 +658,99 @@ function ArticleComponent(props: any) {
             <Grid item xs={12} sm={6} md={4} lg={3}>
                 <ContextMenuTrigger disableIfShiftIsPressed id={contextMenuId}>
                     <CardActionArea component={Link} to={(location: any) => {
-                    location.pathname = "/articleView";
+                        location.pathname = "/articleView";
 
-                    location.state = {article: article};
+                        location.state = {article: article};
 
-                    return location;
-                }}>
-                    <Card className={classes.card}>
-                        <LazyImage
-                            returnMode={RETURN_MODE.CARD_MEDIA}
-                            alt={article.title}
-                            className={classes.cardMedia}
-                            payload={article}
-                            getSrc={setImgSrc => {
-                                if (article.picture && article.picture) {
-                                    setImgSrc(base64ToDataUri(article.picture))
-                                } else {
-                                    loadSingleImage("article", article.id, imageResponse => {
-                                        if (imageResponse)
-                                            setImgSrc(base64ToDataUri(imageResponse.file));
-                                    }, context.imageResolution);
-                                }
-                            }}
-                            reload={reload => context.imageReloadArray.push(reload)}
-                        />
-                        <CardContent className={classes.cardContent}>
-                            <Grid container>
-                                <Grid item xs={12}>
-                                    <Typography gutterBottom variant="h5" component="h2">
-                                        {article.title}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <Grid container spacing={2}>
-                                        <Grid item xs>
-                                            <Typography>
-                                                {article.artists.name}
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item>
-                                            <Typography style={{textAlign: "end"}}>
-                                                {article.genre.name}
-                                            </Typography>
+                        return location;
+                    }}>
+                        <Card className={classes.card}>
+                            <LazyImage
+                                returnMode={RETURN_MODE.CARD_MEDIA}
+                                alt={article.title}
+                                className={classes.cardMedia}
+                                payload={article}
+                                getSrc={setImgSrc => {
+                                    if (article.picture && article.picture) {
+                                        setImgSrc(base64ToDataUri(article.picture))
+                                    } else {
+                                        loadSingleImage("article", article.id, imageResponse => {
+                                            if (imageResponse)
+                                                setImgSrc(base64ToDataUri(imageResponse.file));
+                                        }, context.imageResolution);
+                                    }
+                                }}
+                                reload={reload => context.imageReloadArray.push(reload)}
+                            />
+                            <CardContent className={classes.cardContent}>
+                                <Grid container>
+                                    <Grid item xs={12}>
+                                        <Typography gutterBottom variant="h5" component="h2">
+                                            {article.title}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Grid container spacing={2}>
+                                            <Grid item xs>
+                                                <Typography>
+                                                    {article.artists.name}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item>
+                                                <Typography style={{textAlign: "end"}}>
+                                                    {article.genre.name}
+                                                </Typography>
+                                            </Grid>
                                         </Grid>
                                     </Grid>
+                                    <Grid item xs={12}>
+                                        <Typography style={{textAlign: "end"}}>
+                                            {article.price + " €"}
+                                        </Typography>
+                                    </Grid>
                                 </Grid>
-                                <Grid item xs={12}>
-                                    <Typography style={{textAlign: "end"}}>
-                                        {article.price + " €"}
-                                    </Typography>
-                                </Grid>
-                            </Grid>
-                        </CardContent>
-                    </Card>
-                </CardActionArea>
+                            </CardContent>
+                        </Card>
+                    </CardActionArea>
                 </ContextMenuTrigger>
                 <ContextMenu style={{zIndex: 1}} id={contextMenuId}>
-                    <Card style={padding(8,0)}>
-                        <MenuItem  divider style={padding(10,16)} onClick={(event) => {
+                    <Card style={padding(8, 0)}>
+                        <MenuItem divider style={padding(10, 16)} onClick={(event) => {
                             addToShoppingCart(article)
                             showToast(`Artikel Erfolgreich hinzugefügt (${getShoppingCartCount(article)})`, "success");
                         }}><ShoppingCartIcon/>{"⠀"}In den Einkaufswagen</MenuItem>
-                        <MenuItem style={padding(10,16)} onClick={(event) => {
-                            context.filter = Pair.make({file: "", artistOrGenre: article.artists}, "a");
-                            context.forceUpdate();
-                            reloadImages(context);
-                            window.scrollTo({top: 0})
-                        }} disabled={context.filter && context.filter.second === "a"}><ArtistIcon/>{"⠀"}Nach Künstler suchen</MenuItem>
-                        <MenuItem  divider={roleLevel} style={padding(10,16)} onClick={(event) => {
-                            context.filter = Pair.make({file: "", artistOrGenre: article.genre}, "g");
-                            context.forceUpdate();
-                            reloadImages(context);
-                            window.scrollTo({top: 0})
-                        }}disabled={context.filter && context.filter.second === "g"}><GenreIcon/>{"⠀"}Nach Genre suchen</MenuItem>
+                        <ContextMenuItem>
+                            <MenuItem style={padding(10, 16)} onClick={(event) => {
+                                context.filter = Pair.make({
+                                    file: "",
+                                    artistOrGenre: article.artists
+                                }, "a");
+                                context.forceUpdate();
+                                reloadImages(context);
+                                window.scrollTo({top: 0})
+                            }}
+                                      disabled={context.filter && context.filter.second === "a"}><ArtistIcon/>{"⠀"}Nach
+                                Künstler suchen</MenuItem>
+                        </ContextMenuItem>
+                        <ContextMenuItem>
+                            <MenuItem divider={roleLevel} style={padding(10, 16)}
+                                      onClick={(event) => {
+                                          context.filter = Pair.make({
+                                              file: "",
+                                              artistOrGenre: article.genre
+                                          }, "g");
+                                          context.forceUpdate();
+                                          reloadImages(context);
+                                          window.scrollTo({top: 0})
+                                      }} disabled={context.filter && context.filter.second === "g"}><GenreIcon/>{"⠀"}Nach
+                                Genre suchen</MenuItem>
+                        </ContextMenuItem>
                         {roleLevel &&
-                            <MenuItem style={padding(10,16)} onClick={(event) => {
+                        <ContextMenuItem>
+                            <MenuItem style={padding(10, 16)} onClick={(event) => {
                                 history.push("/editArticles", {article})
                             }}><EditIcon/>{"⠀"}Bearbeiten</MenuItem>
+                        </ContextMenuItem>
                         }
                         <ContextMenuItem divider/>
                     </Card>
