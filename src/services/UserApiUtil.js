@@ -1,10 +1,12 @@
 import axios from "axios";
 import {getSessionUser, setSessionUser, setUserLoggedIn} from "./StorageUtil";
 import {showToast} from "../Utilities/Utilities";
+import {setRememberMe} from "./RememberMeUtil";
 
 const apiBaseUrlUserRegister = `http://${window.location.hostname}:8080/user`;
 const apiBaseUrlUserLogin = `http://${window.location.hostname}:8080/user`;
 const apiBaseUrlUserDelete = `http://${window.location.hostname}:8080/user/`;
+export const MY_USER = "myUser";
 
 /**
  * @param {object} payload
@@ -127,8 +129,9 @@ export const deleteUser = (onSuccess, onFail) => {
 export const logoutUser = (onSuccess, onFail) => {
     try {
         console.log('user has been logged out');
-        localStorage.removeItem("myUser");
+        localStorage.removeItem(MY_USER);
         setUserLoggedIn(false);
+        setRememberMe(false);
         onSuccess();
     } catch (e) {
         if (onFail)

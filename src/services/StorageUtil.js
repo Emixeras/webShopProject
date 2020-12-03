@@ -1,11 +1,12 @@
 import {isMobile} from "../Utilities/Utilities";
+import {MY_USER} from "./UserApiUtil";
 
 export const getSessionUser = () => {
-    return JSON.parse(localStorage.getItem('myUser'));
+    return JSON.parse(localStorage.getItem(MY_USER));
 };
 
 export const setSessionUser = (user) => {
-    localStorage.setItem('myUser', JSON.stringify(user));
+    localStorage.setItem(MY_USER, JSON.stringify(user));
 };
 
 export const setUserLoggedIn = (bool) => {

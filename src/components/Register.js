@@ -20,6 +20,7 @@ import {Visibility, VisibilityOff} from "@material-ui/icons";
 import {makeStyles} from "@material-ui/core/styles";
 import {useHistory} from "react-router-dom";
 import {isUserLoggedIn} from "../services/StorageUtil";
+import {setRememberMe} from "../services/RememberMeUtil";
 
 class Register extends Component {
 
@@ -267,7 +268,7 @@ function RegisterForm(props) {
                                     error={that.passwordError}> {that.passwordError ? "Die Passwörter müssen übereinstimmen" : ""}</FormHelperText>
                             </FormControl>
                             <FormControlLabel style={{alignSelf: "start"}}
-                                              control={<Checkbox value="remember" color="primary"/>}
+                                              control={<Checkbox value="remember" color="primary" onClick={event => setRememberMe(event.target.checked)}/>}
                                               label="Angemeldet bleiben"
                             />
                             <Button

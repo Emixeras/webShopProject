@@ -20,6 +20,7 @@ import {useHistory} from "react-router-dom";
 import {Visibility, VisibilityOff} from "@material-ui/icons";
 import {NavigationComponent} from "../Utilities/Utilities.js"
 import {isUserLoggedIn} from "../services/StorageUtil";
+import {setRememberMe} from "../services/RememberMeUtil";
 
 class Login extends Component {
     showPassword = false;
@@ -137,7 +138,7 @@ function LogInForm(props) {
                             </FormControl>
 
                             <FormControlLabel style={{alignSelf: "start"}}
-                                              control={<Checkbox value="remember" color="primary"/>}
+                                              control={<Checkbox value="remember" color="primary" onClick={event => setRememberMe(event.target.checked)}/>}
                                               label="Angemeldet bleiben"
                             />
                             <Button

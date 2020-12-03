@@ -574,9 +574,9 @@ export function filterArticle(query: string, article: Article) {
     return false;
 }
 
-export function orElse<T>(input: T, orElse: T | (() => T)): T {
+export function orElse<T>(input: T, orElse: NonNullable<T> | (() => NonNullable<T>)): NonNullable<T> {
     if (input)
-        return input;
+        return (input as NonNullable<T>);
     else {
         if (typeof orElse === "function")
             return (orElse as Function)();
