@@ -88,6 +88,7 @@ export interface User {
 export enum ROLES {
     USER, EMPLOYEE, ADMIN
 }
+
 //  <------------------------- Types -------------------------
 
 
@@ -146,8 +147,15 @@ export function base64ToDataUri(base64: string): string {
 interface ImageResponseFunction {
     (imageResponse?: ImageResponseType): void
 }
-export function loadSingleImage(type: "article" | "artist", id: number, onFinish: (ImageResponseFunction | Function), imageResolution?: number) {
-    fetch(new Request(`http://${window.location.hostname}:8080/${type}/range;start=${id};end=${id};quality=${imageResolution ? imageResolution : 250}`, {method: 'GET'}))
+
+export function loadSingleImage(type: "article" | "artist" | "genre", id: number, onFinish: (ImageResponseFunction | Function), imageResolution?: number) {
+    let request: string;
+    if (imageResolution !== undefined)
+        request = `http://${window.location.hostname}:8080/${type}/range;start=${id};end=${id};quality=${imageResolution ? imageResolution : 250}`
+    else
+        request = `http://${window.location.hostname}:8080/${type}/${id}`;
+
+    fetch(new Request(request, {method: 'GET'}))
         .then(response => {
             if (response.status === 200) {
                 return response.json();
@@ -387,7 +395,7 @@ interface ImageGrid_props {
     rounded?: boolean | string | "circle" | "small" | "medium" | "large";
 }
 
-export class ImageGrid extends React.Component<ImageGrid_props, ImageGrid_state>{
+export class ImageGrid extends React.Component<ImageGrid_props, ImageGrid_state> {
     articleList?: Article[];
     imageList?: string[];
     style?: React.CSSProperties;
@@ -439,7 +447,7 @@ export class ImageGrid extends React.Component<ImageGrid_props, ImageGrid_state>
         }
 
         this.imageList = this.imageList?.slice(0, 4);
-        
+
         const borderRadius_byIndex = (index: number): string => {
             let ret;
             switch (this.imageList?.length) {
@@ -452,7 +460,7 @@ export class ImageGrid extends React.Component<ImageGrid_props, ImageGrid_state>
                 case 3:
                     switch (index) {
                         default:
-                            ret =  "0px";
+                            ret = "0px";
                             break;
                         case 0:
                             ret = `${borderRadius} ${0}px ${0}px ${0}px`
@@ -468,7 +476,7 @@ export class ImageGrid extends React.Component<ImageGrid_props, ImageGrid_state>
                 case 4:
                     switch (index) {
                         default:
-                            ret =  "0px";
+                            ret = "0px";
                             break;
                         case 0:
                             ret = `${borderRadius} ${0}px ${0}px ${0}px`
@@ -508,7 +516,9 @@ export class ImageGrid extends React.Component<ImageGrid_props, ImageGrid_state>
                             //@ts-ignore
                             <Grid item xs={xs_byIndex(index)}>
                                 {/*<LazyImage getSrc={setImgSrc => setImgSrc(base64ToDataUri(file))}/>*/}
-                                <CardMedia style={{borderRadius: borderRadius_byIndex(index), ...matchParent(true, true)}} image={base64ToDataUri(file)}/>
+                                <CardMedia
+                                    style={{borderRadius: borderRadius_byIndex(index), ...matchParent(true, true)}}
+                                    image={base64ToDataUri(file)}/>
                             </Grid>
                         )
                     })}
@@ -517,6 +527,7 @@ export class ImageGrid extends React.Component<ImageGrid_props, ImageGrid_state>
         );
     }
 }
+
 //  <------------------------- Image -------------------------
 
 
@@ -626,15 +637,16 @@ export function hasCurrentUserRoleLevel(level: "USER" | "EMPLOYEE" | "ADMIN" | n
     // @ts-ignore
     return user && roleMap[user.role] >= roleMap[level];
 }
+
 //  <------------------------- Logic -------------------------
 
 
 //  ------------------------- Comparators ------------------------->
-export function article_comparator (a: Article, b: Article) {
+export function article_comparator(a: Article, b: Article) {
     return name_comparator(a.title, b.title)
 }
 
-export function artistOrGenre_comparator (a: ArtistOrGenre, b: ArtistOrGenre) {
+export function artistOrGenre_comparator(a: ArtistOrGenre, b: ArtistOrGenre) {
     return name_comparator(a.name, b.name)
 }
 
@@ -650,6 +662,7 @@ export function name_comparator(a: string, b: string) {
     }
     return 0;
 }
+
 //  <------------------------- Comparators -------------------------
 
 
@@ -661,7 +674,8 @@ interface RestrictedPage_props {
     style?: React.CSSProperties;
 }
 
-interface RestrictedPage_state {}
+interface RestrictedPage_state {
+}
 
 export class RestrictedPage extends React.Component<RestrictedPage_props, RestrictedPage_state> {
     children: JSX.Element;
@@ -751,10 +765,11 @@ function LogoutAndLoginLink({text}: { text: string }) {
     )
 }
 
-export function useForceUpdate(){
+export function useForceUpdate() {
     const setValue = useState(0)[1];
     return () => setValue(value => ++value);
 }
+
 //  <------------------------- Components -------------------------
 
 
@@ -798,6 +813,7 @@ export function subString(text: string, start: number, end?: number): string {
 }
 
 const dateFormat = require('dateformat')
+
 export function formatDate(date: string | number, pattern?: (string | boolean)): string {
     if (typeof date === "string") {
         if (date.includes("[UTC]"))
@@ -806,6 +822,7 @@ export function formatDate(date: string | number, pattern?: (string | boolean)):
     }
     return dateFormat(date, (typeof pattern === "string" ? pattern : (pattern ? "dd.mm.yyyy HH:MM" : "dd.mm.yyyy")));
 }
+
 //  <------------------------- Convenience -------------------------
 
 
@@ -814,8 +831,8 @@ export function alignCenter(vertical?: boolean, horizontal?: boolean): React.CSS
     return {
         display: "flex",
         height: "100%",
-        alignItems: vertical ?  "center" : undefined,
-        justifyContent: horizontal ? "center": undefined,
+        alignItems: vertical ? "center" : undefined,
+        justifyContent: horizontal ? "center" : undefined,
     }
 }
 
@@ -825,4 +842,5 @@ export function matchParent(parentHeight?: boolean, parentWith?: boolean): React
         width: parentWith ? "100%" : undefined,
     }
 }
+
 //  <------------------------- Styles -------------------------

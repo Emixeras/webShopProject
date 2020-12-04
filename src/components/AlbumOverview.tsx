@@ -357,12 +357,8 @@ export function FilterCard({context}: ContextType<AlbumOverview>) {
                                 let file = context.filter!.first.file;
                                 if (file)
                                     setImgSrc(base64ToDataUri(file));
-                                else {
-                                    if (context.filter!.second === "a")
-                                        loadSingleImage("artist", context.filter!.first.artistOrGenre.id, setImgSrc)
-                                    else
-                                        setImgSrc(context.filter!.first.file)
-                                }
+                                else
+                                    loadSingleImage(context.filter!.second === "a" ? "artist" : "genre", context.filter!.first.artistOrGenre.id, setImgSrc)
                             }}
                             returnMode={RETURN_MODE.CARD_MEDIA}
                             style={{
@@ -391,8 +387,7 @@ export function FilterCard({context}: ContextType<AlbumOverview>) {
                 </Grid>
             </Card>
         </div>
-    )
-        ;
+    );
 }
 
 function UiSettings({context}: ContextType<AlbumOverview>) {

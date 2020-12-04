@@ -65,16 +65,6 @@ function Genre() {
                     </Grid>
                 </Container>
             </main>
-            {/* Footer */}
-            <footer className={classes.footer}>
-                <Typography variant="h6" align="center" gutterBottom>
-                    Footer
-                </Typography>
-                <Typography variant="subtitle1" align="center" color="textSecondary" component="p">
-                    Something here to give the footer a purpose!
-                </Typography>
-            </footer>
-            {/* End footer */}
         </React.Fragment>
     );
 }
@@ -84,7 +74,7 @@ function GenreComponent(props) {
     let genre = props.genre;
 
     return (
-        <Grid item /*key={article}*/ xs={12} sm={6} md={4} lg={3}>
+        <Grid item xs={12} sm={6} md={4} lg={3}>
             <CardActionArea component={Link} to={(location) => {
                 location.pathname = "/albums";
                 location.state = {filter: renameObjectKey(genre, "genre", "artistOrGenre"), type: 'g'};
