@@ -19,6 +19,7 @@ import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import DescriptionIcon from '@material-ui/icons/Description';
 import SwaggerIcon from '@material-ui/icons/BallotOutlined';
+import MoreIcon from '@material-ui/icons/MoreVert';
 import logo from "../assets/text4549.png";
 import AlbumIcon from '@material-ui/icons/Album';
 import LibraryMusicIcon from '@material-ui/icons/LibraryMusic';
@@ -35,11 +36,12 @@ import MenuItem from "@material-ui/core/MenuItem";
 import {ExitToApp} from "@material-ui/icons";
 import Grid from "@material-ui/core/Grid";
 import {logoutUser} from "../services/UserApiUtil";
-import {isMobile, showToast} from "../Utilities/Utilities";
+import {isMobile, margin, NavigationComponent, padding, showToast} from "../Utilities/Utilities";
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import EditIcon from '@material-ui/icons/Edit';
-import {hasCurrentUserRoleLevel, Pair} from "../Utilities/TsUtilities";
+import {ExecutableComponent, hasCurrentUserRoleLevel, Pair} from "../Utilities/TsUtilities";
 import HistoryIcon from '@material-ui/icons/History';
+import PropTypes from "prop-types";
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -83,7 +85,7 @@ const useStyles = makeStyles((theme) => ({
     },
     content: {
         flexGrow: 1,
-        padding: theme.spacing(3),
+        // padding: theme.spacing(3),
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
@@ -114,7 +116,6 @@ export function addDrawerCallback(drawerCallback, type = 'after') {
 /**
  * @param {function} drawerCallback Der selbe Clallback wie beim Hinzufügen
  */
-
 export function removeDrawerCallback(drawerCallback) {
     drawerStateCallbackList.delete(drawerCallback, (inList, toDelete) => inList.first === toDelete)
 }
@@ -156,12 +157,17 @@ function ListItemLink(props) {
 
 let drawerClose_ref;
 
-export default function MenuDrawer(props) {
+MenuDrawer.propTypes = {
+    children: PropTypes.element,
+    contentContainerStyling: PropTypes.object,
+    contentRootOptions: PropTypes.object
+};
+
+export default function MenuDrawer({contentContainerStyling, children, contentRootOptions}) {
     const classes = useStyles();
     const theme = useTheme();
     const [open, setOpen] = React.useState(isDrawerVisible);
     const [shouldShift, setShouldShift] = React.useState(() => !isMobile());
-    const history = useHistory();
 
     useEffect(() => {
         let mobileCallback = isMobile => setShouldShift(!isMobile);
@@ -197,54 +203,17 @@ export default function MenuDrawer(props) {
                     [classes.appBarShift]: open && !isMobile(),
                 }, "no-margin-left-on-print")}
             >
-                <Toolbar>
-                    <div>
-                        <IconButton
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={handleDrawerOpen}
-                            edge="start"
-                            style={{alignSelf: 'center'}}
-                            className={clsx(classes.menuButton, open && classes.hide)}>
-                            <MenuIcon/>
-                        </IconButton>
-                    </div>
-                    <div style={{
-                        maxWidth: 58 * (hasCurrentUserRoleLevel("ADMIN") ? 4 : 3) - (open ? 0 : 48),
-                        minWidth: 0,
-                        // backgroundColor: "green",
-                        flexGrow: 100,
-                        flexShrink: 100,
-                        flexBasis: "auto",
-                        height: 15
-                    }}/>
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        flexGrow: 1,
-                        flexShrink: 1,
-                        flexBasis: "auto",
-                        // backgroundColor: "red",
-                    }}>
-                        <img style={{alignSelf: 'center', cursor: "pointer"}} height="50" src={logo}
-                             onClick={event => history.push("/", {home: true})}
-                             alt="fireSpot"/>
-                    </div>
-                    {/*<div>*/}
-                    <Link to="/">
-                        <IconButton style={{margin: 5, color: "white"}} component="span"
-                                    edge="start">
-                            <HomeIcon/>
-                        </IconButton>
-                    </Link>
-                    <Link to="/shoppingCart">
-                        <IconButton style={{margin: 5, color: "white"}} component="span">
-                            <ShoppingCartIcon/>
-                        </IconButton>
-                    </Link>
-                    <ProfileButton/>
-                    <DevButton/>
-                    {/*</div>*/}
+                <Toolbar style={{display: 'flex', flexDirection: 'row', alignItems: "center"}}>
+                    <IconButton
+                        color="inherit"
+                        aria-label="open drawer"
+                        onClick={handleDrawerOpen}
+                        edge="start"
+                        style={{alignSelf: 'center'}}
+                        className={clsx(classes.menuButton, open && classes.hide)}>
+                        <MenuIcon/>
+                    </IconButton>
+                    <ToolbarLogoAndButtons drawerOpen={open} shouldShift={shouldShift}/>
                 </Toolbar>
             </AppBar>
             <Drawer
@@ -310,13 +279,119 @@ export default function MenuDrawer(props) {
                 }, "no-margin-left-on-print")}
             >
                 <div className={classes.drawerHeader}/>
-                {props.children}
+                <div id={"menuDrawer_contentContainer"}
+                     style={{...(shouldShift ? padding(24) : padding(12, 0)), ...contentContainerStyling}}>
+
+                    {contentRootOptions ?
+                        <div>
+                            <div>
+                            </div>
+                        </div>
+                        : children}
+                </div>
             </main>
         </div>
     );
 }
 
-function ProfileButton() {
+function ToolbarLogoAndButtons({drawerOpen, shouldShift}) {
+    const history = useHistory();
+    let style = {display: 'flex', flexDirection: 'row'};
+    let widthStyle = {...style, width: '100%'};
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    let color = shouldShift ? "white" : "#2D2D2D";
+    const open = Boolean(anchorEl);
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    let allButtons = (
+        <div style={style}>
+            {/*
+            <Link to="/">
+                <IconButton style={{margin: 5, color: color}} component="span"
+                            edge="start">
+                    <HomeIcon/>
+                </IconButton>
+            </Link>
+*/}
+            <Link to="/shoppingCart">
+                <IconButton style={{margin: 5, color: color}} component="span">
+                    <ShoppingCartIcon/>
+                </IconButton>
+            </Link>
+            <ProfileButton><AccountCircleIcon style={{color: color}}/></ProfileButton>
+            <DevButton><DeveloperBoardIcon style={{color: color}}/></DevButton>
+        </div>
+    )
+
+    let buttonCount = allButtons.props.children.length;
+
+    let logoComponent = (
+        <div style={widthStyle}>
+            <div style={{
+                maxWidth: shouldShift ? (58 * buttonCount - (drawerOpen ? 0 : 48)) : (drawerOpen ? 53 : 1),
+                minWidth: 0,
+                //backgroundColor: "green",
+                flexGrow: 100,
+                flexShrink: 100,
+                flexBasis: "auto",
+                height: 15
+            }}/>
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                flexGrow: 1,
+                flexShrink: 1,
+                flexBasis: "auto",
+                // backgroundColor: "red",
+            }}>
+                <img style={{alignSelf: 'center', cursor: "pointer"}} height="50" src={logo}
+                     onClick={event => history.push("/", {home: true})}
+                     alt="fireSpot"/>
+            </div>
+        </div>
+    )
+
+    return (
+        <div style={widthStyle}>
+            {logoComponent}
+            {shouldShift ?
+                allButtons
+                :
+                <div>
+                    <IconButton style={{marginLeft: 16, marginRight: -12, color: "white"}}
+                                component="span"
+                                edge="end"
+                                onClick={event => setAnchorEl(event.currentTarget)}>
+                        <MoreIcon/>
+                    </IconButton>
+                    <Menu
+                        anchorEl={anchorEl}
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        open={open}
+                        onClose={handleClose}
+                    >
+                        <div style={margin(0, 8)}>
+                            {allButtons}
+                        </div>
+                    </Menu>
+
+                </div>
+            }
+        </div>
+    )
+}
+
+function ProfileButton({children}) {
     const history = useHistory();
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
@@ -339,7 +414,7 @@ function ProfileButton() {
                             else
                                 history.push("/login")
                         }}>
-                <AccountCircleIcon/>
+                {children}
             </IconButton>
             {/*</Link>*/}
             <Menu
@@ -409,7 +484,7 @@ function ProfileButton() {
     )
 }
 
-function DevButton() {
+function DevButton({children}) {
     const history = useHistory();
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
@@ -428,7 +503,7 @@ function DevButton() {
                 <IconButton style={{margin: 5, color: "white"}} component="span"
                             aria-haspopup="true"
                             onClick={handleMenu}>
-                    <DeveloperBoardIcon/>
+                    {children}
                 </IconButton>
                 {/*</Link>*/}
                 <Menu

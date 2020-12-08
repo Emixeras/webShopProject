@@ -8,7 +8,7 @@ import {
     shallowEqual,
     isEmail,
     addAlphaToHexColor,
-    hexToRgbA,
+    hexToRgbA, isMobile,
 } from "../Utilities/Utilities";
 import MenuDrawer from "./MenuDrawer";
 import Box from "@material-ui/core/Box";
@@ -40,7 +40,7 @@ class Dev extends React.Component {
                         justifyContent: 'center'
                     }}>
                         <Grid container
-                              style={{width: '85%', maxWidth: "800px"}}
+                              style={{width: isMobile() ? '100%' : '85%', maxWidth: "800px"}}
                               spacing={5}>
                             {this.generateComponents()}
                         </Grid>

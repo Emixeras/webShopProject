@@ -10,7 +10,14 @@ import {
     Typography,
 } from "@material-ui/core";
 import MenuDrawer from "./MenuDrawer";
-import {deepEqual, margin, padding, shallowEqual, showToast} from "../Utilities/Utilities";
+import {
+    deepEqual,
+    isMobile,
+    margin,
+    padding,
+    shallowEqual,
+    showToast
+} from "../Utilities/Utilities";
 import SimpleReactFileUpload from "./SimpleReactFileUpload";
 import {Combobox} from 'react-widgets'
 import 'react-widgets/dist/css/react-widgets.css';
@@ -30,7 +37,7 @@ import {
     artistOrGenre_comparator,
     Pair,
     RestrictedPage,
-    RETURN_MODE, Article
+    RETURN_MODE, Article, ExecutableComponent
 } from "../Utilities/TsUtilities";
 import {createNewArticle, deleteArticle, updateArticle} from "../services/ItemApiUtil";
 import {createNewArtist, deleteArtist, updateArtist} from "../services/ArtistApiUtil";
@@ -182,14 +189,14 @@ export default class EditArticles extends React.Component<IProps, IState> {
 
         return (
             <RestrictedPage>
-                <MenuDrawer>
+                <MenuDrawer >
                     <div style={{
                         marginTop: 5,
                         display: 'flex',
                         justifyContent: 'center'
                     }}>
                         <Grid container
-                              style={{width: '85%', maxWidth: "800px"}}
+                              style={{width: isMobile() ? '100%' : '85%', maxWidth: "800px"}}
                               spacing={3}>
                             <Grid item xs={12}>
                                 <Typography style={{
@@ -323,14 +330,14 @@ export default class EditArticles extends React.Component<IProps, IState> {
                             <Grid item xs={12}>
                                 <Card style={padding(18)}>
                                     <Grid container spacing={2}>
-                                        <Grid item md={9} sm={12}>
+                                        <Grid item sm={9} xs={12}>
                                             <TextField fullWidth
                                                        value={this.state.title}
                                                        label={"Album Titel"}
                                                        onChange={event => this.setState({title: event.target.value})}
                                                        variant={"outlined"}/>
                                         </Grid>
-                                        <Grid item md={3} sm={12}>
+                                        <Grid item sm={3} xs={12}>
                                             <TextField fullWidth
                                                        variant="outlined"
                                                        onChange={event => {
@@ -348,7 +355,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                        }}
                                             />
                                         </Grid>
-                                        <Grid item md={6} sm={12}>
+                                        <Grid item sm={6} xs={12}>
                                             <Typography style={{
                                                 color: "rgba(0, 0, 0, 0.54)",
                                                 fontWeight: 500
@@ -374,7 +381,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
 
                                             </Grid>
                                         </Grid>
-                                        <Grid item md={6} sm={12}>
+                                        <Grid item sm={6} xs={12}>
                                             <Typography style={{
                                                 color: "rgba(0, 0, 0, 0.54)",
                                                 fontWeight: 500
@@ -397,76 +404,80 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                        label={"Beschreibung"}
                                                        variant={"outlined"}/>
                                         </Grid>
-                                        <Grid item md={8} sm={12}>
-                                            <Typography style={{
-                                                color: "rgba(0, 0, 0, 0.54)",
-                                                fontWeight: 500
-                                            }} variant="h6">Album Cover</Typography>
-                                            <div style={{width: 250, height: 250}}>
-                                                <div style={{
-                                                    width: 250,
-                                                    height: 250,
-                                                    zIndex: 1,
-                                                    position: "absolute"
-                                                }}>
-                                                    <LazyImage
-                                                        style={{
-                                                            width: "100%",
-                                                            height: "100%",
-                                                            zIndex: 5
-                                                        }}
-                                                        rounded
-                                                        alt={this.state.title}
-                                                        payload={Pair.make(this.state.id, this.currentPicture)}
-                                                        shouldImageUpdate={(oldPayload: Pair<number, File>, newPayload: Pair<number, File>) => {
-                                                            return oldPayload.first !== newPayload.first || oldPayload.second !== newPayload.second
-                                                        }}
-                                                        getSrc={setImgSrc => {
-                                                            if (this.currentPicture) {
-                                                                setImgSrc(URL.createObjectURL(this.currentPicture));
-                                                                this.setFileUploadDefaultVisibility(false);
-                                                            } else if (this.state.id !== -1) {
-                                                                loadSingleImage("article", this.state.id, imageResponse => {
-                                                                    if (imageResponse) {
-                                                                        setImgSrc(base64ToDataUri(imageResponse.file));
+                                        <Grid item xs={12}>
+                                            <Grid container spacing={1} wrap={"wrap-reverse"}>
+                                                <Grid item sm={8} xs={12}>
+                                                    <Typography style={{
+                                                        color: "rgba(0, 0, 0, 0.54)",
+                                                        fontWeight: 500
+                                                    }} variant="h6">Album Cover</Typography>
+                                                    <div style={{width: 250, height: 250}}>
+                                                        <div style={{
+                                                            width: 250,
+                                                            height: 250,
+                                                            zIndex: 1,
+                                                            position: "absolute"
+                                                        }}>
+                                                            <LazyImage
+                                                                style={{
+                                                                    width: "100%",
+                                                                    height: "100%",
+                                                                    zIndex: 5
+                                                                }}
+                                                                rounded
+                                                                alt={this.state.title}
+                                                                payload={Pair.make(this.state.id, this.currentPicture)}
+                                                                shouldImageUpdate={(oldPayload: Pair<number, File>, newPayload: Pair<number, File>) => {
+                                                                    return oldPayload.first !== newPayload.first || oldPayload.second !== newPayload.second
+                                                                }}
+                                                                getSrc={setImgSrc => {
+                                                                    if (this.currentPicture) {
+                                                                        setImgSrc(URL.createObjectURL(this.currentPicture));
                                                                         this.setFileUploadDefaultVisibility(false);
+                                                                    } else if (this.state.id !== -1) {
+                                                                        loadSingleImage("article", this.state.id, imageResponse => {
+                                                                            if (imageResponse) {
+                                                                                setImgSrc(base64ToDataUri(imageResponse.file));
+                                                                                this.setFileUploadDefaultVisibility(false);
+                                                                            } else
+                                                                                this.setFileUploadDefaultVisibility(true);
+                                                                        });
                                                                     } else
                                                                         this.setFileUploadDefaultVisibility(true);
-                                                                });
-                                                            } else
-                                                                this.setFileUploadDefaultVisibility(true);
 
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div style={{
-                                                    width: 250,
-                                                    height: 250,
-                                                    zIndex: 2,
-                                                    position: "absolute",
-                                                }}>
-                                                    <SimpleReactFileUpload
-                                                        onFileSelected={(file: File) => {
-                                                            this.currentPicture = file;
-                                                            this.forceUpdate();
-                                                        }}
-                                                        setDefaultVisibility={((setVisibility: (visibility: boolean) => void) => this.setFileUploadDefaultVisibility = setVisibility)}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </Grid>
-                                        <Grid item md={4} sm={12}>
-                                            <TextField fullWidth
-                                                       value={this.state.ean === -1 ? "" : this.state.ean}
-                                                       onChange={event => {
-                                                           let newValue = event.target.value;
-                                                           if (/^\d*$/.test(newValue))
-                                                               this.setState({ean: newValue ? +newValue : -1});
-                                                       }}
-                                                       error={eanError}
-                                                       helperText={eanError ? "Keine valide EAN" : ""}
-                                                       label={"EAN"}
-                                                       variant={"outlined"}/>
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <div style={{
+                                                            width: 250,
+                                                            height: 250,
+                                                            zIndex: 2,
+                                                            position: "absolute",
+                                                        }}>
+                                                            <SimpleReactFileUpload
+                                                                onFileSelected={(file: File) => {
+                                                                    this.currentPicture = file;
+                                                                    this.forceUpdate();
+                                                                }}
+                                                                setDefaultVisibility={((setVisibility: (visibility: boolean) => void) => this.setFileUploadDefaultVisibility = setVisibility)}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </Grid>
+                                                <Grid item sm={4} xs={12}>
+                                                    <TextField fullWidth
+                                                               value={this.state.ean === -1 ? "" : this.state.ean}
+                                                               onChange={event => {
+                                                                   let newValue = event.target.value;
+                                                                   if (/^\d*$/.test(newValue))
+                                                                       this.setState({ean: newValue ? +newValue : -1});
+                                                               }}
+                                                               error={eanError}
+                                                               helperText={eanError ? "Keine valide EAN" : ""}
+                                                               label={"EAN"}
+                                                               variant={"outlined"}/>
+                                                </Grid>
+                                            </Grid>
                                         </Grid>
                                         <Grid item xs={12}>
                                             {/*<Grid container justify="flex-end">*/}

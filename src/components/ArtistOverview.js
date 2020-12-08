@@ -98,7 +98,7 @@ function ArtistComponent({artistResponse}) {
     //     debugger
 
     return (
-        <Grid item /*key={article}*/ xs={12} sm={6} md={4} lg={3}>
+        <Grid item className={"mobile gridItem"} xs={6} md={4} lg={3}>
             <CardActionArea component={Link} to={(location) => {
                 // if (artistResponse.artistOrGenre.id === 2)
                 //     debugger

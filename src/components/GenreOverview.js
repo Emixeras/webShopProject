@@ -74,7 +74,7 @@ function GenreComponent(props) {
     let genre = props.genre;
 
     return (
-        <Grid item xs={12} sm={6} md={4} lg={3}>
+        <Grid item className={"mobile gridItem"} xs={6} md={4} lg={3}>
             <CardActionArea component={Link} to={(location) => {
                 location.pathname = "/albums";
                 location.state = {filter: renameObjectKey(genre, "genre", "artistOrGenre"), type: 'g'};

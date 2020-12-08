@@ -765,11 +765,17 @@ function LogoutAndLoginLink({text}: { text: string }) {
     )
 }
 
+// ---------------
+
 export function useForceUpdate() {
     const setValue = useState(0)[1];
     return () => setValue(value => ++value);
 }
 
+export function ExecutableComponent({execute}: {execute: () => void}) {
+    execute();
+    return null;
+}
 //  <------------------------- Components -------------------------
 
 

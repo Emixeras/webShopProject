@@ -3,7 +3,7 @@ import {Link} from "react-router-dom";
 import MenuDrawer from "./MenuDrawer";
 import {loginUser} from "../services/UserApiUtil";
 import {makeStyles} from '@material-ui/core/styles';
-import {isEmail, padding} from "../Utilities/Utilities";
+import {isEmail, isMobile, padding} from "../Utilities/Utilities";
 import {
     Card,
     Avatar,
@@ -89,7 +89,7 @@ function LogInForm(props) {
                 display: 'flex',
                 justifyContent: 'center'
             }}>
-                <div style={{width: '85%', maxWidth: "450px"}}>
+                <div style={{width: isMobile() ? '92%' : '85%', maxWidth: "450px"}}>
                     <Card style={padding(25)}>
                         <div className={classes.paper}>
                             <Avatar className={classes.avatar}>

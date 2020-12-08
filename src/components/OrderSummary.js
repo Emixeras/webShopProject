@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {NavigationComponent, showToast} from "../Utilities/Utilities";
+import {isMobile, NavigationComponent, showToast} from "../Utilities/Utilities";
 import Grid from "@material-ui/core/Grid";
 import {
     Card,
@@ -48,7 +48,7 @@ class OrderSummary extends Component {
                         justifyContent: 'center'
                     }}>
                         <Grid container
-                              style={{width: '85%', maxWidth: "800px"}}
+                              style={{width: isMobile() ? '100%' : '85%', maxWidth: "800px"}}
                               spacing={3}>
                             <Grid item xs={12}>
                                 <Card style={padding(18)}>

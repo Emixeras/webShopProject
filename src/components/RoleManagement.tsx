@@ -10,7 +10,7 @@ import {
 import MenuDrawer from "./MenuDrawer";
 import axios from "axios";
 import {getSessionUser} from "../services/StorageUtil";
-import {padding, showToast} from "../Utilities/Utilities";
+import {isMobile, padding, showToast} from "../Utilities/Utilities";
 import {
     Button,
     ButtonGroup,
@@ -86,7 +86,7 @@ export default class RoleManagement extends React.Component<RoleManagement_State
                         display: 'flex',
                         justifyContent: 'center'
                     }}>
-                        <div style={{width: '85%', maxWidth: "800px"}}>
+                        <div style={{width: isMobile() ? '93%' : '85%', maxWidth: "800px"}}>
                             <RoleList context={this}/>
                         </div>
                     </div>

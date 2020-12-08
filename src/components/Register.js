@@ -1,4 +1,4 @@
-import {NavigationComponent, titles} from "../Utilities/Utilities";
+import {isMobile, NavigationComponent, titles} from "../Utilities/Utilities";
 import {
     Card,
     Avatar,
@@ -133,7 +133,7 @@ function RegisterForm(props) {
                 display: 'flex',
                 justifyContent: 'center'
             }}>
-                <div style={{width: '85%', maxWidth: "450px"}}>
+                <div style={{width: isMobile() ? '92%' : '85%', maxWidth: "450px"}}>
                     <Card style={padding(25)}>
                         <div className={classes.paper}>
                             <Avatar className={classes.avatar}>

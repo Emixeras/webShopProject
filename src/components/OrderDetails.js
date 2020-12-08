@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {NavigationComponent} from "../Utilities/Utilities";
+import {isMobile, NavigationComponent} from "../Utilities/Utilities";
 import Grid from "@material-ui/core/Grid";
 import {
     Card,
@@ -60,7 +60,7 @@ export default class OrderDetails extends Component {
                         justifyContent: 'center'
                     }}>
                         <Grid container
-                              style={{width: '85%', maxWidth: "800px"}}
+                              style={{width: isMobile() ? '100%' : '85%', maxWidth: "800px"}}
                               spacing={3}>
                             <Grid item xs={12}>
                                 <Card style={{
@@ -151,7 +151,7 @@ export default class OrderDetails extends Component {
                                                     showChangeCount={false}
                                                     shoppingCart = {this.state.shoppingCart}
                                                 />
-                                                <hr/>
+                                                <hr className={"orderDetail-divider"}/>
                                             </Grid>
                                             <Grid item xs={12}>
                                                 <Grid container
@@ -160,7 +160,7 @@ export default class OrderDetails extends Component {
                                                       justify="flex-end"
                                                       spacing={3}>
                                                     <Grid item>
-                                                        <div style={padding(0,90,0,0)}>
+                                                        <div className={"orderDetail-paddingRight"} style={padding(0,90,0,0)}>
                                                             <b>Artikel</b> ({this.state.totalItemCount} Stk.): {this.state.totalPriceWithoutShipping.toFixed(2)} €
                                                         </div>
                                                     </Grid>
@@ -173,7 +173,7 @@ export default class OrderDetails extends Component {
                                                       justify="flex-end"
                                                       spacing={3}>
                                                     <Grid item>
-                                                        <div style={padding(0,90,0,0)}>
+                                                        <div className={"orderDetail-paddingRight"} style={padding(0,90,0,0)}>
                                                             zzgl. Versand 5.99 €
                                                         </div>
                                                     </Grid>
@@ -187,7 +187,7 @@ export default class OrderDetails extends Component {
                                                       justify="flex-end"
                                                       spacing={3}>
                                                     <Grid item>
-                                                        <div style={padding(0,90,0,0)}>
+                                                        <div className={"orderDetail-paddingRight"} style={padding(0,90,0,0)}>
                                                             <b>Gesamtpreis</b> {(this.state.totalPriceWithoutShipping + 5.99).toFixed(2)} €
                                                         </div>
                                                     </Grid>

@@ -1,5 +1,5 @@
 import React, {Component, useState} from 'react';
-import {NavigationComponent, titles} from "../Utilities/Utilities";
+import {isMobile, NavigationComponent, titles} from "../Utilities/Utilities";
 import Grid from "@material-ui/core/Grid";
 import {
     Card,
@@ -73,7 +73,7 @@ class Profile extends Component {
                         justifyContent: 'center'
                     }}>
                         <Grid container
-                              style={{width: '85%', maxWidth: "800px"}}
+                              style={{width: isMobile() ? '100%' : '85%', maxWidth: "800px"}}
                               spacing={3}>
                             <Grid item xs={12}>
                                 <Card style={padding(18)}>

@@ -123,7 +123,7 @@ function OrderList({orderArray, context}) {
                                     </Grid>
                                 </Grid>
                                 <Grid item xs>
-                                    <Grid container style={margin(0, 15)} spacing={2} direction={"column"}>
+                                    <Grid container style={margin(0, 15, 0, 0)} spacing={2} direction={"column"}>
                                         <Grid item>
                                             <b>Gesamtpreis:</b> {(entry.fullPrice + entry.order.shipping).toFixed(2)} €
                                         </Grid>

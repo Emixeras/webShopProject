@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import CardActionArea from "@material-ui/core/CardActionArea";
-import {margin, NavigationComponent, padding, showToast} from "../Utilities/Utilities";
+import {isMobile, margin, NavigationComponent, padding, showToast} from "../Utilities/Utilities";
 import {
     article_comparator,
     base64ToDataUri,
@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
     },
     heroContent: {
         backgroundColor: theme.palette.background.paper,
-        padding: theme.spacing(3, 0, 2),
+        padding: theme.spacing(3, 1.6, 2, 0),
     },
     heroButtons: {
         marginTop: theme.spacing(4),
@@ -141,7 +141,7 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
             return <NavigationComponent to={"/albums"}/>;
         }
         return (
-            <MenuDrawer>
+            <MenuDrawer contentContainerStyling={isMobile() ? padding(12, 0, 12, 12) : padding(24, 8, 24, 24)}>
                 <Album context={this}/>
             </MenuDrawer>
         )
@@ -219,72 +219,70 @@ function Album(props: ContextType<AlbumOverview>) {
         filteredArticleArray = articleArray;
 
     return (
-        <React.Fragment>
-            <main>
-                <div className={classes.heroContent}>
-                    <Container maxWidth="sm">
-                        {!context.filter ?
-                            <div>
-                                <Typography component="h1" variant="h2" align="center"
-                                            color="textPrimary"
-                                            gutterBottom>
-                                    Unsere Alben
-                                </Typography>
-                                < Typography variant="h5" align="center" color="textSecondary"
-                                             paragraph>
-                                    Auf dieser Seite können Sie durch unsere Angebote stöbern
-                                </Typography>
-                            </div>
-                            :
-                            /*<FilterCard context={context}/>*/
-                            <FilterCard context={context}/>
-                        }
-                    </Container>
-                    <Container maxWidth={"md"} style={{marginTop: 40}}>
-                        <FormControl fullWidth variant="outlined">
-                            <InputLabel htmlFor="albums-search">Suche</InputLabel>
-                            <OutlinedInput
-                                id="albums-search"
-                                onChange={event => context.query.first = event.target.value.toLowerCase()}
-                                onKeyUp={(event) => {
-                                    if (event.key === 'Enter') {
-                                        context.forceUpdate();
-                                        context.query.second = true;
-                                    }
-                                }}
-                                placeholder={"Titel: t, Künstler: a, Genre; g, Beschreibung: d, Preis: p (x-x), EAN: e"}
-                                endAdornment={
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            aria-label="toggle password visibility"
-                                            onClick={event => {
-                                                context.forceUpdate();
-                                                context.query.second = true;
-                                            }}
-                                            edge="end"
-                                        >
-                                            {<SearchIcon/>}
-                                        </IconButton>
-                                    </InputAdornment>
-                                }
-                                labelWidth={45}
-                            />
-                        </FormControl>
-                        <UiSettings context={context}/>
-                    </Container>
-                </div>
-                <Container className={classes.cardGrid} maxWidth="lg">
-                    {filteredArticleArray.length > 0 ?
-                        <GridList context={context} filteredArticleArray={filteredArticleArray}/>
+        <div className={"mobile"}>
+            <div className={classes.heroContent} style={{paddingRight: 12}}>
+                <Container maxWidth="sm">
+                    {!context.filter ?
+                        <div>
+                            <Typography component="h1" variant="h2" align="center"
+                                        color="textPrimary"
+                                        gutterBottom>
+                                Unsere Alben
+                            </Typography>
+                            < Typography variant="h5" align="center" color="textSecondary"
+                                         paragraph>
+                                Auf dieser Seite können Sie durch unsere Angebote stöbern
+                            </Typography>
+                        </div>
                         :
-                        <Typography style={{marginTop: 50}} variant="h6" align="center"
-                                    gutterBottom>
-                            Keine Alben gefunden
-                        </Typography>
+                        /*<FilterCard context={context}/>*/
+                        <FilterCard context={context}/>
                     }
                 </Container>
-            </main>
-        </React.Fragment>
+                <Container maxWidth={"md"} style={{marginTop: 40}}>
+                    <FormControl fullWidth variant="outlined">
+                        <InputLabel htmlFor="albums-search">Suche</InputLabel>
+                        <OutlinedInput
+                            id="albums-search"
+                            onChange={event => context.query.first = event.target.value.toLowerCase()}
+                            onKeyUp={(event) => {
+                                if (event.key === 'Enter') {
+                                    context.forceUpdate();
+                                    context.query.second = true;
+                                }
+                            }}
+                            placeholder={"Titel: t, Künstler: a, Genre; g, Beschreibung: d, Preis: p (x-x), EAN: e"}
+                            endAdornment={
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={event => {
+                                            context.forceUpdate();
+                                            context.query.second = true;
+                                        }}
+                                        edge="end"
+                                    >
+                                        {<SearchIcon/>}
+                                    </IconButton>
+                                </InputAdornment>
+                            }
+                            labelWidth={45}
+                        />
+                    </FormControl>
+                    <UiSettings context={context}/>
+                </Container>
+            </div>
+            <Container className={classes.cardGrid} maxWidth="lg" style={{paddingRight: 0}}>
+                {filteredArticleArray.length > 0 ?
+                    <GridList context={context} filteredArticleArray={filteredArticleArray}/>
+                    :
+                    <Typography style={{marginTop: 50}} variant="h6" align="center"
+                                gutterBottom>
+                        Keine Alben gefunden
+                    </Typography>
+                }
+            </Container>
+        </div>
     );
 }
 
@@ -574,6 +572,7 @@ function GridList({context, filteredArticleArray}: { context: AlbumOverview, fil
     return (
         <InfiniteScroll
             style={{width: "100%"}}
+            className={"albumOverview-infiniteScroll"}
             dataLength={shortedFilteredArticleArray.length}
             next={fetchMoreData}
             hasMore={context.hasMore}
@@ -607,7 +606,7 @@ function ArticleComponent(props: any) {
     const history = useHistory();
     if (isDummy) {
         return (
-            <Grid item xs={12} sm={6} md={4} lg={3}>
+            <Grid item xs={6} md={4} lg={3} className={"gridItem"}>
                 <Card className={classes.card}>
                     <CardMedia className={classes.cardMedia}/>
                     <CardContent className={classes.cardContent}>
@@ -650,8 +649,8 @@ function ArticleComponent(props: any) {
     } else {
         let roleLevel = hasCurrentUserRoleLevel();
         return (
-            <Grid item xs={12} sm={6} md={4} lg={3}>
-                <ContextMenuTrigger disableIfShiftIsPressed id={contextMenuId}>
+            <Grid item xs={6} md={4} lg={3} className={"albumOverview-gridItem"}>
+                <ContextMenuTrigger holdToDisplay={-1} disableIfShiftIsPressed id={contextMenuId}>
                     <CardActionArea component={Link} to={(location: any) => {
                         location.pathname = "/articleView";
 

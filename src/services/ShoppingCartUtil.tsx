@@ -1,5 +1,6 @@
 import React from "react";
 import {
+    alignCenter,
     Article,
     base64ToDataUri,
     callIfExists,
@@ -12,6 +13,7 @@ import RemoveIcon from '@material-ui/icons/RemoveCircleOutline';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {Link} from "react-router-dom";
 import {margin, showToast} from "../Utilities/Utilities";
+// import "../styling/mobile.css"
 
 const SHOPPING_CART: string = "SHOPPING_CART";
 const emptyShoppingCart: ShoppingCartObject = {entries: []};
@@ -208,11 +210,11 @@ export class ShoppingCartList extends React.Component<ShoppingCartList_props, {}
 
     render() {
         return (
-            <Grid container spacing={2}>
+            <Grid container spacing={1}>
                 {
                     this.entryArray.map((entry, index) => {
                         return <ShoppingCartListItem update={() => callIfExists(this.update)}
-                                                     entry={entry} index={index}
+                                                     entry={entry} index={index} array={this.entryArray}
                                                      showChangeCount={this.props.showChangeCount}
                                                      isDetails={!!this.props.shoppingCart}/>
                     })
@@ -226,6 +228,7 @@ interface ShoppingCartListItem_props {
     isDetails: boolean;
     entry: ShoppingCartEntry;
     index: number;
+    array: ShoppingCartEntry[];
     showChangeCount: boolean;
     update: () => void;
 }
@@ -250,7 +253,7 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
         this.article = this.entry.article;
         this.update = props.update;
         this.count = this.isDetails ? props.entry.count : getShoppingCartCount(this.article);
-        this.price = this.isDetails ? (parseFloat(props.entry.article.price)*props.entry.count) : parseFloat(getShoppingCartPrice(this.article));
+        this.price = this.isDetails ? (parseFloat(props.entry.article.price) * props.entry.count) : parseFloat(getShoppingCartPrice(this.article));
     }
 
     componentWillUpdate(nextProps: Readonly<ShoppingCartListItem_props>, nextState: Readonly<{}>, nextContext: any) {
@@ -261,29 +264,26 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
         this.article = this.entry.article;
         this.update = nextProps.update;
         this.count = this.isDetails ? nextProps.entry.count : getShoppingCartCount(this.article);
-        this.price = this.isDetails ? (parseFloat(nextProps.entry.article.price)*nextProps.entry.count) : parseFloat(getShoppingCartPrice(this.article));
+        this.price = this.isDetails ? (parseFloat(nextProps.entry.article.price) * nextProps.entry.count) : parseFloat(getShoppingCartPrice(this.article));
     }
 
     render() {
         let sCc = this.showChangeCount;
         return (
-            <Grid item xs={12}
-                  style={{borderRadius: "4px", ...(this.index % 2 === 1 ? {backgroundColor: "rgba(0,0,0,0.05)"} : {})}}>
-                <Grid container>
-                    <Grid item>
-                        <div style={{
-                            display: "flex",
-                            height: "100%",
-                            alignItems: "center"
-                        }}>
-
+            <Grid item xs={12} className={"mobile"}
+                  style={{
+                      borderRadius: "4px",
+                      padding: 8, ...(this.index % 2 === 1 ? {backgroundColor: "rgba(0,0,0,0.05)"} : {backgroundColor: "rgba(0,0,0,0.0)"})
+                  }}>
+                <Grid container spacing={2}>
+                    <Grid item className={"no-print"}>
+                        <div style={alignCenter(true)}>
                             <LazyImage
                                 getSrc={setImgSrc => {
                                     if (this.isDetails) {
-                                        if (this.article.picture)
-                                            { // @ts-ignore
-                                                setImgSrc(base64ToDataUri(this.article.picture))
-                                            }
+                                        if (this.article.picture) { // @ts-ignore
+                                            setImgSrc(base64ToDataUri(this.article.picture))
+                                        }
                                     } else
                                         loadSingleImage("article", this.article.id, setImgSrc, 100)
                                 }}
@@ -292,77 +292,85 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
                                     return oldPayload.id !== newPayload.id;
                                 }}
                                 rounded
-                                className={"no-print"}
+                                className={"shoppingCartImage"}
                                 style={{
                                     width: 75,
                                     height: 75,
                                     backgroundColor: "lightgray",
-                                    marginRight: 18,
+                                    // marginRight: 18,
                                 }}/>
                         </div>
                     </Grid>
-                    <Grid item lg={sCc ? 3 : 4} md={8} sm={8}>
-                        <div style={margin(0, 20, 0, 0)}>
-                            <Grid container style={{height: "100%", ...margin(0, 20, 0, 0)}}
-                                  direction={"column"}>
-                                <Grid item>
-                                    <Typography variant="h6" style={{color: "rgba(0,0,0,0.87)"}}
-                                                gutterBottom to={(location: any) => {
-                                        location.pathname = "/articleView";
-                                        location.state = {article: this.article, isDetails: this.isDetails};
-                                        return location;
-                                    }} component={Link}>
-                                        {this.article.title}
-                                    </Typography>
-                                </Grid>
-                                <Grid item>
-                                    <Typography variant="body1" gutterBottom>
-                                        {(+this.article.price).toFixed(2)} €
-                                    </Typography>
-                                </Grid>
+                    <Grid item lg={sCc ? 3 : 4} xs={8}>
+                        {/*<div style={margin(0, 20, 0, 0)}>*/}
+                        <Grid container style={{height: "100%"}}
+                              direction={"column"}>
+                            <Grid item>
+                                <Typography variant="h6" style={{color: "rgba(0,0,0,0.87)"}}
+                                            gutterBottom to={(location: any) => {
+                                    location.pathname = "/articleView";
+                                    location.state = {
+                                        article: this.article,
+                                        isDetails: this.isDetails
+                                    };
+                                    return location;
+                                }} component={Link}>
+                                    {this.article.title}
+                                </Typography>
                             </Grid>
-                        </div>
+                            <Grid item>
+                                <Typography variant="body1" gutterBottom>
+                                    {(+this.article.price).toFixed(2)} €
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                        {/*</div>*/}
                     </Grid>
-                    <Grid item lg={sCc ? 2 : 3} md={sCc ? 4 : 5} sm={sCc ? 4 : 5}>
-                        <div style={margin(0, 20, 0, 0)}>
-                            <Grid container style={{height: "100%", ...margin(0, 20, 0, 0)}}
-                                  direction={"column"}>
-                                <Grid item>
-                                    <Typography variant="body1" style={{marginBottom: 15}}>
-                                        {this.article.artists.name}
-                                    </Typography>
-                                </Grid>
-                                <Grid item>
-                                    <Typography variant="body1" gutterBottom>
-                                        {this.article.genre.name}
-                                    </Typography>
-                                </Grid>
+                    <Grid item lg={sCc ? 2 : 3} md={sCc ? 4 : 5} xs={sCc ? 4 : 5}>
+                        {/*<div style={margin(0, 20, 0, 0)}>*/}
+                        <Grid container style={{height: "100%"}}
+                              direction={"column"}>
+                            <Grid item>
+                                <Typography variant="body1"
+                                            style={{marginTop: 3, marginBottom: 6}}>
+                                    {this.article.artists.name}
+                                </Typography>
                             </Grid>
-                        </div>
+                            <Grid item>
+                                <Typography variant="body1" gutterBottom>
+                                    {this.article.genre.name}
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                        {/*</div>*/}
                     </Grid>
-                    <Grid item lg={3} md={sCc ? 4 : 5} sm={sCc ? 4 : 5}>
-                        <div style={margin(0, 20, 0, 0)}>
-                            <Grid container style={{height: "100%", ...margin(0, 20, 0, 0)}}
-                                  direction={"column"}>
-                                <Grid item>
-                                    <Typography variant="body1" style={{marginBottom: 15}}>
-                                        Stück: {this.count}
-                                    </Typography>
-                                </Grid>
-                                <Grid item>
-                                    <Typography variant="body1" gutterBottom>
-                                        Gesamt: {(this.price).toFixed(2)} €
-                                    </Typography>
-                                </Grid>
+                    <Grid item lg={3} md={sCc ? 4 : 5} xs={sCc ? 4 : 5}>
+                        {/*<div style={margin(0, 20, 0, 0)}>*/}
+                        <Grid container style={{height: "100%"}}
+                              direction={"column"}>
+                            <Grid item>
+                                <Typography variant="body1"
+                                            style={{marginTop: 3, marginBottom: 6}}>
+                                    Stück: {this.count}
+                                </Typography>
                             </Grid>
-                        </div>
+                            <Grid item>
+                                <Typography variant="body1" gutterBottom>
+                                    Gesamt: {(this.price).toFixed(2)} €
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                        {/*</div>*/}
                     </Grid>
                     {this.showChangeCount &&
-                    <Grid item lg={2} md={3} sm={3}>
+                    <Grid item lg={2} md={3} xs={3}>
                         <ShoppingCartListItemButtons update={() => this.update()}
                                                      article={this.article}/>
                     </Grid>}
                 </Grid>
+                {this.props.array.length - 1 > this.index &&
+                    <hr className={"shoppingCartList-articleDivider"} style={{display: 'none'}}/>
+                }
             </Grid>
         )
     }

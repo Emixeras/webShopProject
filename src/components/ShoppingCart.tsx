@@ -8,7 +8,7 @@ import {
     ShoppingCartList
 } from "../services/ShoppingCartUtil";
 import Grid from "@material-ui/core/Grid";
-import {padding} from "../Utilities/Utilities";
+import {isMobile, padding} from "../Utilities/Utilities";
 import PaymentIcon from '@material-ui/icons/Payment';
 import DeleteIcon from '@material-ui/icons/DeleteForever';
 import {ContextType} from "../Utilities/TsUtilities";
@@ -39,8 +39,9 @@ class ShoppingCart extends React.Component<IProps, IState> {
                 }}>
                     <Grid container>
                         <Grid item xs={12}>
-                            <Typography component="h1" variant="h2" align="center"
+                            <Typography variant="h2" align="center"
                                         color="textPrimary"
+                                        className={"mobile"}
                                         gutterBottom>
                                 Warenkorb
                             </Typography>
@@ -48,13 +49,13 @@ class ShoppingCart extends React.Component<IProps, IState> {
                         <Grid item xs={12}>
                             <div style={{display: 'flex', justifyContent: 'center'}}>
                                 <Grid container wrap={"wrap-reverse"} spacing={4}
-                                      style={{width: '95%', maxWidth: isEmpty ? "1000px" : "1500px"}}>
+                                      style={{width: isMobile() ? '100%' : '95%', maxWidth: isEmpty ? "1000px" : "1500px"}}>
                                     <Grid item md={isEmpty ? 12 : 9} sm={12}>
                                         <Grid container style={{width: "100%"}}>
                                             <Grid item xs={12}>
                                                 <Card style={{marginTop: +isEmpty * 50, ...padding(18)}}>
                                                     {isEmpty ?
-                                                        <div style={{textAlign: "center"}}>
+                                                        <div style={{textAlign: "center"}} className={"mobile"}>
                                                             <Typography variant="h4" gutterBottom>
                                                                 Der Einkaufswagen ist leer
                                                             </Typography>
