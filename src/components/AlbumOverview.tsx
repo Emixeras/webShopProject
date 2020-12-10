@@ -649,7 +649,7 @@ function ArticleComponent(props: any) {
     } else {
         let roleLevel = hasCurrentUserRoleLevel();
         return (
-            <Grid item xs={6} md={4} lg={3} className={"albumOverview-gridItem"}>
+            <Grid item xs={6} md={4} lg={3} className={"gridItem"}>
                 <ContextMenuTrigger holdToDisplay={-1} disableIfShiftIsPressed id={contextMenuId}>
                     <CardActionArea component={Link} to={(location: any) => {
                         location.pathname = "/articleView";

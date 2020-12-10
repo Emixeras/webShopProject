@@ -266,7 +266,7 @@ export default function MenuDrawer({contentContainerStyling, children, contentRo
                         icon={<EditIcon/>}
                     />}
                     <ListItemLink
-                        to="/Impressum"
+                        to="/SideNotice"
                         primary="Impressum"
                         icon={<DescriptionIcon/>}
                     />

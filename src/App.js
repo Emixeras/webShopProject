@@ -20,6 +20,7 @@ import OrderSummary from "./components/OrderSummary";
 import OrderComplete from "./components/OrderComplete";
 import OrderOverview from "./components/OrderOverview"
 import OrderDetails from "./components/OrderDetails";
+import SideNotice from "./components/sideNotice";
 
 toast.configure();
 function App() {
@@ -45,6 +46,7 @@ function App() {
         <Route path="/ordercomplete" component={OrderComplete} exact />
         <Route path="/orderdetails" component={OrderDetails} exact />
         <Route path="/orderoverview" component={OrderOverview} exact />
+        <Route path="/SideNotice" component={SideNotice} exact />
         <Route component={AlbumOverview}/>
       </Switch>
     </div>

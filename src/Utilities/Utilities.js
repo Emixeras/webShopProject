@@ -54,6 +54,7 @@ export function padding(a, b, c, d) {
         paddingLeft: d !== undefined ? d : (b !== undefined ? b : a)
     }
 }
+
 /**
  * @param {number} a Alle oder Vertikal oder Oben
  * @param {number} [b] Horizontal oder Rechts

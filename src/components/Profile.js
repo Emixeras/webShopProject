@@ -406,7 +406,7 @@ function DeleteAccountButton() {
                     color="secondary">Account Löschen</Button>
             {new DialogBuilder(open, setOpen)
                 .setTitle("Account Löschen")
-                .setText("Möchtesten sie wirklich den Account unwiederruflich löschen?")
+                .setText("Möchten sie wirklich den Account unwiederruflich löschen?")
                 .addButton("Abbrechen")
                 .addButton({
                     label: "Löschen",
