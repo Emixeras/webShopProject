@@ -67,7 +67,6 @@ class ArtistOverview extends Component {
             this.forceUpdate()
         })
             .catch(function (error) {
-                // showToast("artist fetch failed" + error, "error");
             })
     }
 }
@@ -94,8 +93,6 @@ function Artist() {
 function ArtistComponent({artistResponse}) {
     const classes = useStyles();
 
-    // if (artistResponse.artistOrGenre.id === 1)
-    //     debugger
 
     return (
         <Grid item className={"mobile gridItem"} xs={6} md={4} lg={3}>
@@ -114,16 +111,10 @@ function ArtistComponent({artistResponse}) {
                         // payload={artistResponse}
                         getSrc={setImgSrc => {
                             loadSingleImage("artist", artistResponse.artistOrGenre.id, imageResponse => {
-                                // if (artistResponse.artistOrGenre.id === 2)
-                                //     debugger
-                                // if (artistResponse.artistOrGenre.id === 54)
-                                //     debugger
                                 if (imageResponse) {
                                     let file = imageResponse.file;
                                     artistResponse.file = file;
                                     setImgSrc(base64ToDataUri(file))
-                                    // if (artistResponse.artistOrGenre.id === 51)
-                                    //     debugger
 
                                 }
                             })

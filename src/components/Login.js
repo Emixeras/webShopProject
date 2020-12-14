@@ -13,7 +13,7 @@ import {
     TextField,
     FormControlLabel,
     Typography,
-    Container, FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton,
+    FormControl, InputLabel, OutlinedInput, InputAdornment, IconButton,
 } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import {useHistory} from "react-router-dom";
@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: theme.palette.secondary.main,
     },
     form: {
-        width: '100%', // Fix IE 11 issue.
+        width: '100%',
         marginTop: theme.spacing(1),
     },
     submit: {
@@ -150,11 +150,6 @@ function LogInForm(props) {
                                 style={{marginBottom: 12, marginTop: 12}}
                             >Anmelden</Button>
                             <Grid container justify={"flex-end"}>
-                                {/*    <Grid item>*/}
-                                {/*        <Link href="#" variant="body2" >*/}
-                                {/*            Forgot password?*/}
-                                {/*        </Link>*/}
-                                {/*    </Grid>*/}
                                 <Grid item>
                                     <Link href="#" variant="body2" to={"register"}>
                                         {"Noch keinen Account? Hier Registrieren"}

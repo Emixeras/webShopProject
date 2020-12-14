@@ -6,7 +6,6 @@ import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 import {
     alignCenter,
     Article,
-    base64ToDataUri,
     ContextType,
     hasCurrentUserRoleLevel,
     LazyImage,
@@ -15,10 +14,8 @@ import {
 import EditIcon from '@material-ui/icons/Edit';
 import {useHistory} from "react-router-dom";
 import {
-    AAR_RETURN_TYPE,
     addToShoppingCart,
-    getShoppingCartCount, isInShoppingCart,
-    removeFromShoppingCart
+    getShoppingCartCount, isInShoppingCart
 } from "../services/ShoppingCartUtil";
 
 interface IProps {

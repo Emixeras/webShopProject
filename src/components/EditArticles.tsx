@@ -1,5 +1,5 @@
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {
     Button,
     Card,
@@ -36,12 +36,10 @@ import {
     loadSingleImage,
     artistOrGenre_comparator,
     Pair,
-    RestrictedPage,
-    RETURN_MODE, Article, ExecutableComponent
+    RestrictedPage,  Article
 } from "../Utilities/TsUtilities";
 import {createNewArticle, deleteArticle, updateArticle} from "../services/ItemApiUtil";
 import {createNewArtist, deleteArtist, updateArtist} from "../services/ArtistApiUtil";
-import {addToShoppingCart} from "../services/ShoppingCartUtil";
 
 interface IProps {
     // @ts-ignore
@@ -58,17 +56,6 @@ interface IState {
     genre?: ArtistOrGenre;
     articlePicture?: { id: number };
 }
-
-// export interface Article {
-//     id: number;
-//     title: string;
-//     description: string;
-//     ean: number;
-//     price: string;
-//     artists: ArtistOrGenre;
-//     genre: ArtistOrGenre;
-//     picture?: { id: number, data: string };
-// }
 
 interface ArtistOrGenre {
     id: number;
@@ -292,15 +279,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                                   onSelect={(article: Article) => {
                                                       this.currentPicture = undefined;
                                                       this.selectedArticle = article;
-                                                      this.setState(article/*{
-                                                          id: article.id,
-                                                          title: article.title,
-                                                          price: article.price,
-                                                          artists: article.artists,
-                                                          genre: article.genre,
-                                                          ean: article.ean,
-                                                          description: article.description
-                                                      }*/)
+                                                      this.setState(article)
                                                   }}
                                                   onChange={value => {
                                                       if (typeof value === "string") {
@@ -480,11 +459,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
                                             </Grid>
                                         </Grid>
                                         <Grid item xs={12}>
-                                            {/*<Grid container justify="flex-end">*/}
-                                            {/*    <Grid item>*/}
                                             <ActionButtons context={this}/>
-                                            {/*    </Grid>*/}
-                                            {/*</Grid>*/}
                                         </Grid>
 
                                     </Grid>

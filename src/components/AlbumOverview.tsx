@@ -14,8 +14,7 @@ import {
     ContextType,
     filterArticle,
     ifExistsReturnOrElse, ifValueReturnOrElse,
-    LazyImage, name_comparator,
-    Pair,
+    LazyImage, Pair,
     RETURN_MODE, Article, loadSingleImage, hasCurrentUserRoleLevel
 } from "../Utilities/TsUtilities";
 import {Link, useHistory} from "react-router-dom";
@@ -23,13 +22,11 @@ import MenuDrawer, {addDrawerCallback, removeDrawerCallback} from "./MenuDrawer"
 import {
     Button,
     FormControl,
-    FormControlLabel,
     IconButton,
     InputAdornment,
     InputLabel, Menu, MenuItem,
     OutlinedInput,
     Slider,
-    Switch, TextField
 } from "@material-ui/core";
 import {DialogBuilder} from "../Utilities/DialogBuilder";
 import SettingsIcon from '@material-ui/icons/Settings';
@@ -206,8 +203,6 @@ function Album(props: ContextType<AlbumOverview>) {
     const classes = useStyles();
     let context = props.context;
     let filteredArticleArray: Array<Article>;
-    // context.maxVisible = context.stepDistance;
-    // context.hasMore = true;
 
     if (articleArray.length === 0)
         buildDummyData();
@@ -235,7 +230,6 @@ function Album(props: ContextType<AlbumOverview>) {
                             </Typography>
                         </div>
                         :
-                        /*<FilterCard context={context}/>*/
                         <FilterCard context={context}/>
                     }
                 </Container>
@@ -294,7 +288,6 @@ export function FilterCard({context}: ContextType<AlbumOverview>) {
     setDummy = useState(0)[1];
 
     function getNewDirection(): GridDirection {
-        // debugger
         let filterCard_root = document.getElementById("filterCard_root");
         let filterCard_text = document.getElementById("filterCard_text");
         if (filterCard_root && filterCard_text) {
@@ -502,21 +495,6 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
                                 valueLabelDisplay="on"
                             />
                             <Typography>Schrittweite</Typography>
-                            {/*<FormControlLabel*/}
-                            {/*    control={*/}
-                            {/*        <Switch*/}
-                            {/*            checked={checked}*/}
-                            {/*            onChange={(event, checked) => {*/}
-                            {/*                context.unloadImages = checked;*/}
-                            {/*                setChecked(checked);*/}
-                            {/*                localStorage.setItem(context.UNLOAD_IMAGES, `${checked}`)*/}
-                            {/*            }}*/}
-                            {/*            name="checkedB"*/}
-                            {/*            color="primary"*/}
-                            {/*        />*/}
-                            {/*    }*/}
-                            {/*    label="Bilder automatisch entladen"*/}
-                            {/*/>*/}
                         </div>
                     )
                 })

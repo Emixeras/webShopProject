@@ -44,6 +44,8 @@ import HistoryIcon from '@material-ui/icons/History';
 import PropTypes from "prop-types";
 
 const drawerWidth = 240;
+
+
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',

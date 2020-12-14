@@ -15,7 +15,6 @@ import SearchIcon from '@material-ui/icons/Search';
 
 
 export default class OrderOverview extends React.Component {
-    emptyOrderHistory = {entries: []};
     user = {};
     orders = [-1];
 
@@ -30,6 +29,13 @@ export default class OrderOverview extends React.Component {
 
     }
 
+
+    /**
+     * Lädt alle Kundenbestellungen aus Backend,
+     * füllt sie in Array,
+     * berechnet Gesamtpreis der Bestellung und hängt diese an.
+     * Reversed das array, damit Sortierung für Darstellung aktuellste Bestellung zuerst passt.
+     */
     loadOrders() {
         axios.get(`http://${window.location.hostname}:8080/order`, {
             auth: {
@@ -96,6 +102,14 @@ export default class OrderOverview extends React.Component {
     }
 }
 
+/**
+ *
+ * @param {Order} orderArray
+ * @param context
+ * @returns {JSX.Element|null}
+ * @constructor
+ * Stellt alle Kundenbestellungen dar
+ */
 function OrderList({orderArray, context}) {
     const history = useHistory()
 

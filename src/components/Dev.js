@@ -1,13 +1,8 @@
 import React from 'react'
-import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
-import RaisedButton from 'material-ui/RaisedButton';
-import {Grid, Card, TextField, Button, Typography, hexToRgb, IconButton} from "@material-ui/core";
+import {Grid, Card, Button, Typography, IconButton} from "@material-ui/core";
 import {
     padding,
     showToast,
-    shallowEqual,
-    isEmail,
-    addAlphaToHexColor,
     hexToRgbA, isMobile,
 } from "../Utilities/Utilities";
 import MenuDrawer from "./MenuDrawer";
@@ -50,7 +45,6 @@ class Dev extends React.Component {
         )
     }
 
-    // ---------------
 
     generateComponents() {
         return (
@@ -268,8 +262,5 @@ class Dev extends React.Component {
 
 }
 
-/*function getColor(name){
-return buttonColors[name];
-}*/
 
 export default Dev;

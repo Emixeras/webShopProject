@@ -123,7 +123,7 @@ export default class OrderDetails extends Component {
                                         </Grid>
                                         <Grid item>
                                             <Typography> </Typography>
-                                            <Typography>Vorkasse</Typography>
+                                            <Typography>{this.state.paymentMethod}</Typography>
                                         </Grid>
                                     </Grid>
                                 </Card>
