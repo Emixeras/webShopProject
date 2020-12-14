@@ -14,7 +14,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import {Link, useHistory} from "react-router-dom";
-import HomeIcon from "@material-ui/icons/Home";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import DescriptionIcon from '@material-ui/icons/Description';
@@ -36,10 +35,10 @@ import MenuItem from "@material-ui/core/MenuItem";
 import {ExitToApp} from "@material-ui/icons";
 import Grid from "@material-ui/core/Grid";
 import {logoutUser} from "../services/UserApiUtil";
-import {isMobile, margin, NavigationComponent, padding, showToast} from "../Utilities/Utilities";
+import {isMobile, margin, padding, showToast} from "../Utilities/Utilities";
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import EditIcon from '@material-ui/icons/Edit';
-import {ExecutableComponent, hasCurrentUserRoleLevel, Pair} from "../Utilities/TsUtilities";
+import {hasCurrentUserRoleLevel, Pair} from "../Utilities/TsUtilities";
 import HistoryIcon from '@material-ui/icons/History';
 import PropTypes from "prop-types";
 
@@ -87,7 +86,6 @@ const useStyles = makeStyles((theme) => ({
     },
     content: {
         flexGrow: 1,
-        // padding: theme.spacing(3),
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
@@ -309,14 +307,6 @@ function ToolbarLogoAndButtons({drawerOpen, shouldShift}) {
 
     let allButtons = (
         <div style={style}>
-            {/*
-            <Link to="/">
-                <IconButton style={{margin: 5, color: color}} component="span"
-                            edge="start">
-                    <HomeIcon/>
-                </IconButton>
-            </Link>
-*/}
             <Link to="/shoppingCart">
                 <IconButton style={{margin: 5, color: color}} component="span">
                     <ShoppingCartIcon/>
@@ -334,7 +324,6 @@ function ToolbarLogoAndButtons({drawerOpen, shouldShift}) {
             <div style={{
                 maxWidth: shouldShift ? (58 * buttonCount - (drawerOpen ? 0 : 48)) : (drawerOpen ? 53 : 1),
                 minWidth: 0,
-                //backgroundColor: "green",
                 flexGrow: 100,
                 flexShrink: 100,
                 flexBasis: "auto",
@@ -346,7 +335,6 @@ function ToolbarLogoAndButtons({drawerOpen, shouldShift}) {
                 flexGrow: 1,
                 flexShrink: 1,
                 flexBasis: "auto",
-                // backgroundColor: "red",
             }}>
                 <img style={{alignSelf: 'center', cursor: "pointer"}} height="50" src={logo}
                      onClick={event => history.push("/", {home: true})}
@@ -407,7 +395,6 @@ function ProfileButton({children}) {
     };
     return (
         <div>
-            {/*<Link to="/login">*/}
             <IconButton style={{margin: 5, color: "white"}} component="span"
                         aria-haspopup="true"
                         onClick={event => {
@@ -418,7 +405,6 @@ function ProfileButton({children}) {
                         }}>
                 {children}
             </IconButton>
-            {/*</Link>*/}
             <Menu
                 anchorEl={anchorEl}
                 anchorOrigin={{
@@ -501,13 +487,11 @@ function DevButton({children}) {
     if (hasCurrentUserRoleLevel("ADMIN"))
         return (
             <div>
-                {/*<Link to="/login">*/}
                 <IconButton style={{margin: 5, color: "white"}} component="span"
                             aria-haspopup="true"
                             onClick={handleMenu}>
                     {children}
                 </IconButton>
-                {/*</Link>*/}
                 <Menu
                     anchorEl={anchorEl}
                     anchorOrigin={{
@@ -564,7 +548,6 @@ function DevButton({children}) {
                         </Grid>
                     </MenuItem>
                 </Menu>
-
             </div>
         )
     else
