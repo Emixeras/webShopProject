@@ -10,6 +10,9 @@ import Box from "@material-ui/core/Box";
 import {Visibility, VisibilityOff} from "@material-ui/icons";
 import {RestrictedPage, ROLES} from "../Utilities/TsUtilities";
 
+/**
+ * The main Component of Dev.js
+ */
 class Dev extends React.Component {
 
     buttonColors = {
@@ -45,7 +48,10 @@ class Dev extends React.Component {
         )
     }
 
-
+    /**
+     * Generates the component list based on allComponents
+     * @return {JSX.Element}
+     */
     generateComponents() {
         return (
             this.allComponents.map(category => {
@@ -79,6 +85,11 @@ class Dev extends React.Component {
         )
     }
 
+    /**
+     * Generates the content of a specific category
+     * @param category The category to be rendered
+     * @return {JSX.Element[]}
+     */
     generateContent(category) {
 
         return (
@@ -174,6 +185,11 @@ class Dev extends React.Component {
         )
     }
 
+    /**
+     * Returns the button for showing the complete result
+     * @param object The reference object
+     * @return {JSX.Element}
+     */
     showCompleteResultButton(object) {
         if (object.completeResponse) {
             return (
@@ -196,6 +212,11 @@ class Dev extends React.Component {
         }
     }
 
+    /**
+     * Returns the complete result for an object
+     * @param object The reference object
+     * @return {JSX.Element}
+     */
     showCompleteResult(object) {
         if (object.showCompleteResponse && object.completeResponse) {
             return (
@@ -208,6 +229,12 @@ class Dev extends React.Component {
         }
     }
 
+    /**
+     * Retrieves the response for a component
+     * @param resultCallback Called when a result is received
+     * @param endpoint The endpoint for the call
+     * @param label The name for the result text
+     */
     apiGetData(resultCallback, endpoint, label) {
         fetch(new Request(`http://${window.location.hostname}:8080/` + endpoint, {method: 'GET'}))
             .then(response => {
@@ -261,6 +288,5 @@ class Dev extends React.Component {
     ]
 
 }
-
 
 export default Dev;

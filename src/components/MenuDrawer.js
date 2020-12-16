@@ -80,7 +80,6 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         alignItems: 'center',
         padding: theme.spacing(0, 1),
-        // necessary for content to be below app bar
         ...theme.mixins.toolbar,
         justifyContent: 'flex-end',
     },
@@ -106,6 +105,7 @@ const useStyles = makeStyles((theme) => ({
 const drawerStateCallbackList = require("collections/list")();
 
 /**
+ * Fügt einen drawerCallback hinzu
  * @param {function} drawerCallback Der hinzuzufügende Clallback
  * @param {'before' | 'after' | 'both' } [type] Wann wird der Callback aufgerufen
  */
@@ -114,12 +114,18 @@ export function addDrawerCallback(drawerCallback, type = 'after') {
 }
 
 /**
+ * Entfernt einen drawerCallback
  * @param {function} drawerCallback Der selbe Clallback wie beim Hinzufügen
  */
 export function removeDrawerCallback(drawerCallback) {
     drawerStateCallbackList.delete(drawerCallback, (inList, toDelete) => inList.first === toDelete)
 }
 
+/**
+ * Ruft alle drawerCallbacks auf
+ * @param value Der aktuelle Zustand
+ * @param type Welche art von callback soll aufgerufen werden
+ */
 export function callDrawerCallbacks(value, type) {
     drawerStateCallbackList.forEach(pair => {
         if (type === 'both' || pair.second === type)
@@ -129,7 +135,11 @@ export function callDrawerCallbacks(value, type) {
 
 //  <------------------------- Drawer-Callbacks -------------------------
 
-
+/**
+ * Returns a item for the drawer
+ * @param props
+ * @return {JSX.Element}
+ */
 function ListItemLink(props) {
     const {icon, primary, to} = props;
 
@@ -163,6 +173,9 @@ MenuDrawer.propTypes = {
     contentRootOptions: PropTypes.object
 };
 
+/**
+ * The main Component of MenuDrawer.js
+ */
 export default function MenuDrawer({contentContainerStyling, children, contentRootOptions}) {
     const classes = useStyles();
     const theme = useTheme();
@@ -294,6 +307,12 @@ export default function MenuDrawer({contentContainerStyling, children, contentRo
     );
 }
 
+/**
+ * Returns the layout for the toolbar logo and buttons
+ * @param drawerOpen Is the drawer open
+ * @param shouldShift Is in mobile mode
+ * @return {JSX.Element}
+ */
 function ToolbarLogoAndButtons({drawerOpen, shouldShift}) {
     const history = useHistory();
     let style = {display: 'flex', flexDirection: 'row'};
@@ -381,6 +400,11 @@ function ToolbarLogoAndButtons({drawerOpen, shouldShift}) {
     )
 }
 
+/**
+ * Returns the Button for opening the profileMenu
+ * @param children The profileMenu-button
+ * @return {JSX.Element}
+ */
 function ProfileButton({children}) {
     const history = useHistory();
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -472,6 +496,11 @@ function ProfileButton({children}) {
     )
 }
 
+/**
+ * Returns the Button for opening the devMenu
+ * @param children The devMenu-button
+ * @return {JSX.Element}
+ */
 function DevButton({children}) {
     const history = useHistory();
     const [anchorEl, setAnchorEl] = React.useState(null);

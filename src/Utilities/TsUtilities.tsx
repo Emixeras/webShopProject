@@ -7,6 +7,9 @@ import {logoutUser} from "../services/UserApiUtil";
 import MenuDrawer from "../components/MenuDrawer";
 
 //  ------------------------- Tuple ------------------------->
+/**
+ * A construct for holding two connected values
+ */
 export class Pair<A, B> {
     public first: A;
     public second: B;
@@ -22,6 +25,9 @@ export class Pair<A, B> {
     }
 }
 
+/**
+ * A construct for holding three connected values
+ */
 export class Triple<A, B, C> {
     public first: A;
     public second: B;
@@ -38,15 +44,20 @@ export class Triple<A, B, C> {
         return new Triple(first, second, third);
     }
 }
-
 //  <------------------------- Tuple -------------------------
 
 
 //  ------------------------- Types ------------------------->
+/**
+ * A parameter type that contains the context of another component
+ */
 export interface ContextType<T> {
     context: T;
 }
 
+/**
+ * The scheme of an article
+ */
 export interface Article {
     id: number;
     title: string;
@@ -58,17 +69,26 @@ export interface Article {
     picture?: string;
 }
 
+/**
+ * The scheme of an artist or genre
+ */
 export interface ArtistOrGenre {
     id: number;
     name: string;
     file?: string;
 }
 
+/**
+ * The scheme of an imageResponse
+ */
 export interface ImageResponseType {
     article: Article;
     file: string;
 }
 
+/**
+ * The scheme of an user
+ */
 export interface User {
     id: number;
     birth: string;
@@ -84,10 +104,12 @@ export interface User {
     town?: string;
 }
 
+/**
+ * All supported user roles
+ */
 export enum ROLES {
     USER, EMPLOYEE, ADMIN
 }
-
 //  <------------------------- Types -------------------------
 
 
@@ -106,6 +128,10 @@ export const roleMap = {
 
 
 //  ------------------------- Image ------------------------->
+/**
+ * Transforms a base64 data string to be converted to a data uri
+ * @param base64
+ */
 export function base64ToDataUri(base64: string): string {
     var mime;
     if (base64.startsWith("iVBORw0KGgo"))
@@ -119,6 +145,13 @@ interface ImageResponseFunction {
     (imageResponse?: ImageResponseType): void
 }
 
+/**
+ * The central method for loading an image for an article, artist or genre
+ * @param type The type of the target endpoint
+ * @param id The id of the object to be loaded
+ * @param onFinish A callback that is called when the data is loaded; the loaded data is the parameter
+ * @param [imageResolution] An optional parameter to select a specific resolution
+ */
 export function loadSingleImage(type: "article" | "artist" | "genre", id: number, onFinish: (ImageResponseFunction | Function), imageResolution?: number) {
     let request: string;
     if (imageResolution !== undefined)
@@ -180,6 +213,9 @@ export enum LOAD_IMAGE_MODE {
     ON_VISIBLE, ALWAYS
 }
 
+/**
+ * A custom component that simplifies the performant loading of an image
+ */
 export class LazyImage extends React.Component<LazyImageProperties, LazyImageState> {
     imageSrc: string = placeHolder;
     // @ts-ignore
@@ -366,6 +402,9 @@ interface ImageGrid_props {
     rounded?: boolean | string | "circle" | "small" | "medium" | "large";
 }
 
+/**
+ * A custom component that renders a grid of 1-4 images
+ */
 export class ImageGrid extends React.Component<ImageGrid_props, ImageGrid_state> {
     articleList?: Article[];
     imageList?: string[];
@@ -498,12 +537,17 @@ export class ImageGrid extends React.Component<ImageGrid_props, ImageGrid_state>
         );
     }
 }
-
 //  <------------------------- Image -------------------------
 
 
 //  ------------------------- Logic ------------------------->
-export function filterArticle(query: string, article: Article) {
+/**
+ * The central method for testing a single article by  the advanced search
+ * @param query The search query
+ * @param article The article to be tested
+ * @return {boolean} Does the article match the query
+ */
+export function filterArticle(query: string, article: Article): boolean {
     let subArray = query.split("&");
     let length = subArray.length;
     let found = 0;
@@ -556,6 +600,11 @@ export function filterArticle(query: string, article: Article) {
     return false;
 }
 
+/**
+ * A simplified way of returning an element if it is defined, oderwise another value
+ * @param input The object to be tested
+ * @param orElse The object that is returned if the input is not defined
+ */
 export function orElse<T>(input: T, orElse: NonNullable<T> | (() => NonNullable<T>)): NonNullable<T> {
     if (input)
         return (input as NonNullable<T>);
@@ -567,6 +616,12 @@ export function orElse<T>(input: T, orElse: NonNullable<T> | (() => NonNullable<
     }
 }
 
+/**
+ * If the input is defined the method transforms it; otherwise another value is returned
+ * @param input The object to be tested
+ * @param returnFunction The function to transform the input
+ * @param orElse The object that is returned if the input is not defined
+ */
 export function ifExistsReturnOrElse<T, R>(input: T, returnFunction: (input: NonNullable<T>) => R, orElse: R | (() => R)): R {
     if (input)
         return returnFunction((input as NonNullable<T>));
@@ -578,6 +633,14 @@ export function ifExistsReturnOrElse<T, R>(input: T, returnFunction: (input: Non
     }
 }
 
+/**
+ * If the input matches the value the method transforms it; otherwise another value is returned
+ * @param input The object to be tested
+ * @param value The value the input is compared to
+ * @param returnFunction The function to transform the input
+ * @param orElse The object that is returned if the input is not defined
+ * @param reverse If true the input must not match the value
+ */
 export function ifValueReturnOrElse<T, R>(input: T, value: T, returnFunction: ((input: T) => R) | undefined, orElse: R | (() => R), reverse?: boolean): R {
     if ((reverse && input !== value) || (!reverse && input === value))
         if (returnFunction)
@@ -593,6 +656,12 @@ export function ifValueReturnOrElse<T, R>(input: T, value: T, returnFunction: ((
     }
 }
 
+/**
+ * A simplified way of testing if a input is equal to multiple values
+ * @param input The input to be tested
+ * @param ors An array of compare values
+ * @return True if the input matches any value in ors
+ */
 export function boolOr<T>(input: T, ...ors: T[]): boolean {
     for (let or of ors) {
         if (input === or)
@@ -603,24 +672,43 @@ export function boolOr<T>(input: T, ...ors: T[]): boolean {
 
 // ---------------
 
+/**
+ * Checks if the current logged in user has a least the given roleLevel
+ * @param level The minimum required roleLevel
+ * @return True if the user has the the required roleLevel
+ */
 export function hasCurrentUserRoleLevel(level: "USER" | "EMPLOYEE" | "ADMIN" | number = "EMPLOYEE"): boolean {
     let user = getSessionUser();
     // @ts-ignore
     return user && roleMap[user.role] >= roleMap[level];
 }
-
 //  <------------------------- Logic -------------------------
 
 
 //  ------------------------- Comparators ------------------------->
+/**
+ * A comparator for sorting articles
+ * @param a
+ * @param b
+ */
 export function article_comparator(a: Article, b: Article) {
     return name_comparator(a.title, b.title)
 }
 
+/**
+ * A comparator for sorting artists, or genres
+ * @param a
+ * @param b
+ */
 export function artistOrGenre_comparator(a: ArtistOrGenre, b: ArtistOrGenre) {
     return name_comparator(a.name, b.name)
 }
 
+/**
+ * A comparator for sorting names
+ * @param a
+ * @param b
+ */
 export function name_comparator(a: string, b: string) {
     a = a.toUpperCase();
     b = b.toUpperCase();
@@ -633,7 +721,6 @@ export function name_comparator(a: string, b: string) {
     }
     return 0;
 }
-
 //  <------------------------- Comparators -------------------------
 
 
@@ -648,6 +735,9 @@ interface RestrictedPage_props {
 interface RestrictedPage_state {
 }
 
+/**
+ * A custom component that restricts the access to a page if the user doesn't have the required roleLevel
+ */
 export class RestrictedPage extends React.Component<RestrictedPage_props, RestrictedPage_state> {
     children: JSX.Element;
     roleLevel?: ROLES;
@@ -720,6 +810,10 @@ export class RestrictedPage extends React.Component<RestrictedPage_props, Restri
     }
 }
 
+/**
+ * A component for rendering a auto logout link
+ * @param text The text to be displayed
+ */
 function LogoutAndLoginLink({text}: { text: string }) {
     const history = useHistory();
     return (
@@ -738,19 +832,23 @@ function LogoutAndLoginLink({text}: { text: string }) {
 
 // ---------------
 
+/**
+ * A convenience hook for forcing an rerender on a functional component
+ */
 export function useForceUpdate() {
     const setValue = useState(0)[1];
     return () => setValue(value => ++value);
-}
-
-export function ExecutableComponent({execute}: {execute: () => void}) {
-    execute();
-    return null;
 }
 //  <------------------------- Components -------------------------
 
 
 //  ------------------------- Convenience ------------------------->
+/**
+ * A convenience function for renaming a key of an object
+ * @param object The object
+ * @param oldKey The name of the old key
+ * @param newKey The name of the new key
+ */
 export function renameObjectKey(object: object, oldKey: string, newKey: string): object {
     // @ts-ignore
     object[newKey] = object[oldKey];
@@ -758,6 +856,11 @@ export function renameObjectKey(object: object, oldKey: string, newKey: string):
     return object
 }
 
+/**
+ * A convenience function that calls a callback only if it is defined
+ * @param what The callback
+ * @param args The arguments of the callback
+ */
 export function callIfExists(what: Function | undefined | null, ...args: any[]) {
     if (what)
         what.call(undefined, args)
@@ -783,6 +886,11 @@ export function subString(text: string, start: number, end?: number): string {
 
 const dateFormat = require('dateformat')
 
+/**
+ * A convenience function for formatting a date
+ * @param date The date to be formatted
+ * @param [pattern] An optional formatting pattern
+ */
 export function formatDate(date: string | number, pattern?: (string | boolean)): string {
     if (typeof date === "string") {
         if (date.includes("[UTC]"))
@@ -791,7 +899,6 @@ export function formatDate(date: string | number, pattern?: (string | boolean)):
     }
     return dateFormat(date, (typeof pattern === "string" ? pattern : (pattern ? "dd.mm.yyyy HH:MM" : "dd.mm.yyyy")));
 }
-
 //  <------------------------- Convenience -------------------------
 
 
@@ -805,11 +912,15 @@ export function alignCenter(vertical?: boolean, horizontal?: boolean): React.CSS
     }
 }
 
+/**
+ * Returns a CSSProperties that sets the children's dimensions to fit their parent as specified
+ * @param parentHeight Should it be vertically centered
+ * @param parentWith Should it be horizontally centered
+ */
 export function matchParent(parentHeight?: boolean, parentWith?: boolean): React.CSSProperties {
     return {
         height: parentHeight ? "100%" : undefined,
         width: parentWith ? "100%" : undefined,
     }
 }
-
 //  <------------------------- Styles -------------------------

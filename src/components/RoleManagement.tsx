@@ -29,24 +29,30 @@ import AdminIcon from '@material-ui/icons/SupervisorAccount';
 import SaveIcon from "@material-ui/icons/Save";
 import {updateUser} from "../services/UserApiUtil";
 
-interface RoleManagement_State {
+interface RoleManagement_state {
 
 }
 
-interface RoleManagement_Props {
+interface RoleManagement_props {
 
 }
 
-export default class RoleManagement extends React.Component<RoleManagement_State, RoleManagement_Props> {
+/**
+ * The main Component of RoleManagement.tsx
+ */
+export default class RoleManagement extends React.Component<RoleManagement_state, RoleManagement_props> {
 
     userArray: User[] = [];
 
-    constructor(props: RoleManagement_State, context: any) {
+    constructor(props: RoleManagement_state, context: any) {
         super(props, context);
         if (hasCurrentUserRoleLevel("ADMIN"))
             this.loadUsers();
     }
 
+    /**
+     * Loads the information of all the users
+     */
     loadUsers() {
         var user = getSessionUser();
         if (!user) {
@@ -94,6 +100,10 @@ export default class RoleManagement extends React.Component<RoleManagement_State
     }
 }
 
+/**
+ * Presents all the users in a list
+ * @param context The context of the main component
+ */
 function RoleList({context}: ContextType<RoleManagement>) {
     return (
         <Grid container spacing={2}>
@@ -104,6 +114,12 @@ function RoleList({context}: ContextType<RoleManagement>) {
     );
 }
 
+/**
+ * One Item in the RoleList
+ * @param context The context of the main component
+ * @param user The user to be shown
+ * @param index The index of the item
+ */
 function RoleListItem({context, user, index}: { context: RoleManagement, user: User, index: number }) {
     return (
         <Grid item alignItems="center" xs={12}>
@@ -147,6 +163,11 @@ function RoleListItem({context, user, index}: { context: RoleManagement, user: U
 const options = ['Nutzer', 'Angestellter', 'Admin'];
 const icons = [<UserIcon/>, <EmployeeIcon/>, <AdminIcon/>];
 
+/**
+ * Returns the button for changing the role of a user
+ * @param context The context of the main component
+ * @param user The corresponding user
+ */
 function RoleListItemButton({context, user}: { context: RoleManagement, user: User }) {
     let forceUpdate = useForceUpdate();
     const [open, setOpen] = React.useState(false);

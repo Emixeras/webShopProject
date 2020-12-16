@@ -37,39 +37,34 @@
     div.mobile .hide{
         display: none;
     }
-    .MuiTypography-h2/*div.mobile .MuiTypography-h2, .MuiTypography-h2.mobile*/ {
+    .MuiTypography-h2 {
         font-size: 3rem !important;
         font-weight: 300 !important;
         line-height: 1 !important;
-        /*color: blue !important;*/
         letter-spacing: 0.0066em !important;
     }
     div.mobile .MuiTypography-h4, .MuiTypography-h4.mobile {
         font-size: 1.7rem !important;
         font-weight: 400 !important;
         line-height: 1 !important;
-        /*color: yellow !important;*/
         letter-spacing: 0.00588em !important;
     }
     div.mobile .MuiTypography-h5, .MuiTypography-h5.mobile {
         font-size: 1.2rem !important;
         font-weight: 400 !important;
         line-height: 1.07 !important;
-        /*color: green !important;*/
         letter-spacing: 0.001em !important;
     }
     div.mobile .MuiTypography-h6, .MuiTypography-h6.mobile {
         font-size: 1rem !important;
         font-weight: 400 !important;
         line-height: 1.28 !important;
-        /*color: magenta !important;*/
         letter-spacing: 0.006em !important;
     }
     div.mobile .MuiTypography-body1, .MuiTypography-body1.mobile {
         font-size: .8rem !important;
         font-weight: 400 !important;
         line-height: 1.2 !important;
-        /*color: red !important;*/
         letter-spacing: 0.0075em !important;
     }
     div.mobile .shoppingCartImage {

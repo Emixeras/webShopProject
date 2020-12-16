@@ -4,6 +4,13 @@ import {showToast} from "../Utilities/Utilities";
 
 const apiBaseUrlUpdateArtist = `http://${window.location.hostname}:8080/artist/`;
 
+/**
+ * The endpoint utility for creating artists
+ * @param metaDataPayload The artist metadata
+ * @param pictureFile The artist picture
+ * @param onSuccess Callback when the request was successful
+ * @param onFail Callback when the request failed
+ */
 export const createNewArtist = (metaDataPayload: object, pictureFile: File | null, onSuccess?: (response: any) => void, onFail?: (error: any) => void) => {
     var user = getSessionUser();
     if (!user) {
@@ -42,6 +49,13 @@ export const createNewArtist = (metaDataPayload: object, pictureFile: File | nul
         });
 };
 
+/**
+ * The endpoint utility for updating artists
+ * @param metaDataPayload The artist metadata
+ * @param pictureFile The artist picture
+ * @param onSuccess Callback when the request was successful
+ * @param onFail Callback when the request failed
+ */
 export const updateArtist = (metaDataPayload: object, pictureFile: File | null, onSuccess?: (response: any) => void, onFail?: (error: any) => void) => {
     var user = getSessionUser();
     if (!user) {
@@ -80,6 +94,12 @@ export const updateArtist = (metaDataPayload: object, pictureFile: File | null, 
         });
 };
 
+/**
+ * The endpoint utility for deleting artists
+ * @param id The artist id
+ * @param onSuccess Callback when the request was successful
+ * @param onFail Callback when the request failed
+ */
 export function deleteArtist(id: number, onSuccess?: (response: any) => void, onFail?: (error: any) => void) {
     var user = getSessionUser();
     if (!user) {

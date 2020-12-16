@@ -41,12 +41,12 @@ import {
 import {createNewArticle, deleteArticle, updateArticle} from "../services/ItemApiUtil";
 import {createNewArtist, deleteArtist, updateArtist} from "../services/ArtistApiUtil";
 
-interface IProps {
+interface EditArticles_rops {
     // @ts-ignore
     location: history.Location;
 }
 
-interface IState {
+interface EditArticles_state {
     id: number;
     title: string
     description?: string
@@ -74,7 +74,10 @@ const initialState = {
     articlePicture: undefined,
 };
 
-export default class EditArticles extends React.Component<IProps, IState> {
+/**
+ * The main Component of EditArticles.tsx
+ */
+export default class EditArticles extends React.Component<EditArticles_rops, EditArticles_state> {
     currentPicture: File | undefined = undefined;
     setFileUploadDefaultVisibility: (visibility: boolean) => void = visibility => {
     };
@@ -84,7 +87,7 @@ export default class EditArticles extends React.Component<IProps, IState> {
     selectArticle_input: string = "";
     selectedArticle?: Article;
 
-    constructor(props: IProps, context: any) {
+    constructor(props: EditArticles_rops, context: any) {
         super(props, context);
         this.state = initialState;
 
@@ -94,6 +97,9 @@ export default class EditArticles extends React.Component<IProps, IState> {
         window.scrollTo(0, 0);
     }
 
+    /**
+     * Loads the metadata for all articles; without the pictures
+     */
     loadData() {
         let pendingRequests = 3;
         fetch(new Request(`http://${window.location.hostname}:8080/article`, {method: 'GET'}))
@@ -148,6 +154,9 @@ export default class EditArticles extends React.Component<IProps, IState> {
             })
     }
 
+    /**
+     * Loads the metadata for all artists; without the pictures
+     */
     loadArtists(onLoaded: () => void) {
         fetch(new Request(`http://${window.location.hostname}:8080/artist`, {method: 'GET'}))
             .then(response => {
@@ -168,6 +177,10 @@ export default class EditArticles extends React.Component<IProps, IState> {
             })
     }
 
+    /**
+     * checks if the entered price is valid
+     * @param price The new price
+     */
     checkPriceError = (price: string) => price.length > 0 && !/^(\d+([.,]\d{1,2})?)$/.test(price);
 
     render() {
@@ -477,9 +490,8 @@ let setIsPictureNotSelected: (visibility: boolean) => void = visibility => {
 };
 
 /**
- *
- * @param {EditArticles} context
- * @return {JSX.Element} editButton, grid, addButton, text
+ * The component for the 'Kunstler Anlegen / Bearbeiten' dialog
+ * @param context The context of the main component
  */
 function DialogComponent({context}: ContextType<EditArticles>) {
     const artist: ArtistOrGenre = (context.state.artists as ArtistOrGenre);
@@ -549,7 +561,6 @@ function DialogComponent({context}: ContextType<EditArticles>) {
                                             shouldImageUpdate={(oldPayload: Pair<File, ArtistOrGenre>, newPayload: Pair<File, ArtistOrGenre>) => {
                                                 return open && (oldPayload.first !== newPayload.first || !shallowEqual(oldPayload.second, newPayload.second))
                                             }}
-                                            // shouldImageUpdate={oldPayload => true}
                                             getSrc={setImgSrc => {
                                                 if (picture) {
                                                     setImgSrc(URL.createObjectURL(picture));
@@ -575,8 +586,6 @@ function DialogComponent({context}: ContextType<EditArticles>) {
                                     }}>
                                         <SimpleReactFileUpload
                                             onFileSelected={(file: File) => {
-                                                // context.currentPicture = file;
-                                                // context.forceUpdate()
                                                 setPicture(file);
                                             }}
                                             setDefaultVisibility={((setVisibility: (visibility: boolean) => void) => setIsPictureNotSelected = setVisibility)}
@@ -622,7 +631,6 @@ function DialogComponent({context}: ContextType<EditArticles>) {
                                     id: artist.id,
                                     name: newName
                                 }, picture ? picture : null, response => {
-                                    // showToast("Jay", "success");
                                     context.loadArtists(() => {
                                         context.forceUpdate();
                                         showToast("Der Künstler wurde geändert", "success")
@@ -635,11 +643,9 @@ function DialogComponent({context}: ContextType<EditArticles>) {
                             }
                         } else {
                             let netArtist = {
-                                // id: context.artists.length + 1,
                                 name: dialogBuilder.getInputText().trim(),
                             };
                             createNewArtist(netArtist, picture ? picture : null, response => {
-                                // showToast("Jay", "success");
                                 context.loadArtists(() => {
                                     context.forceUpdate();
                                     showToast("Der Künstler wurde angelegt", "success")
@@ -650,9 +656,6 @@ function DialogComponent({context}: ContextType<EditArticles>) {
                                 debugger
                             });
                         }
-
-                        // context.artists.push(netArtist);
-                        // context.setState({artists: netArtist});
                     }
                 })
                 .build()
@@ -663,9 +666,8 @@ function DialogComponent({context}: ContextType<EditArticles>) {
 }
 
 /**
- *
- * @param {EditArticles} context
- * @return {JSX.Element} grid, addButton, text
+ * Renders the delete, copy, save and add buttons
+ * @param context The context of the main component
  */
 function ActionButtons({context}: ContextType<EditArticles>) {
     let state = context.state;
@@ -708,8 +710,6 @@ function ActionButtons({context}: ContextType<EditArticles>) {
                         title="Artikel Kopieren"
                         placement="top">
                         <IconButton style={{width: 36, height: 36}} onClick={event => {
-                            // addToShoppingCart(this.article);
-                            // this.update();
                             context.selectedArticle = undefined;
                             context.setState({
                                 id: -1,

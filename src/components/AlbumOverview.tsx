@@ -41,12 +41,12 @@ import ResizeObserver from 'resize-observer-polyfill';
 import {ContextMenu, MenuItem as ContextMenuItem, ContextMenuTrigger} from "react-contextmenu";
 import {addToShoppingCart, getShoppingCartCount} from "../services/ShoppingCartUtil";
 
-interface IProps {
+interface AlbumOverview_props {
     // @ts-ignore
     location: History.Location;
 }
 
-interface IState {
+interface AlbumOverview_state {
 }
 
 interface ArtistOrGenre {
@@ -57,11 +57,6 @@ interface ArtistOrGenre {
 interface FilterPayload {
     file: string;
     artistOrGenre: ArtistOrGenre;
-}
-
-interface ImageResponseType {
-    article: Article;
-    file: string;
 }
 
 enum SORT_TYPE {
@@ -103,7 +98,10 @@ const useStyles = makeStyles((theme) => ({
 
 let articleArray: Array<Article> = [];
 
-export default class AlbumOverview extends React.Component<IProps, IState> {
+/**
+ * The main Component of AlbumOverview.tsx
+ */
+export default class AlbumOverview extends React.Component<AlbumOverview_props, AlbumOverview_state> {
     IMAGE_RESOLUTION: string = "IMAGE_RESOLUTION";
     imageResolution: number = ifValueReturnOrElse(+(localStorage.getItem(this.IMAGE_RESOLUTION) as string), 0, undefined, 250, true);
     STEP_DISTANCE: string = "STEP_DISTANCE";
@@ -118,14 +116,14 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
     maxVisible: number = this.stepDistance;
     hasMore: boolean = true;
 
-    constructor(props: IProps, context: any) {
+    constructor(props: AlbumOverview_props, context: any) {
         super(props, context);
 
         let state = this.props.location.state;
         if (state) {
             this.filter = Pair.make(state.filter, state.type)
         }
-        this.loadArticles(this);
+        this.loadArticles();
         window.scrollTo(0, 0);
     }
 
@@ -144,7 +142,10 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
         )
     }
 
-    loadArticles(context: AlbumOverview) {
+    /**
+     * Loads the metadata of all Articles without the Images
+     */
+    loadArticles() {
         fetch(new Request(`http://${window.location.hostname}:8080/article`, {method: 'GET'}))
             .then(response => {
                 if (response.status === 200) {
@@ -154,17 +155,18 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
                 }
             })
             .then((response: Article[]) => {
-                // debugger
                 articleArray = response;
                 this.sortList();
                 this.forceUpdate();
-                // this.performanceTest(context);
             })
             .catch(reason => {
                 showToast(reason.message, "error")
             })
     }
 
+    /**
+     * Sorts the list depending on the selected sortType
+     */
     sortList() {
         let idSorter = (a: Article, b: Article) => a.id - b.id;
         switch (this.sortType) {
@@ -185,7 +187,13 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
         }
     }
 
-    componentWillUpdate(nextProps: Readonly<IProps>, nextState: Readonly<IState>, nextContext: any) {
+    /**
+     * Resets the maximum visible articles and marks the images for a reload, if any search exists
+     * @param nextProps
+     * @param nextState
+     * @param nextContext
+     */
+    componentWillUpdate(nextProps: Readonly<AlbumOverview_props>, nextState: Readonly<AlbumOverview_state>, nextContext: any) {
         if (this.query.second) {
             this.maxVisible = this.stepDistance;
             this.hasMore = true;
@@ -193,12 +201,22 @@ export default class AlbumOverview extends React.Component<IProps, IState> {
 
     }
 
-    componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any): void {
+    /**
+     * Reloads the images if a search exists
+     * @param prevProps
+     * @param prevState
+     * @param snapshot
+     */
+    componentDidUpdate(prevProps: Readonly<AlbumOverview_props>, prevState: Readonly<AlbumOverview_state>, snapshot?: any): void {
         if (this.query.second)
             reloadImages(this);
     }
 }
 
+/**
+ * The secondary component of the page which is rendered inside the MenuDrawer
+ * @param props Contains the context of the main component
+ */
 function Album(props: ContextType<AlbumOverview>) {
     const classes = useStyles();
     let context = props.context;
@@ -284,9 +302,16 @@ let setDummy: ((next: number) => void);
 let direction: GridDirection = "row";
 let dummy: number = 0;
 
+/**
+ * The component to display the current artist or genre filter
+ * @param context The context of the main component
+ */
 export function FilterCard({context}: ContextType<AlbumOverview>) {
     setDummy = useState(0)[1];
 
+    /**
+     * Returns the current arrangement of the FilterCard
+     */
     function getNewDirection(): GridDirection {
         let filterCard_root = document.getElementById("filterCard_root");
         let filterCard_text = document.getElementById("filterCard_text");
@@ -300,6 +325,9 @@ export function FilterCard({context}: ContextType<AlbumOverview>) {
         return direction;
     }
 
+    /**
+     * Updates the direction only if it is different from before
+     */
     function testAndApply() {
         let newDirection = getNewDirection();
         if (direction !== newDirection) {
@@ -381,9 +409,12 @@ export function FilterCard({context}: ContextType<AlbumOverview>) {
     );
 }
 
+/**
+ * The component that contains the sort options and the 'UI Einstellungen' dialog
+ * @param context Contains the context of the main component
+ */
 function UiSettings({context}: ContextType<AlbumOverview>) {
     const [open, setOpen] = useState(false);
-    const [checked, setChecked] = useState(context.unloadImages);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     let resolution = context.imageResolution;
     let stepDistance = context.stepDistance;
@@ -391,6 +422,10 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
         setAnchorEl(null);
     };
 
+    /**
+     * Updates the new sortType
+     * @param sortType The new sortType
+     */
     function setSortType(sortType: SORT_TYPE) {
         handleClose();
         context.sortType = sortType;
@@ -400,6 +435,12 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
         reloadImages(context);
     }
 
+    /**
+     * Generates a sortType-menu item
+     * @param text The displayed text
+     * @param sortType The referenced sortType
+     * @param divider Should the item display d Divider
+     */
     function listItem(text: string, sortType: SORT_TYPE, divider?: boolean): JSX.Element {
         return <MenuItem divider={divider}
                          style={context.sortType === sortType ? {backgroundColor: "rgba(0,0,0,0.1)"} : undefined}
@@ -519,6 +560,11 @@ function UiSettings({context}: ContextType<AlbumOverview>) {
     )
 }
 
+/**
+ * The component for the GridList
+ * @param context The context of the main component
+ * @param filteredArticleArray The filtered articleArryt to be displayed
+ */
 function GridList({context, filteredArticleArray}: { context: AlbumOverview, filteredArticleArray: Article[] }): JSX.Element {
 
     const [dummy, setDummy] = useState(0);
@@ -571,10 +617,18 @@ function GridList({context, filteredArticleArray}: { context: AlbumOverview, fil
     )
 }
 
+/**
+ * Calls all image reload callbacks
+ * @param context The context of the main component
+ */
 function reloadImages(context: AlbumOverview) {
     context.imageReloadArray.forEach(reload => reload())
 }
 
+/**
+ * The component that renders a single article
+ * @param props Contains the article to be displayed and the context of the main component
+ */
 function ArticleComponent(props: any) {
     const classes = useStyles();
     let article: Article = props.article;
@@ -732,6 +786,9 @@ function ArticleComponent(props: any) {
     }
 }
 
+/**
+ * Generates an array of empty dummy articles
+ */
 function buildDummyData() {
     for (let i = 0; i < 12; i++) {
         articleArray.push({

@@ -97,8 +97,6 @@ function ArtistComponent({artistResponse}) {
     return (
         <Grid item className={"mobile gridItem"} xs={6} md={4} lg={3}>
             <CardActionArea component={Link} to={(location) => {
-                // if (artistResponse.artistOrGenre.id === 2)
-                //     debugger
                 location.pathname = "/albums";
                 location.state = {filter: artistResponse, type: 'a'};
                 return location;
@@ -108,7 +106,6 @@ function ArtistComponent({artistResponse}) {
                         returnMode={RETURN_MODE.CARD_MEDIA}
                         alt={artistResponse.artistOrGenre.name}
                         className={classes.cardMedia}
-                        // payload={artistResponse}
                         getSrc={setImgSrc => {
                             loadSingleImage("artist", artistResponse.artistOrGenre.id, imageResponse => {
                                 if (imageResponse) {

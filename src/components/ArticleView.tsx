@@ -18,21 +18,21 @@ import {
     getShoppingCartCount, isInShoppingCart
 } from "../services/ShoppingCartUtil";
 
-interface IProps {
+interface ArticleView_props {
     // @ts-ignore
     location: history.Location;
 }
 
-interface IState {
+interface ArticleView_state {
 }
 
 
-class ArticleView extends React.Component<IProps, IState> {
+class ArticleView extends React.Component<ArticleView_props, ArticleView_state> {
 
     article: Article;
     isDetails: boolean = false;
 
-    constructor(props: IProps, context: any) {
+    constructor(props: ArticleView_props, context: any) {
         super(props, context);
         if (this.props.location.state) {
             this.article = this.props.location.state.article;

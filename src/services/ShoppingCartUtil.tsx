@@ -27,8 +27,10 @@ export interface ShoppingCartEntry {
 }
 
 //  ------------------------- Internal ------------------------->
+/**
+ * Ensures that a shoppingCart object is alway in the localStorage
+ */
 function apply() {
-    // localStorage.removeItem(SHOPPING_CART)
     let item = localStorage.getItem(SHOPPING_CART);
     if (!item)
         localStorage.setItem(SHOPPING_CART, JSON.stringify(emptyShoppingCart));
@@ -38,6 +40,10 @@ apply();
 
 // ---------------
 
+/**
+ * Gets the shoppingCartObject from the localStorage
+ * @return the ShoppingCartObject
+ */
 export function getShoppingCartObject(): ShoppingCartObject {
     let item = localStorage.getItem(SHOPPING_CART);
     if (item)
@@ -46,10 +52,20 @@ export function getShoppingCartObject(): ShoppingCartObject {
         return emptyShoppingCart
 }
 
+/**
+ * Saves the ShoppingCartObject to the localStorage
+ * @param shoppingCartObject The object to be saved
+ */
 function saveShoppingCartObject(shoppingCartObject: ShoppingCartObject) {
     localStorage.setItem(SHOPPING_CART, JSON.stringify(shoppingCartObject))
 }
 
+/**
+ * Gets the ShoppingCartEntry for a specific article
+ * @param article
+ * @param shoppingCartObject
+ * @return {ShoppingCartObject | null} The shoppingCartEntry or null is article isn't in the shoppingCart
+ */
 function getShoppingCartEntry(article: Article, shoppingCartObject?: ShoppingCartObject): ShoppingCartEntry | null {
     if (!shoppingCartObject)
         shoppingCartObject = getShoppingCartObject();
@@ -59,7 +75,6 @@ function getShoppingCartEntry(article: Article, shoppingCartObject?: ShoppingCar
     }
     return null;
 }
-
 //  <------------------------- Internal -------------------------
 
 
@@ -68,6 +83,10 @@ export enum AAR_RETURN_TYPE {
     ADDED, REMOVED, INCREASED, DECREASED, NULL
 }
 
+/**
+ * Adds the article to the shoppingCart, or increases its count
+ * @param article The article to be added
+ */
 export function addToShoppingCart(article: Article): AAR_RETURN_TYPE {
     let shoppingCartObject = getShoppingCartObject();
     let shoppingCartEntry = getShoppingCartEntry(article, shoppingCartObject);
@@ -83,6 +102,10 @@ export function addToShoppingCart(article: Article): AAR_RETURN_TYPE {
     return returnValue;
 }
 
+/**
+ * Removes the article from the shoppingCart
+ * @param article The article to be removed
+ */
 export function removeFromShoppingCart(article: Article): AAR_RETURN_TYPE {
     let shoppingCartObject = getShoppingCartObject();
     let shoppingCartEntry = getShoppingCartEntry(article, shoppingCartObject);
@@ -99,11 +122,14 @@ export function removeFromShoppingCart(article: Article): AAR_RETURN_TYPE {
     saveShoppingCartObject(shoppingCartObject);
     return returnValue;
 }
-
 //  <------------------------- Add and Remove -------------------------
 
 
 //  ------------------------- Convenience ------------------------->
+/**
+ * Checks if the article is in the shoppingCart
+ * @param article The article to be checked
+ */
 export function isInShoppingCart(article: Article): boolean {
     for (const entry of getShoppingCartObject().entries) {
         if (article.id === entry.article.id)
@@ -112,14 +138,20 @@ export function isInShoppingCart(article: Article): boolean {
     return false;
 }
 
+/**
+ * Clears the shoppingCart
+ */
 export function clearShoppingCart() {
     localStorage.setItem(SHOPPING_CART, JSON.stringify(emptyShoppingCart))
 }
-
 //  <------------------------- Convenience -------------------------
 
 
 //  ------------------------- getters ------------------------->
+/**
+ * Gets the count of all the items, or for a specific article in the shoppingCart
+ * @param article Optional if the count of a specific article is wanted
+ */
 export function getShoppingCartCount(article?: Article): number {
     if (article) {
         let entry = getShoppingCartEntry(article);
@@ -135,6 +167,10 @@ export function getShoppingCartCount(article?: Article): number {
     }
 }
 
+/**
+ * Gets the cumulative price of all the items, or for a specific article in the shoppingCart
+ * @param article Optional if the cumulative price of a specific article is wanted
+ */
 export function getShoppingCartPrice(article?: Article): string {
     let result: number;
     if (article) {
@@ -152,20 +188,28 @@ export function getShoppingCartPrice(article?: Article): string {
     return result.toFixed(2);
 }
 
+/**
+ * Checks if the shoppingCart is empty
+ */
 export function isShoppingCartEmpty(): boolean {
     return getShoppingCartObject().entries.length === 0;
 }
 
 // ---------------
 
+/**
+ * Returns all the shoppingCartEntries
+ */
 export function getAllShoppingCartEntries(): ShoppingCartEntry[] {
     return getShoppingCartObject().entries
 }
 
+/**
+ * Returns all the articles in the shoppingCart
+ */
 export function getAllShoppingCartArticles(): Article[] {
     return getAllShoppingCartEntries().map(entry => entry.article)
 }
-
 //  <------------------------- getters -------------------------
 
 
@@ -176,6 +220,9 @@ interface ShoppingCartList_props {
     shoppingCart: any;
 }
 
+/**
+ * A reusable component for displaying the shoppingCart entries in a list
+ */
 export class ShoppingCartList extends React.Component<ShoppingCartList_props, {}> {
 
     entryArray: ShoppingCartEntry[]
@@ -212,7 +259,8 @@ export class ShoppingCartList extends React.Component<ShoppingCartList_props, {}
                 {
                     this.entryArray.map((entry, index) => {
                         return <ShoppingCartListItem update={() => callIfExists(this.update)}
-                                                     entry={entry} index={index} array={this.entryArray}
+                                                     entry={entry} index={index}
+                                                     array={this.entryArray}
                                                      showChangeCount={this.props.showChangeCount}
                                                      isDetails={!!this.props.shoppingCart}/>
                     })
@@ -231,6 +279,9 @@ interface ShoppingCartListItem_props {
     update: () => void;
 }
 
+/**
+ * A single entry in the the ShoppingCartList
+ */
 class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {}> {
     isDetails: boolean
     entry: ShoppingCartEntry
@@ -360,7 +411,7 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
                     </Grid>}
                 </Grid>
                 {this.props.array.length - 1 > this.index &&
-                    <hr className={"shoppingCartList-articleDivider"} style={{display: 'none'}}/>
+                <hr className={"shoppingCartList-articleDivider"} style={{display: 'none'}}/>
                 }
             </Grid>
         )
@@ -373,6 +424,9 @@ interface ShoppingCartListItemButtons_props {
     update: () => void;
 }
 
+/**
+ * The buttons for increasing or decreasing the count of a article in the shoppingCart
+ */
 class ShoppingCartListItemButtons extends React.Component<ShoppingCartListItemButtons_props, {}> {
     article: Article;
     count: number;
@@ -420,5 +474,4 @@ class ShoppingCartListItemButtons extends React.Component<ShoppingCartListItemBu
         )
     }
 }
-
 //  <------------------------- List -------------------------

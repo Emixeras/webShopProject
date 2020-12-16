@@ -15,16 +15,16 @@ import {ContextType} from "../Utilities/TsUtilities";
 import {DialogBuilder} from "../Utilities/DialogBuilder";
 import {Link, useHistory} from "react-router-dom";
 
-interface IProps {
+interface ShoppingCart_props {
 
 }
 
-interface IState {
+interface ShoppingCart_state {
 }
 
-class ShoppingCart extends React.Component<IProps, IState> {
+class ShoppingCart extends React.Component<ShoppingCart_props, ShoppingCart_state> {
 
-    constructor(props: IProps, context: any) {
+    constructor(props: ShoppingCart_props, context: any) {
         super(props, context);
         window.scrollTo(0, 0);
     }

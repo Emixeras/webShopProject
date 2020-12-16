@@ -15,8 +15,6 @@ import {
 } from "../services/StorageUtil";
 import Typography from "@material-ui/core/Typography";
 
-
-
 class OrderComplete extends Component {
 
     user = {};

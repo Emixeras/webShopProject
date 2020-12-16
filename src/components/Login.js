@@ -22,6 +22,9 @@ import {NavigationComponent} from "../Utilities/Utilities.js"
 import {isUserLoggedIn} from "../services/StorageUtil";
 import {setRememberMe} from "../services/RememberMeUtil";
 
+/**
+ * The main Component of Login.js
+ */
 class Login extends Component {
     showPassword = false;
     passwordError = false;
@@ -65,6 +68,11 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+/**
+ * Renders the LogInForm
+ * @param props Contains the context of the main component
+ * @return {JSX.Element}
+ */
 function LogInForm(props) {
     const that = props.context;
     const classes = useStyles();
@@ -171,7 +179,4 @@ function LogInForm(props) {
     )
 }
 
-const style = {
-    margin: 15,
-};
 export default Login;

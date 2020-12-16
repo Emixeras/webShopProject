@@ -103,12 +103,10 @@ export default class OrderOverview extends React.Component {
 }
 
 /**
- *
+ * Stellt alle Kundenbestellungen dar
  * @param {Order} orderArray
  * @param context
  * @returns {JSX.Element|null}
- * @constructor
- * Stellt alle Kundenbestellungen dar
  */
 function OrderList({orderArray, context}) {
     const history = useHistory()

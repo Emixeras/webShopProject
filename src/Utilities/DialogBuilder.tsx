@@ -44,6 +44,9 @@ interface InputObject {
 let persistentErrorState: Triple<string, boolean, string> = Triple.make("", false, "");
 let setPersistentErrorState: Dispatch<SetStateAction<Triple<string, boolean, string>>> = value => {};
 
+/**
+ * A class for creating simplified dialogs
+ */
 export class DialogBuilder {
     readonly open: boolean;
     _title: string = "";
@@ -136,6 +139,10 @@ export class DialogBuilder {
 
 
     //  ------------------------- Build ------------------------->
+    /**
+     * Validates the the input content
+     * @param newValue The current input value
+     */
     validate(newValue: string) {
         // @ts-ignore
         let result = this.input.inputValidator(newValue, persistentErrorState, this);
@@ -147,6 +154,9 @@ export class DialogBuilder {
             persistentErrorState = result;
     }
 
+    /**
+     * Returns the dialog
+     */
     // @ts-ignore
     build(): Dialog {
         return <Builder context={this}/>
@@ -155,6 +165,10 @@ export class DialogBuilder {
 
 
     //  ------------------------- Convenience ------------------------->
+    /**
+     * Closes the dialog
+     * @param event An optional event that caused the closing
+     */
     dismiss(event?: any): DialogBuilder {
         if (this.handleClose.name === "DialogOnClick")
             (this.handleClose as DialogOnClick)(this, event);
@@ -165,6 +179,10 @@ export class DialogBuilder {
     //  <------------------------- Convenience -------------------------
 }
 
+/**
+ * Returns the build dialog
+ * @param context The context of the DialogBuilder
+ */
 function Builder({context}: ContextType<DialogBuilder>) {
     let state = useState(() => {
         if (context.input) {
@@ -227,6 +245,10 @@ function Builder({context}: ContextType<DialogBuilder>) {
     )
 }
 
+/**
+ * Returns the TextField for the dialog
+ * @param context The context of the DialogBuilder
+ */
 function buildInput(context: DialogBuilder) {
     if (context.input === undefined)
         return null;

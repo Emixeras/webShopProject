@@ -85,7 +85,7 @@ class SimpleReactFileUpload extends React.Component {
                 <div className={`files ${this.state.defaultVisibility ? "" :"image-opacity"}`}
                      style={this.state.defaultVisibility ? {height: "100%"} : {
                          height: "100%",
-                         opacity: +showUpload // ? 0.8 : 0
+                         opacity: +showUpload
                      }}>
                     <Button color={"primary"}
                             variant="contained"

@@ -20,9 +20,13 @@ import OrderSummary from "./components/OrderSummary";
 import OrderComplete from "./components/OrderComplete";
 import OrderOverview from "./components/OrderOverview"
 import OrderDetails from "./components/OrderDetails";
-import SideNotice from "./components/sideNotice";
+import SideNotice from "./components/SideNotice";
 
 toast.configure();
+
+/**
+ * The main Component of App.js
+ */
 function App() {
   return (
     <div className="App">

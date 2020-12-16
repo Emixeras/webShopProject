@@ -1,8 +1,6 @@
 import axios from "axios";
 import {getSessionUser} from "./StorageUtil";
 
-
-//todo enpoint anpassen
 const apiBaseUrlPlaceOrder = `http://${window.location.hostname}:8080/order`;
 
 export const placeOrder = (payload, onSuccess, onFail) => {

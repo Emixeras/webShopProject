@@ -26,6 +26,9 @@ import {useHistory} from "react-router-dom";
 import {DialogBuilder} from "../Utilities/DialogBuilder";
 import {Triple} from "../Utilities/TsUtilities";
 
+/**
+ * The main Component of Profile.js
+ */
 class Profile extends Component {
     showPassword = false;
     passwordError = false;
@@ -336,6 +339,12 @@ class Profile extends Component {
         }
     }
 
+    /**
+     * Keeps the elements on a static place when the edit mode changes
+     * @param prevProps
+     * @param prevState
+     * @param snapshot
+     */
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.scrollHelper.first !== this.editMode) {
             this.scrollHelper.first = this.editMode;
@@ -346,6 +355,11 @@ class Profile extends Component {
 
     // ---------------
 
+    /**
+     * Changes the state according to the inputs
+     * @param key
+     * @param eventOrText
+     */
     changeStateItem(key, eventOrText) {
         if (this.editMode)
             this.setState({[key]: (eventOrText instanceof String ? eventOrText : eventOrText.target.value.trim())});
@@ -357,8 +371,16 @@ class Profile extends Component {
         }
     }
 
+    /**
+     * Handles the change of the title
+     * @param event The change event
+     */
     handleChange = event => this.setState({title: event.target.value.trim()});
 
+    /**
+     * Handles and checks the passwords
+     * @param name The name of the passwort field
+     */
     handlePasswordChange = name => event => {
         let currentPasswordChange = event.target.value;
         this.setState({password: currentPasswordChange});
@@ -366,6 +388,10 @@ class Profile extends Component {
         this.passwordError = this.passwordState.password !== this.passwordState.passwordRepeat;
     };
 
+    /**
+     * Checks if the save should be enabled
+     * @return {boolean} Should the button be enabled
+     */
     getButtonState() {
         return !(
             this.state.title &&
@@ -379,10 +405,18 @@ class Profile extends Component {
         );
     }
 
+    /**
+     * Checks if the eMail inpit is valid
+     * @return {boolean}
+     */
     checkEmail() {
         return this.emailError = !(this.state.email.length === 0 || isEmail(this.state.email));
     }
 
+    /**
+     * Toggles the editMode
+     * @param notForce Should the rerender be forced
+     */
     toggleEditMode(notForce) {
         this.editMode = !this.editMode;
         this.scrollHelper.second = this.scrollHelper.third.getBoundingClientRect().top;
@@ -391,6 +425,10 @@ class Profile extends Component {
     }
 }
 
+/**
+ * Returns the deleteAccount-button and the delete dialog
+ * @return {JSX.Element}
+ */
 function DeleteAccountButton() {
     const history = useHistory();
     const [open, setOpen] = useState(false);
@@ -426,6 +464,12 @@ function DeleteAccountButton() {
         </div>
     )
 }
+
+/**
+ * Returns the editMode-buttons
+ * @param props Contains the context of the main component
+ * @return {JSX.Element}
+ */
 function ModeButtons(props) {
     let that = props.context;
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
