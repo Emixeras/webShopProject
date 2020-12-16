@@ -476,6 +476,11 @@ export default class EditArticles extends React.Component<IProps, IState> {
 let setIsPictureNotSelected: (visibility: boolean) => void = visibility => {
 };
 
+/**
+ *
+ * @param {EditArticles} context
+ * @return {JSX.Element} editButton, grid, addButton, text
+ */
 function DialogComponent({context}: ContextType<EditArticles>) {
     const artist: ArtistOrGenre = (context.state.artists as ArtistOrGenre);
     let editMode: boolean = typeof artist === "object";
@@ -657,6 +662,11 @@ function DialogComponent({context}: ContextType<EditArticles>) {
 
 }
 
+/**
+ *
+ * @param {EditArticles} context
+ * @return {JSX.Element} grid, addButton, text
+ */
 function ActionButtons({context}: ContextType<EditArticles>) {
     let state = context.state;
     let shouldButtonBeEnabled: boolean = Boolean(state.title && typeof state.artists === "object" && typeof state.genre === "object" && state.ean.toString().length === 8 && (context.currentPicture || state.id !== -1) && !context.checkPriceError(state.price))

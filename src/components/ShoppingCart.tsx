@@ -116,6 +116,11 @@ class ShoppingCart extends React.Component<IProps, IState> {
         )
     }
 }
+
+/**
+ *
+ * @return {JSX.Element} paymentButton
+ */
 function GoToOrder(){
     const history = useHistory();
     let continueToOrder = () => {
@@ -132,6 +137,12 @@ function GoToOrder(){
         </Button>
     )
 }
+
+/**
+ *
+ * @param {shoppingCart} context
+ * @return {JSX.Element} emptyShoppingcartButton
+ */
 function ClearShoppingCartButton({context}: ContextType<ShoppingCart>) {
     const [open, setOpen] = useState(false);
     return (

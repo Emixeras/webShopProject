@@ -26,6 +26,7 @@ interface IProps {
 interface IState {
 }
 
+
 class ArticleView extends React.Component<IProps, IState> {
 
     article: Article;
@@ -183,6 +184,11 @@ class ArticleView extends React.Component<IProps, IState> {
 
 }
 
+/**
+ * Component for rendering edit button
+ * @param {ArticleView} context
+ * @return {JSX.Element} editButton
+ */
 function EditButton({context}: ContextType<ArticleView>) {
     const history = useHistory();
     if (hasCurrentUserRoleLevel() && !context.isDetails) {
