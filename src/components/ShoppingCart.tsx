@@ -106,7 +106,8 @@ class ShoppingCart extends React.Component<IProps, IState> {
                                             </Grid>
                                         </Card>
                                     </Grid>
-                                    }                                </Grid>
+                                    }
+                                </Grid>
                             </div>
                         </Grid>
                     </Grid>

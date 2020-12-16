@@ -1,6 +1,5 @@
 import React from "react";
 import MenuDrawer from "./MenuDrawer";
-import Grid from "@material-ui/core/Grid";
 import {isMobile} from "../Utilities/Utilities";
 import {Card, Typography} from "@material-ui/core";
 

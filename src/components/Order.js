@@ -276,7 +276,6 @@ class Order extends Component {
                             <Grid item>
                                 <div style={{marginBottom: 8}}/>
                             </Grid>
-                            {/*<LogoutAccountButton context={this}/>*/}
                         </Grid>
                     </div>
                 </MenuDrawer>
@@ -293,8 +292,6 @@ class Order extends Component {
                 window.scrollBy(0, this.scrollHelper.third.getBoundingClientRect().top - this.scrollHelper.second)
         }
     }
-
-    // ---------------
 
     changeStateItem(key, eventOrText) {
         if (this.editMode)

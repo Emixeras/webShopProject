@@ -1,6 +1,6 @@
 import axios from "axios";
-import {getSessionUser, setSessionUser, setUserLoggedIn} from "./StorageUtil";
-import {showToast} from "../Utilities/Utilities";
+import {getSessionUser} from "./StorageUtil";
+
 
 //todo enpoint anpassen
 const apiBaseUrlPlaceOrder = `http://${window.location.hostname}:8080/order`;

@@ -1,6 +1,5 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Card, CardMedia, Grid, Link, Typography} from "@material-ui/core";
-import {number} from "prop-types";
 import {padding, showToast} from "../Utilities/Utilities";
 import {getSessionUser} from "../services/StorageUtil";
 import {useHistory} from "react-router-dom";
@@ -108,39 +107,11 @@ export const roleMap = {
 
 //  ------------------------- Image ------------------------->
 export function base64ToDataUri(base64: string): string {
-    // if (!base64)
-    //     return "";
     var mime;
     if (base64.startsWith("iVBORw0KGgo"))
         mime = "image/png";
     else if (base64.startsWith("/9j/4AAQSkZJRg"))
         mime = "image/jpeg";
-
-    // for (let s in signatures) {
-    //     if (base64.startsWith(s)) {
-    //          mime = signatures[s as string] as string;
-    //     }
-    // }
-    // var a = new Uint8Array(buffer);
-    // var nb = a.length;
-    // if (nb < 4)
-    //     return "";
-    // var b0 = a[0];
-    // var b1 = a[1];
-    // var b2 = a[2];
-    // var b3 = a[3];
-    // if (b0 == 0x89 && b1 == 0x50 && b2 == 0x4E && b3 == 0x47)
-    //     mime = 'image/png';
-    // else if (b0 == 0xff && b1 == 0xd8)
-    //     mime = 'image/jpeg';
-    // else if (b0 == 0x47 && b1 == 0x49 && b2 == 0x46)
-    //     mime = 'image/gif';
-    // else
-    //     return "";
-    // var binary = "";
-    // for (var i = 0; i < nb; i++)
-    //     binary += String.fromCharCode(a[i]);
-    // var base64 = window.btoa(binary);
     return `data:${mime};base64,${base64}`
 }
 
@@ -784,14 +755,6 @@ export function renameObjectKey(object: object, oldKey: string, newKey: string):
     // @ts-ignore
     object[newKey] = object[oldKey];
     // @ts-ignore
-    // delete object[oldKey];
-    // if (oldKey !== newKey) {
-    //     Object.defineProperty(object, newKey,
-    //     // @ts-ignore
-    //         Object.getOwnPropertyDescriptor(object, oldKey));
-    //     // @ts-ignore
-    //     delete object[oldKey];
-    // }
     return object
 }
 

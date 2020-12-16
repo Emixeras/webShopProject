@@ -1,13 +1,9 @@
 import React, {
-    Component,
     Dispatch,
-    MouseEventHandler,
     ReactNode,
-    RefObject,
     SetStateAction,
     useState
 } from "react";
-import * as Collections from 'typescript-collections';
 import {LinkedList} from "typescript-collections";
 import Dialog from "@material-ui/core/Dialog";
 import {
@@ -15,7 +11,7 @@ import {
     DialogActions,
     DialogContent,
     DialogContentText,
-    DialogTitle, InputProps as StandardInputProps, PropTypes,
+    DialogTitle, PropTypes,
     TextField
 } from "@material-ui/core";
 import {boolOr, Pair, Triple, ContextType} from "./TsUtilities";
@@ -57,7 +53,6 @@ export class DialogBuilder {
     handleClose: DialogOnClick | Dispatch<SetStateAction<boolean>> = (dialogBuilder, event) => new DOMException("Handle Close nicht überschrieben");
     input: InputObject | undefined = undefined;
     content: ((dialogBuilder: DialogBuilder) => JSX.Element) | undefined = undefined;
-    // persistentErrorState: Triple<string, boolean, string>
 
 
     //  ------------------------- Constructor ------------------------->
@@ -235,8 +230,6 @@ function Builder({context}: ContextType<DialogBuilder>) {
 function buildInput(context: DialogBuilder) {
     if (context.input === undefined)
         return null;
-    // setPersistentErrorState = setPersistentErrorState;
-    // persistentErrorState = persistentErrorState;
 
     return (
         <TextField

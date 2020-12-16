@@ -65,8 +65,6 @@ export default class RoleManagement extends React.Component<RoleManagement_State
             .then(response => {
                 console.log(response);
                 this.userArray = response.data
-                // debugger;
-                // showToast("Jay", "success");
                 this.forceUpdate();
             })
             .catch(error => {
@@ -116,7 +114,6 @@ function RoleListItem({context, user, index}: { context: RoleManagement, user: U
                         <div style={{
                             display: "flex",
                             height: "100%",
-                            // justifyContent: "center",
                             alignItems: "center",
                         }}>
                             <Typography><b>{user.email}</b></Typography>
@@ -126,7 +123,6 @@ function RoleListItem({context, user, index}: { context: RoleManagement, user: U
                         <div style={{
                             display: "flex",
                             height: "100%",
-                            // justifyContent: "center",
                             alignItems: "center",
                         }}>
                             <Grid container spacing={1}>

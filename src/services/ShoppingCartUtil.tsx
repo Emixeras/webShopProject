@@ -12,8 +12,7 @@ import AddIcon from '@material-ui/icons/AddCircleOutline';
 import RemoveIcon from '@material-ui/icons/RemoveCircleOutline';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {Link} from "react-router-dom";
-import {margin, showToast} from "../Utilities/Utilities";
-// import "../styling/mobile.css"
+import {showToast} from "../Utilities/Utilities";
 
 const SHOPPING_CART: string = "SHOPPING_CART";
 const emptyShoppingCart: ShoppingCartObject = {entries: []};
@@ -200,7 +199,6 @@ export class ShoppingCartList extends React.Component<ShoppingCartList_props, {}
     }
 
     componentWillUpdate(nextProps: Readonly<ShoppingCartList_props>, nextState: Readonly<{}>, nextContext: any) {
-        // debugger
         if (this.props.shoppingCart) {
             this.entryArray = this.props.shoppingCart
         } else {
@@ -297,12 +295,10 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
                                     width: 75,
                                     height: 75,
                                     backgroundColor: "lightgray",
-                                    // marginRight: 18,
                                 }}/>
                         </div>
                     </Grid>
                     <Grid item lg={sCc ? 3 : 4} xs={8}>
-                        {/*<div style={margin(0, 20, 0, 0)}>*/}
                         <Grid container style={{height: "100%"}}
                               direction={"column"}>
                             <Grid item>
@@ -324,10 +320,8 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
                                 </Typography>
                             </Grid>
                         </Grid>
-                        {/*</div>*/}
                     </Grid>
                     <Grid item lg={sCc ? 2 : 3} md={sCc ? 4 : 5} xs={sCc ? 4 : 5}>
-                        {/*<div style={margin(0, 20, 0, 0)}>*/}
                         <Grid container style={{height: "100%"}}
                               direction={"column"}>
                             <Grid item>
@@ -342,10 +336,8 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
                                 </Typography>
                             </Grid>
                         </Grid>
-                        {/*</div>*/}
                     </Grid>
                     <Grid item lg={3} md={sCc ? 4 : 5} xs={sCc ? 4 : 5}>
-                        {/*<div style={margin(0, 20, 0, 0)}>*/}
                         <Grid container style={{height: "100%"}}
                               direction={"column"}>
                             <Grid item>
@@ -360,7 +352,6 @@ class ShoppingCartListItem extends React.Component<ShoppingCartListItem_props, {
                                 </Typography>
                             </Grid>
                         </Grid>
-                        {/*</div>*/}
                     </Grid>
                     {this.showChangeCount &&
                     <Grid item lg={2} md={3} xs={3}>

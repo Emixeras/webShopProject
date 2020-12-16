@@ -53,8 +53,6 @@ class Register extends Component {
         }
     }
 
-    // ---------------
-
     handlePasswordChange = name => event => {
         let currentPasswordChange = event.target.value;
         this.setState({password: currentPasswordChange});
@@ -277,15 +275,9 @@ function RegisterForm(props) {
                                 variant="contained"
                                 color="primary"
                                 onClick={register}
-                                //disabled={!(validEmail && this.state.email && this.state.password)}
                                 style={{marginBottom: 12, marginTop: 12}}
                             >Registrieren</Button>
                             <Grid container justify={"flex-end"}>
-                                {/*    <Grid item>*/}
-                                {/*        <Link href="#" variant="body2" >*/}
-                                {/*            Forgot password?*/}
-                                {/*        </Link>*/}
-                                {/*    </Grid>*/}
                                 <Grid item>
                                     <Link href="#" variant="body2" to={"login"}>
                                         {"bereits registriert? Hier einloggen"}

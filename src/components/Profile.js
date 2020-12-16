@@ -20,13 +20,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import {deleteUser, logoutUser, updateUser} from "../services/UserApiUtil";
 import {padding, showToast, shallowEqual, isEmail} from "../Utilities/Utilities";
 import {
-    getDrawerState,
     getSessionUser, isUserLoggedIn
 } from "../services/StorageUtil";
 import {useHistory} from "react-router-dom";
-import Login from "./Login";
 import {DialogBuilder} from "../Utilities/DialogBuilder";
-import {Pair, Triple} from "../Utilities/TsUtilities";
+import {Triple} from "../Utilities/TsUtilities";
 
 class Profile extends Component {
     showPassword = false;
@@ -329,7 +327,6 @@ class Profile extends Component {
                             <Grid item>
                                 <div style={{marginBottom: 8}}/>
                             </Grid>
-                            {/*<LogoutAccountButton context={this}/>*/}
                         </Grid>
                     </div>
                 </MenuDrawer>
@@ -429,35 +426,6 @@ function DeleteAccountButton() {
         </div>
     )
 }
-
-function LogoutAccountButton() {
-    const history = useHistory();
-
-    return (
-        <Grid item xs>
-            <Grid
-                container
-                justify="flex-end"
-                spacing={1}
-                direction="row">
-                <Grid item>
-                    <Button endIcon={<ExitToApp/>}
-                            variant="contained"
-                            onClick={() => {
-                                logoutUser(() => {
-                                    showToast("Abmeldung Erfolgreich", "success")
-                                    history.push("/");
-                                }, () => {
-                                    showToast('Abmelden Fehlgeschlagen', "error")
-                                });
-                            }}>Abmelden</Button>
-                </Grid>
-            </Grid>
-        </Grid>
-
-    )
-}
-
 function ModeButtons(props) {
     let that = props.context;
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);

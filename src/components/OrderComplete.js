@@ -13,10 +13,8 @@ import {padding} from "../Utilities/Utilities";
 import {
     getSessionUser, isUserLoggedIn
 } from "../services/StorageUtil";
-import HorizontalLabelPositionBelowStepper from "./Stepper";
-import {useHistory} from "react-router-dom";
 import Typography from "@material-ui/core/Typography";
-import Redirect from "react-router/lib/Redirect";
+
 
 
 class OrderComplete extends Component {
@@ -89,7 +87,6 @@ class OrderComplete extends Component {
                             <Grid item>
                                 <div style={{marginBottom: 8}}/>
                             </Grid>
-                            {/*<LogoutAccountButton context={this}/>*/}
                         </Grid>
                     </div>
                 </MenuDrawer>

@@ -5,11 +5,10 @@ import {
     Card,
     Button,
 } from '@material-ui/core';
-import MenuDrawer, {addDrawerCallback, setOpen_ref, removeDrawerCallback} from "./MenuDrawer";
+import MenuDrawer from "./MenuDrawer";
 import 'react-toastify/dist/ReactToastify.css';
 import {padding} from "../Utilities/Utilities";
 import {
-    isDrawerVisible,
     isUserLoggedIn
 } from "../services/StorageUtil";
 import Typography from "@material-ui/core/Typography";
@@ -207,7 +206,6 @@ export default class OrderDetails extends Component {
                             <Grid item>
                                 <div style={{marginBottom: 8}}/>
                             </Grid>
-                            {/*<LogoutAccountButton context={this}/>*/}
                         </Grid>
                     </div>
                 </MenuDrawer>

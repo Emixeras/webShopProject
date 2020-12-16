@@ -180,7 +180,6 @@ class OrderSummary extends Component {
                             <Grid item>
                                 <div style={{marginBottom: 8}}/>
                             </Grid>
-                            {/*<LogoutAccountButton context={this}/>*/}
                         </Grid>
                     </div>
                 </MenuDrawer>

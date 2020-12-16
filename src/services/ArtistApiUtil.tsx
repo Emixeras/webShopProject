@@ -1,7 +1,6 @@
 import {getSessionUser} from "./StorageUtil";
 import axios from "axios";
 import {showToast} from "../Utilities/Utilities";
-import {resolve} from "dns";
 
 const apiBaseUrlUpdateArtist = `http://${window.location.hostname}:8080/artist/`;
 
@@ -106,22 +105,4 @@ export function deleteArtist(id: number, onSuccess?: (response: any) => void, on
             if(onFail)
                 onFail(error);
         });
-
-
-
-    // fetch(new Request(apiBaseUrlUpdateArtist + id, {method: 'DELETE'}))
-    //     .then(response => {
-    //         debugger
-    //         if (response.status === 200) {
-    //             if (onSuccess)
-    //                 onSuccess(response)
-    //         } else {
-    //             throw new Error(`Fehler bei der Anfrage: ${response.status} ${response.statusText}`);
-    //         }
-    //     })
-    //     .catch(reason => {
-    //         if (onFail)
-    //             onFail(reason)
-    //     })
-
 }
