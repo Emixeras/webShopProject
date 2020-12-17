@@ -51,6 +51,11 @@ class GenreOverview extends Component {
 
 let genreArray = [];
 
+/**
+ * mapped alle genres aus array und rendert sie in je eine card
+ * @returns {JSX.Element}
+ * @constructor
+ */
 function Genre() {
     const classes = useStyles();
     return (
