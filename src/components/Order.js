@@ -27,6 +27,9 @@ import {
 } from "../services/ShoppingCartUtil";
 
 
+/**
+ * The main Component of Order.js
+ */
 class Order extends Component {
     showPassword = false;
     passwordError = false;
@@ -340,6 +343,10 @@ class Order extends Component {
     }
 }
 
+/**
+ * The function forwards to the payment page
+ * @returns {JSX.Element}
+ */
 function ContinueButton() {
     const history = useHistory();
     let continueToPayment = () => {
@@ -364,6 +371,11 @@ function ContinueButton() {
     )
 }
 
+/**
+ * The function checks the userAdress
+ * @param onSuccess is a boolean
+ * @param onFail is a boolean
+ */
 function checkUserAddress(onSuccess, onFail) {
     let user = getSessionUser()
     if (user.town === '' || user.town === undefined ||
@@ -378,6 +390,10 @@ function checkUserAddress(onSuccess, onFail) {
     }
 }
 
+/**
+ * The function forwards to the shoppingcart page
+ * @returns {JSX.Element}
+ */
 function BackButton() {
     const history = useHistory();
     let backToShoppingCart = () => {
@@ -397,6 +413,11 @@ function BackButton() {
     )
 }
 
+/**
+ * The buttons for toggling the editMode
+ * @param props Includes the context of the mein component
+ * @returns {JSX.Element}
+ */
 function ModeButtons(props) {
     let that = props.context;
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
@@ -484,3 +505,4 @@ function ModeButtons(props) {
 }
 
 export default Order;
+
