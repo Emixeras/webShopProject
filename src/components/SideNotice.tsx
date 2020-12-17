@@ -3,15 +3,15 @@ import MenuDrawer from "./MenuDrawer";
 import {isMobile} from "../Utilities/Utilities";
 import {Card, Typography} from "@material-ui/core";
 
-interface Impressum_props {
+interface SideNotice_props {
 
 }
 
-interface Impressum_state {
+interface SideNotice_state {
 
 }
 
-export default class SideNotice extends React.Component<Impressum_props, Impressum_state>{
+export default class SideNotice extends React.Component<SideNotice_props, SideNotice_state>{
     render() {
         return (
             <MenuDrawer>
