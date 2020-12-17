@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {isMobile, NavigationComponent} from "../Utilities/Utilities";
+import {isMobile, NavigationComponent, showToast} from "../Utilities/Utilities";
 import Grid from "@material-ui/core/Grid";
 import {
     Card,
@@ -30,6 +30,8 @@ class PaymentMethod extends Component {
             paymentMethod: -1,
         };
 
+        if (!localStorage.getItem('paymentmethod'))
+            localStorage.setItem('paymentmethod', 'VORKASSE')
     }
 
     render() {
