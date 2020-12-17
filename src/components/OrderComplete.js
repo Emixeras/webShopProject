@@ -15,6 +15,9 @@ import {
 } from "../services/StorageUtil";
 import Typography from "@material-ui/core/Typography";
 
+/**
+ * The main Component of OrderComplete.js
+ */
 class OrderComplete extends Component {
 
     user = {};
@@ -28,9 +31,11 @@ class OrderComplete extends Component {
         };
 
     }
+
     componentDidMount() {
-        this.id = setTimeout(() => this.setState({ redirect: true }), 5000)
+        this.id = setTimeout(() => this.setState({redirect: true}), 5000)
     }
+
     componentWillUnmount() {
         clearTimeout(this.id)
     }
@@ -68,7 +73,8 @@ class OrderComplete extends Component {
                                                 fontSize: 22,
                                                 marginBottom: 3
                                             }}>
-                                                Vielen Dank für ihre Bestellung! Sie werden in wenigen Sekunden weitergeleitet.
+                                                Vielen Dank für ihre Bestellung! Sie werden in
+                                                wenigen Sekunden weitergeleitet.
                                                 <Lottie options={defaultOptions}
                                                         height={250}
                                                         width={250}
@@ -93,8 +99,8 @@ class OrderComplete extends Component {
             return <NavigationComponent to={"/login"}/>;
         }
     }
-    handleChange = event => this.setState({title: event.target.value.trim()});
 
+    handleChange = event => this.setState({title: event.target.value.trim()});
 }
 
 export default OrderComplete;

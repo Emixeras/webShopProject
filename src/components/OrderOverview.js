@@ -14,6 +14,9 @@ import Button from "@material-ui/core/Button";
 import SearchIcon from '@material-ui/icons/Search';
 
 
+/**
+ * The main Component of OrderOverview.js
+ */
 export default class OrderOverview extends React.Component {
     user = {};
     orders = [-1];

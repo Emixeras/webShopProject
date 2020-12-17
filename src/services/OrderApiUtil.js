@@ -3,6 +3,12 @@ import {getSessionUser} from "./StorageUtil";
 
 const apiBaseUrlPlaceOrder = `http://${window.location.hostname}:8080/order`;
 
+/**
+ * Creates a new order
+ * @param payload The metadata of the order
+ * @param onSuccess Called if the call was successfull
+ * @param onFail Called when the creation failed
+ */
 export const placeOrder = (payload, onSuccess, onFail) => {
     var user = getSessionUser();
     axios.post(apiBaseUrlPlaceOrder, payload, {

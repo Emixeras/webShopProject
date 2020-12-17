@@ -20,8 +20,11 @@ import {DialogBuilder} from "../Utilities/DialogBuilder";
 import {Triple} from "../Utilities/TsUtilities";
 import HorizontalLabelPositionBelowStepper from "./Stepper";
 import {useHistory} from "react-router-dom";
-import {getShoppingCartCount, getShoppingCartPrice, ShoppingCartList} from "../services/ShoppingCartUtil";
-
+import {
+    getShoppingCartCount,
+    getShoppingCartPrice,
+    ShoppingCartList
+} from "../services/ShoppingCartUtil";
 
 
 class Order extends Component {
@@ -56,7 +59,7 @@ class Order extends Component {
             this.state = this.unchangedState = {...this.state, ...this.user};
             this.passwordState = {password: this.user.password, passwordRepeat: this.user.password};
         }
-        window.scrollTo(0,0);
+        window.scrollTo(0, 0);
     }
 
     render() {
@@ -97,30 +100,32 @@ class Order extends Component {
                                                 <ShoppingCartList
                                                     update={() => this.forceUpdate()}
                                                     showChangeCount={false}
-                                                shoppingCart={undefined}/>
+                                                    shoppingCart={undefined}/>
                                                 <hr/>
                                             </Grid>
                                             <Grid item xs={12}>
-                                                <Grid container ref={element => this.scrollHelper.third = element}
+                                                <Grid container
+                                                      ref={element => this.scrollHelper.third = element}
                                                       wrap={"wrap-reverse"}
                                                       direction="row"
                                                       justify="flex-end"
                                                       spacing={3}>
                                                     <Grid item>
-                                                        <div style={padding(0,90,0,0)}>
+                                                        <div style={padding(0, 90, 0, 0)}>
                                                             <b>Artikel</b> ({getShoppingCartCount()} Stk.): {parseFloat((getShoppingCartPrice()).toString()).toFixed(2)} €
                                                         </div>
                                                     </Grid>
                                                 </Grid>
                                             </Grid>
                                             <Grid item xs={12}>
-                                                <Grid container ref={element => this.scrollHelper.third = element}
+                                                <Grid container
+                                                      ref={element => this.scrollHelper.third = element}
                                                       wrap={"wrap-reverse"}
                                                       direction="row"
                                                       justify="flex-end"
                                                       spacing={3}>
                                                     <Grid item>
-                                                        <div style={padding(0,90,0,0)}>
+                                                        <div style={padding(0, 90, 0, 0)}>
                                                             zzgl. Versand 5.99 €
                                                         </div>
                                                     </Grid>
@@ -128,13 +133,14 @@ class Order extends Component {
                                                 <Grid item fullWidth>
                                                     <hr/>
                                                 </Grid>
-                                                <Grid container ref={element => this.scrollHelper.third = element}
+                                                <Grid container
+                                                      ref={element => this.scrollHelper.third = element}
                                                       wrap={"wrap-reverse"}
                                                       direction="row"
                                                       justify="flex-end"
                                                       spacing={3}>
                                                     <Grid item>
-                                                        <div style={padding(0,90,0,0)}>
+                                                        <div style={padding(0, 90, 0, 0)}>
                                                             <b>Gesamtpreis</b> {parseFloat((parseFloat(getShoppingCartPrice()) + 5.99).toString()).toFixed(2)} €
                                                         </div>
                                                     </Grid>
@@ -333,7 +339,8 @@ class Order extends Component {
             this.forceUpdate()
     }
 }
-function ContinueButton(){
+
+function ContinueButton() {
     const history = useHistory();
     let continueToPayment = () => {
         history.push("/payment")
@@ -345,10 +352,10 @@ function ContinueButton(){
             variant="contained"
             color="primary"
             onClick={() => {
-                checkUserAddress(()=>{
+                checkUserAddress(() => {
                     continueToPayment()
-                }, ()=>{
-                    showToast('Bitte überprüfen Sie Ihre Eingaben','error')
+                }, () => {
+                    showToast('Bitte überprüfen Sie Ihre Eingaben', 'error')
                 })
             }
             }>
@@ -356,20 +363,22 @@ function ContinueButton(){
         </Button>
     )
 }
-function checkUserAddress(onSuccess, onFail){
+
+function checkUserAddress(onSuccess, onFail) {
     let user = getSessionUser()
-        if( user.town === '' || user.town === undefined ||
-            user.firstName ==='' || user.firstName === undefined ||
-            user.lastName ==='' || user.lastName=== undefined ||
-            user.postalCode ==='' || user.postalCode === undefined ||
-            user.street === '' || user.street === undefined ||
-            user.title === '' || user.title === undefined){
-                onFail()
-        }else{
-                onSuccess()
-        }
+    if (user.town === '' || user.town === undefined ||
+        user.firstName === '' || user.firstName === undefined ||
+        user.lastName === '' || user.lastName === undefined ||
+        user.postalCode === '' || user.postalCode === undefined ||
+        user.street === '' || user.street === undefined ||
+        user.title === '' || user.title === undefined) {
+        onFail()
+    } else {
+        onSuccess()
+    }
 }
-function BackButton(){
+
+function BackButton() {
     const history = useHistory();
     let backToShoppingCart = () => {
         history.push("/shoppingcart")
@@ -387,6 +396,7 @@ function BackButton(){
         </Button>
     )
 }
+
 function ModeButtons(props) {
     let that = props.context;
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);

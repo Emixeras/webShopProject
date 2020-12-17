@@ -15,6 +15,9 @@ import CardContent from "@material-ui/core/CardContent";
 import axios from "axios";
 import {base64ToDataUri, renameObjectKey} from "../Utilities/TsUtilities";
 
+/**
+ * The main Component of GenreOverview.js
+ */
 class GenreOverview extends Component {
 
     constructor(props, context) {

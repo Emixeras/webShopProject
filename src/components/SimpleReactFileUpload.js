@@ -3,6 +3,9 @@ import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 
 
+/**
+ * The main Component of SimpleReactFileUpload.js
+ */
 class SimpleReactFileUpload extends React.Component {
 
     inputRef;

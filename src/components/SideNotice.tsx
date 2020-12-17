@@ -11,6 +11,9 @@ interface SideNotice_state {
 
 }
 
+/**
+ * The main Component of SideNotice.js
+ */
 export default class SideNotice extends React.Component<SideNotice_props, SideNotice_state>{
     render() {
         return (

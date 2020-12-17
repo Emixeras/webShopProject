@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 
 /**
  * Returns an object of all the supported titles
- * @return {({label: string, value: string}|{label: string, value: string}|{label: string, value: string}|{label: string, value: string}|{label: string, value: string})[]}
  */
 export function titles() {
     return (

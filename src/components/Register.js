@@ -22,6 +22,9 @@ import {useHistory} from "react-router-dom";
 import {isUserLoggedIn} from "../services/StorageUtil";
 import {setRememberMe} from "../services/RememberMeUtil";
 
+/**
+ * The main Component of Register.js
+ */
 class Register extends Component {
 
     showPassword = false;

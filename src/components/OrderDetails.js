@@ -19,6 +19,9 @@ import {formatDate, matchParent} from "../Utilities/TsUtilities";
 import PrintIcon from '@material-ui/icons/Print';
 
 
+/**
+ * The main Component of OrderDetails.js
+ */
 export default class OrderDetails extends Component {
     user = {};
     shoppingCart = {}
@@ -40,10 +43,10 @@ export default class OrderDetails extends Component {
             paymentMethod: payload.order.payment,
         };
 
-        this.state.shoppingCart.map((item) =>{
-                this.state.totalPriceWithoutShipping=this.state.totalPriceWithoutShipping+(parseFloat(item.count).toFixed(2)*parseFloat(item.article.price).toFixed(2))
-            this.state.totalItemCount = this.state.totalItemCount + (item.count);
-        }
+        this.state.shoppingCart.map((item) => {
+                this.state.totalPriceWithoutShipping = this.state.totalPriceWithoutShipping + (parseFloat(item.count).toFixed(2) * parseFloat(item.article.price).toFixed(2))
+                this.state.totalItemCount = this.state.totalItemCount + (item.count);
+            }
         );
 
         window.scrollTo(0, 0);
@@ -77,7 +80,8 @@ export default class OrderDetails extends Component {
                                                 marginBottom: 3,
                                                 color: "white"
                                             }} className={"black-on-print"}>
-                                                Ihre Bestellung (id: {this.state.id}) vom {formatDate(this.state.orderDate, true)} Uhr
+                                                Ihre Bestellung (id: {this.state.id})
+                                                vom {formatDate(this.state.orderDate, true)} Uhr
                                             </div>
                                         </Grid>
                                     </Grid>
@@ -148,7 +152,7 @@ export default class OrderDetails extends Component {
                                                 <ShoppingCartList
                                                     update={() => this.forceUpdate()}
                                                     showChangeCount={false}
-                                                    shoppingCart = {this.state.shoppingCart}
+                                                    shoppingCart={this.state.shoppingCart}
                                                 />
                                                 <hr className={"orderDetail-divider"}/>
                                             </Grid>
@@ -159,7 +163,8 @@ export default class OrderDetails extends Component {
                                                       justify="flex-end"
                                                       spacing={3}>
                                                     <Grid item>
-                                                        <div className={"orderDetail-paddingRight"} style={padding(0,90,0,0)}>
+                                                        <div className={"orderDetail-paddingRight"}
+                                                             style={padding(0, 90, 0, 0)}>
                                                             <b>Artikel</b> ({this.state.totalItemCount} Stk.): {this.state.totalPriceWithoutShipping.toFixed(2)} €
                                                         </div>
                                                     </Grid>
@@ -172,7 +177,8 @@ export default class OrderDetails extends Component {
                                                       justify="flex-end"
                                                       spacing={3}>
                                                     <Grid item>
-                                                        <div className={"orderDetail-paddingRight"} style={padding(0,90,0,0)}>
+                                                        <div className={"orderDetail-paddingRight"}
+                                                             style={padding(0, 90, 0, 0)}>
                                                             zzgl. Versand 5.99 €
                                                         </div>
                                                     </Grid>
@@ -186,7 +192,8 @@ export default class OrderDetails extends Component {
                                                       justify="flex-end"
                                                       spacing={3}>
                                                     <Grid item>
-                                                        <div className={"orderDetail-paddingRight"} style={padding(0,90,0,0)}>
+                                                        <div className={"orderDetail-paddingRight"}
+                                                             style={padding(0, 90, 0, 0)}>
                                                             <b>Gesamtpreis</b> {(this.state.totalPriceWithoutShipping + 5.99).toFixed(2)} €
                                                         </div>
                                                     </Grid>
@@ -197,8 +204,13 @@ export default class OrderDetails extends Component {
                                 </Card>
                             </Grid>
                             <Grid item xs={12}>
-                                <div style={{display: "flex", justifyContent: "flex-end", ...matchParent(false, true)}}>
-                                    <Button onClick={event => window.print()} variant={"contained"} color={"primary"} startIcon={<PrintIcon/>} className={"no-print"}>
+                                <div style={{
+                                    display: "flex",
+                                    justifyContent: "flex-end", ...matchParent(false, true)
+                                }}>
+                                    <Button onClick={event => window.print()} variant={"contained"}
+                                            color={"primary"} startIcon={<PrintIcon/>}
+                                            className={"no-print"}>
                                         Drucken
                                     </Button>
                                 </div>
@@ -222,6 +234,7 @@ export default class OrderDetails extends Component {
                 window.scrollBy(0, this.scrollHelper.third.getBoundingClientRect().top - this.scrollHelper.second)
         }
     }
+
     handleChange = event => this.setState({title: event.target.value.trim()});
 
 }
