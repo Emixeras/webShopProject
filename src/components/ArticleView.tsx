@@ -5,7 +5,7 @@ import {isMobile, padding, showToast} from "../Utilities/Utilities";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 import {
     alignCenter,
-    Article,
+    Article, base64ToDataUri,
     ContextType,
     hasCurrentUserRoleLevel,
     LazyImage,
@@ -88,7 +88,11 @@ class ArticleView extends React.Component<ArticleView_props, ArticleView_state> 
                                             rounded
                                             alt={this.article.title}
                                             getSrc={setImgSrc => {
-                                                loadSingleImage("article", this.article.id, setImgSrc)
+                                                if (this.isDetails) {
+                                                    if (this.article.picture)
+                                                        setImgSrc(base64ToDataUri(this.article.picture))
+                                                } else
+                                                    loadSingleImage("article", this.article.id, setImgSrc)
                                             }}
                                         />
                                     </Grid>
