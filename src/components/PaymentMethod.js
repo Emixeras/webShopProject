@@ -20,6 +20,9 @@ import FormLabel from '@material-ui/core/FormLabel';
 import {useHistory} from "react-router-dom";
 
 
+/**
+ * The main Component of PaymentMethod.js
+ */
 class PaymentMethod extends Component {
 
     user = {};
@@ -100,10 +103,12 @@ class PaymentMethod extends Component {
                 window.scrollBy(0, this.scrollHelper.third.getBoundingClientRect().top - this.scrollHelper.second)
         }
     }
+
     handleChange = event => this.setState({title: event.target.value.trim()});
 
 }
-function BackButton(){
+
+function BackButton() {
     const history = useHistory();
     let backToShoppingCart = () => {
         history.push("/placeorder")
@@ -121,7 +126,8 @@ function BackButton(){
         </Button>
     )
 }
-function ContinueButton(){
+
+function ContinueButton() {
     const history = useHistory();
     let continueToSummary = () => {
         history.push("/ordersummary")
@@ -140,6 +146,7 @@ function ContinueButton(){
         </Button>
     )
 }
+
 function RadioButtonsGroup() {
     const [value, setValue] = React.useState('female');
 
@@ -152,11 +159,14 @@ function RadioButtonsGroup() {
         <FormControl component="fieldset">
             <FormLabel component="legend"/>
             <RadioGroup aria-label="gender" name="gender1" value={value} onChange={handleChange}>
-                <FormControlLabel value="VORKASSE" control={<Radio />} label="Vorkasse" checked={localStorage.getItem('paymentmethod')==='VORKASSE'}/>
-                <FormControlLabel value="RECHNUNG" control={<Radio />} label="Rechnung" checked={localStorage.getItem('paymentmethod')==='RECHNUNG'}/>
-                <FormControlLabel value="KREDITKARTE" disabled control={<Radio />} label="(Kreditkarte)" />
-                <FormControlLabel value="PAYPAL" disabled control={<Radio />} label="(Paypal)" />
-                <FormControlLabel value="BITCOINS" disabled control={<Radio />} label="(Bitcoins)" />
+                <FormControlLabel value="VORKASSE" control={<Radio/>} label="Vorkasse"
+                                  checked={localStorage.getItem('paymentmethod') === 'VORKASSE'}/>
+                <FormControlLabel value="RECHNUNG" control={<Radio/>} label="Rechnung"
+                                  checked={localStorage.getItem('paymentmethod') === 'RECHNUNG'}/>
+                <FormControlLabel value="KREDITKARTE" disabled control={<Radio/>}
+                                  label="(Kreditkarte)"/>
+                <FormControlLabel value="PAYPAL" disabled control={<Radio/>} label="(Paypal)"/>
+                <FormControlLabel value="BITCOINS" disabled control={<Radio/>} label="(Bitcoins)"/>
             </RadioGroup>
         </FormControl>
     );

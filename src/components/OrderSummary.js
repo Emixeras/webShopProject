@@ -24,6 +24,9 @@ import {
 import {placeOrder} from "../services/OrderApiUtil";
 
 
+/**
+ * The main Component of OrderSummary.js
+ */
 class OrderSummary extends Component {
 
     user = {};
@@ -115,7 +118,7 @@ class OrderSummary extends Component {
                                                 <ShoppingCartList
                                                     update={() => this.forceUpdate()}
                                                     showChangeCount={false}
-                                                    shoppingcart = {undefined}
+                                                    shoppingcart={undefined}
                                                 />
                                                 <hr/>
                                             </Grid>
@@ -126,7 +129,7 @@ class OrderSummary extends Component {
                                                       justify="flex-end"
                                                       spacing={3}>
                                                     <Grid item>
-                                                        <div style={padding(0,90,0,0)}>
+                                                        <div style={padding(0, 90, 0, 0)}>
                                                             <b>Artikel</b> ({getShoppingCartCount()} Stk.): {parseFloat((getShoppingCartPrice()).toString()).toFixed(2)} €
                                                         </div>
                                                     </Grid>
@@ -139,7 +142,7 @@ class OrderSummary extends Component {
                                                       justify="flex-end"
                                                       spacing={3}>
                                                     <Grid item>
-                                                        <div style={padding(0,90,0,0)}>
+                                                        <div style={padding(0, 90, 0, 0)}>
                                                             zzgl. Versand 5.99 €
                                                         </div>
                                                     </Grid>
@@ -153,7 +156,7 @@ class OrderSummary extends Component {
                                                       justify="flex-end"
                                                       spacing={3}>
                                                     <Grid item>
-                                                        <div style={padding(0,90,0,0)}>
+                                                        <div style={padding(0, 90, 0, 0)}>
                                                             <b>Gesamtpreis</b> {parseFloat((parseFloat(getShoppingCartPrice()) + 5.99).toString()).toFixed(2)} €
                                                         </div>
                                                     </Grid>
@@ -196,16 +199,19 @@ class OrderSummary extends Component {
                 window.scrollBy(0, this.scrollHelper.third.getBoundingClientRect().top - this.scrollHelper.second)
         }
     }
+
     handleChange = event => this.setState({title: event.target.value.trim()});
 
 }
-function OrderSummaryComponent(){
 
-    return(
+function OrderSummaryComponent() {
+
+    return (
         <div></div>
     )
 }
-function BackButton(){
+
+function BackButton() {
     const history = useHistory();
     let backToPayment = () => {
         history.push("/payment")
@@ -223,7 +229,8 @@ function BackButton(){
         </Button>
     )
 }
-function ContinueButton(){
+
+function ContinueButton() {
     const history = useHistory();
     let continueToComplete = () => {
         let payload = {
@@ -231,11 +238,11 @@ function ContinueButton(){
             "paymentMethod": localStorage.getItem('paymentmethod'),
             "shipping": 5.99,
         };
-        placeOrder(payload, ()=>{
+        placeOrder(payload, () => {
             history.push("/ordercomplete")
             showToast("Bestellung erfolgreich aufgegeben", "success")
             clearShoppingCart()
-        },()=>showToast("Bestellung fehlgeschlagen", "error"))
+        }, () => showToast("Bestellung fehlgeschlagen", "error"))
     };
 
     return (

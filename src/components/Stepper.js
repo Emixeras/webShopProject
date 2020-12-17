@@ -24,6 +24,9 @@ function getSteps() {
 }
 
 
+/**
+ * The main Component of Stepper.js
+ */
 export default function HorizontalLabelPositionBelowStepper(props) {
     const index = props.index;
     const classes = useStyles();
