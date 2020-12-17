@@ -21,7 +21,6 @@ class SimpleReactFileUpload extends React.Component {
         if (this.props.setDefaultVisibility) {
             this.props.setDefaultVisibility(visibility => this.setState({defaultVisibility: visibility}))
         }
-        this.onClickHandler = this.onClickHandler.bind(this);
     }
 
     /**
