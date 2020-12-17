@@ -25,6 +25,9 @@ import {
     RETURN_MODE
 } from "../Utilities/TsUtilities";
 
+/**
+ * The main Component of ArtistOverview.js
+ */
 class ArtistOverview extends Component {
 
     constructor(props, context) {
@@ -73,6 +76,10 @@ class ArtistOverview extends Component {
 
 let artistResponseArray = [];
 
+/**
+ * Component to show the artist
+ * @returns {JSX.Element}
+ */
 function Artist() {
     const classes = useStyles();
     return (
@@ -90,6 +97,10 @@ function Artist() {
     );
 }
 
+/**
+ * @param artistResponse an object that represent an artist with more information
+ * @returns {JSX.Element}
+ */
 function ArtistComponent({artistResponse}) {
     const classes = useStyles();
 
