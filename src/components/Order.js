@@ -23,7 +23,9 @@ import {useHistory} from "react-router-dom";
 import {getShoppingCartCount, getShoppingCartPrice, ShoppingCartList} from "../services/ShoppingCartUtil";
 
 
-
+/**
+ * The main Component of Order.js
+ */
 class Order extends Component {
     showPassword = false;
     passwordError = false;
@@ -333,6 +335,11 @@ class Order extends Component {
             this.forceUpdate()
     }
 }
+
+/**
+ * The function forwards to the payment page
+ * @returns {JSX.Element}
+ */
 function ContinueButton(){
     const history = useHistory();
     let continueToPayment = () => {
@@ -356,6 +363,12 @@ function ContinueButton(){
         </Button>
     )
 }
+
+/**
+ * The function checks the userAdress
+ * @param onSuccess is a boolean
+ * @param onFail is a boolean
+ */
 function checkUserAddress(onSuccess, onFail){
     let user = getSessionUser()
         if( user.town === '' || user.town === undefined ||
@@ -369,6 +382,11 @@ function checkUserAddress(onSuccess, onFail){
                 onSuccess()
         }
 }
+
+/**
+ * The function forwards to the shoppingcart page
+ * @returns {JSX.Element}
+ */
 function BackButton(){
     const history = useHistory();
     let backToShoppingCart = () => {
@@ -387,6 +405,12 @@ function BackButton(){
         </Button>
     )
 }
+
+/**
+ * The
+ * @param props
+ * @returns {JSX.Element}
+ */
 function ModeButtons(props) {
     let that = props.context;
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
