@@ -26,7 +26,9 @@ interface ArticleView_props {
 interface ArticleView_state {
 }
 
-
+/**
+ * The main Component of ArticleView.tsx
+ */
 class ArticleView extends React.Component<ArticleView_props, ArticleView_state> {
 
     article: Article;
