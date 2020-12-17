@@ -4,6 +4,14 @@ import {showToast} from "../Utilities/Utilities";
 
 const apiBaseUrlUpdateArticle = `http://${window.location.hostname}:8080/article/`;
 
+
+/**
+ * Nimmt die neuen Daten und pusht sie auf die DB
+ * @param metaDataPayload neue Metadaten
+ * @param pictureFile neues Bild
+ * @param onSuccess Callback when the request was successful
+ * @param onFail Callback when the request failed
+ */
 export const createNewArticle = (metaDataPayload, pictureFile, onSuccess, onFail) => {
     var user = getSessionUser();
     const formData = new FormData();
@@ -36,6 +44,13 @@ export const createNewArticle = (metaDataPayload, pictureFile, onSuccess, onFail
         });
 };
 
+/**
+ * Nimmt die bestehenden und neuen Daten des alten Artikels und pusht sie auf die DB
+ * @param metaDataPayload neue Metadaten
+ * @param pictureFile neues Bild
+ * @param onSuccess Callback when the request was successful
+ * @param onFail Callback when the request failed
+ */
 export const updateArticle = (metaDataPayload, pictureFile, onSuccess, onFail) => {
     var user = getSessionUser();
     if (!user) {
@@ -71,6 +86,12 @@ export const updateArticle = (metaDataPayload, pictureFile, onSuccess, onFail) =
                 onFail(error);
         });
 };
+
+/**
+ * @param {number} id
+ * @param onSuccess Callback when the request was successful
+ * @param onFail Callback when the request failed
+ */
 
 export const deleteArticle = (id, onSuccess, onFail) => {
     var user = getSessionUser();

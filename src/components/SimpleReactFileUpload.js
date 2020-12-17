@@ -1,6 +1,4 @@
 import React from 'react'
-import {updateArticle} from "../services/ItemApiUtil";
-import {showToast} from "../Utilities/Utilities";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 
@@ -23,6 +21,10 @@ class SimpleReactFileUpload extends React.Component {
         this.onClickHandler = this.onClickHandler.bind(this);
     }
 
+    /**
+     * Drag and Drop Handlerfunktion
+     * @param event
+     */
     onDrop = event => {
         event.stopPropagation();
         event.preventDefault();
@@ -41,28 +43,6 @@ class SimpleReactFileUpload extends React.Component {
                 loaded: 0,
             })
         }
-    };
-    onClickHandler = () => {
-        var payload = {
-            "artists": {
-                "id": 2,
-                "name": "Britney Spears"
-            },
-            "description": "Fusce consequat.",
-            "ean": 2967861,
-            "genre": {
-                "id": 14,
-                "name": "Techno"
-            },
-            "id": 2,
-            "price": 38.44,
-            "title": "Graham, Beahan and Jacobs"
-        };
-        updateArticle(payload, this.state.selectedFile, () => {
-            showToast('Artikel wurde erfolgreich erstellt', "success");
-        }, (error) => {
-            showToast('Artikel erstellen fehlgeschlagen: ' + error.message, "error");
-        })
     };
 
     render() {
