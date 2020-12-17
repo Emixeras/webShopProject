@@ -22,6 +22,9 @@ interface ShoppingCart_props {
 interface ShoppingCart_state {
 }
 
+/**
+ * The main Component of ShoppingCart.tsx
+ */
 class ShoppingCart extends React.Component<ShoppingCart_props, ShoppingCart_state> {
 
     constructor(props: ShoppingCart_props, context: any) {
@@ -118,7 +121,7 @@ class ShoppingCart extends React.Component<ShoppingCart_props, ShoppingCart_stat
 }
 
 /**
- *
+ *Component to render a payment button to continue the payment process
  * @return {JSX.Element} paymentButton
  */
 function GoToOrder(){
@@ -139,7 +142,7 @@ function GoToOrder(){
 }
 
 /**
- *
+ *Component to render a clear butten to delete all article in the shoppingcart
  * @param {shoppingCart} context
  * @return {JSX.Element} emptyShoppingcartButton
  */
